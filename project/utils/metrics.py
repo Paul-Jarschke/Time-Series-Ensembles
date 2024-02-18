@@ -11,7 +11,16 @@ def rmse(predictions, targets):
     Returns:
         float: RMSE value.
     """
-    return np.sqrt(((predictions - targets) ** 2).mean())
+
+    # Convert input arrays to numpy arrays to ensure compatibility
+    predictions = np.array(predictions)
+    targets = np.array(targets)
+
+    # Calcucalute root mean squared error
+    rmse = np.sqrt(((predictions - targets) ** 2).mean())
+
+    return rmse
+
 
 def mape(predictions, targets):
     """
