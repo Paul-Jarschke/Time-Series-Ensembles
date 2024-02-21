@@ -4,7 +4,7 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-
+# Define a custom class for SARIMAX simulation, extending functionality from statsmodels' SARIMAX class.
 class SARIMAX_Simulation(sm.tsa.SARIMAX):
     def __init__(self, order, nsimulations=None, start=None, end=None, trend=False, 
                  seasonal_order=None, trend_value=None, ar_coefs=None, ma_coefs=None,
@@ -19,6 +19,8 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
         # Convert start and end dates to datetime objects
         self.start = datetime.strptime(start, "%m/%Y")
         self.end = datetime.strptime(end, "%m/%Y")
+        
+        # Generate an array of months between start and end dates
         self.months = np.array(pd.period_range(start=self.start, end=self.end, freq='M'))
         
         # Concatenate exogenous variables if provided as a list
@@ -37,11 +39,16 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
         self.upper_bound = upper_bound
         self.trend_binary = trend
         
+        # Initialize endogenous dataset
         empty_dataset = np.zeros(self.nsimulations)
         endog = empty_dataset
     
         # Determine trend choice
-        trend_choice = 'c' if self.trend_binary else None
+        if self.trend_binary:
+            trend_choice = 'c'  
+        else:
+            trend_choice = None
+            trend_value = None
             
         # Adjust coefficients based on provided orders
         if seasonal_order[0] == 0:
@@ -56,7 +63,12 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
             
         # Create a list of parameters for SARIMAX model
         param_list = [trend_value, exog_coefs, ar_coefs, ma_coefs, sar_coefs, sma_coefs, shock_sigma2]
-        self.params = [param for param in param_list if param is not None]
+        self.params = []
+        for param in param_list: 
+            if param is not None:
+                if isinstance(param, int) or isinstance(param, float):
+                    param = [param]
+                self.params += param
                   
         # Initialize SARIMAX model with specified parameters
         super().__init__(endog=endog, order=order, seasonal_order=seasonal_order,
@@ -64,8 +76,9 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
         
         # Validate parameter count
         if len(self.params) != len(self.param_names):  
-            raise ValueError(f"Parameters are not correctly defined. Expected {len(self.param_names)} parameters, but provided {len(self.params)}.")
+            raise ValueError(f"Parameters are not correctly defined. Expected {len(self.param_names)} parameters, but provided {len(self.params)}. Check that you have defined all of {self.param_names}.")
     
+    # Define a custom Series class for Simulated Series
     class SimulatedSeries(pd.Series):
         def __init__(self, series, seed, order, seasonal_order, trend, exog):
             super().__init__(data=series)
@@ -90,20 +103,22 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
     
             # Adjust plot title based on model components
             self.plot_title += f"{'X' if self.nexog > 0 else ''}{self.order}"
-            if not all(x == 0 for x in self.seasonal_order):
+            if not all(x == 0 for x in self.seasonal_order[:3]):
                 self.plot_title = f"S{self.plot_title}{self.seasonal_label}"
             
             if self.trend:
-                self.plot_title += f" with trend{' and' if self.nexog > 0 else ''}"
-            if self.nexog > 0:
-                self.plot_title += f" {self.nexog} exogenous variables"
+                self.plot_title = self.plot_title + " with trend"
+                if self.nexog > 0:
+                    self.plot_title = self.plot_title + f" and {self.nexog} exogenous variables"
+            elif self.nexog > 0:
+                    self.plot_title = self.plot_title + f" with {self.nexog} exogenous variables"
             
             # Generate the plot
             plt.figure(figsize=(6, 5))
             plt.suptitle(title, size=16, y=0.98)
             plt.title(f"{self.plot_title}", size=14)
             freq = 12
-            xticks_positions = np.arange(0, len(self.series), freq) 
+            xticks_positions = np.arange(0, len(self.series), freq*2) 
             plt.xticks(ticks=xticks_positions, rotation=45)
             plt.xlabel("Time")
             plt.ylabel("Price")
