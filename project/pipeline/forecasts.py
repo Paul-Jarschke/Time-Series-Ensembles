@@ -5,6 +5,14 @@ import numpy as np
 print(models)
 
 
+# vorübergehend ist Datenimport + Preprocessing noch in diesem Fail, wird dann aber irgendwann outgesourced
+# für die Modelle müssen preprocessede Daten folgendes Format haben:
+# Target heißt "y"
+# Covariates heißen "x1", "x2", "x.."
+# "Date Spalte beinhaltet Zeitindex im Format DD-MM-YYYY"
+
+
+
 # Define the directory path and file name
 sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/data/simulations/'
 file_name = 'noisy_simdata.csv'
