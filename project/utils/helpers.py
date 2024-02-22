@@ -49,9 +49,6 @@ def prepare_eurusd_data(data, n=1000):
     # Select the first n rows
     df = data.head(n)
 
-    # Get length of current DataFrame
-    print(f'Number of rows: {len(df)}')
-
     # Save datetime column
     dates = df['datetime']
 
