@@ -17,8 +17,8 @@ def timeseries_to_array(timeseries, pop=True):
     """
     
     # Convert to list
-    values = list(timeseries.values())  # Flatten is not necessary since values are already lists
-
+    values = list(timeseries.values().flatten())
+    
     # Pop last element to match length of validation/test set
     if pop:
         values.pop()
