@@ -161,7 +161,3 @@ noisy_df.index = pd.PeriodIndex(noisy_df.index, freq = "M").to_timestamp().strft
 
 filename = f'noisy_simdata.csv'
 noisy_df.to_csv(os.path.join(sim_dir, filename))
-
-
-
-noisy_series[0].plot()
