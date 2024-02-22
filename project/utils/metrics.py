@@ -1,5 +1,7 @@
 import numpy as np
 
+print('Loading metrics...')
+
 def rmse(predictions, targets):
     """
     Calculate the Root Mean Squared Error (RMSE) between predicted values and targets.
