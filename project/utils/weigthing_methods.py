@@ -1,6 +1,7 @@
 import numpy as np
 from metrics import rmse
 
+print(rmse([1,2,3], [2,3,4]))
 
 def simple_average(data):
     """
