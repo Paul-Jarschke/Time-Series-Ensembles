@@ -31,7 +31,7 @@ ens_train_split = 0.3
 end_ens_training = int(ens_train_split*n_predictions) # At this period ensemble training ends end ensemble forecast is produced for end_ens_training + 1
 
 # Set Up Ensemble Forecast Dataset
-ensemble_predictions = pd.DataFrame(columns = ["Date", "fc_Ensemble_Simple", "fc_Ensemble_RSME", "fc_Ensemble_Variance", "fc_Ensemble_ErrorCorrelation", "fc_Ensemble_Metamodel_SVR", "fc_Ensemble_RandomForest"])
+ensemble_predictions = pd.DataFrame(columns = ["Date", "Ensemble_Simple", "Ensemble_RSME", "Ensemble_Variance", "Ensemble_ErrorCorrelation", "Ensemble_Metamodel_SVR", "Ensemble_RandomForest"])
 
 
 for i, fc_period in enumerate(range(end_ens_training, n_predictions)):
@@ -70,4 +70,4 @@ print("...finished!")
 
 # Because training takes so long, interim results are (for now) exported as csv to work further on pipeline; makes debugging easier
 export_path = sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
-predictions.to_csv(os.path.join(export_path, f"full_predictions.csv"), index=True)
+full_predictions.to_csv(os.path.join(export_path, f"full_predictions.csv"), index=True)
