@@ -1,4 +1,5 @@
 from darts import TimeSeries
+import pandas as pd
 
 # Run Check
 print('Loading helper functions...')
@@ -99,9 +100,6 @@ def train_test_split(series, train_split=0.3):
 
 
 # Transform pandas object to darts TimeSeries format
-from darts import TimeSeries
-import pandas as pd
-
 def transform_to_darts_format(pandas_object):
     pandas_object_copy = pandas_object.copy() # otherwise it changes the index globally
     pandas_object_copy.index = pandas_object_copy.index.to_timestamp()
