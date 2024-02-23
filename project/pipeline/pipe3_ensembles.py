@@ -23,34 +23,34 @@ print(predictions)
 # Ensemble Train Split
 n_predictions = predictions.shape[0]
 ens_train_split = 0.3
-end_training = int(ens_train_split*n_predictions) - 1 # At this period (index!) ensemble training ends end ensemble forecast is produced for end_training + 1
+end_ens_training = int(ens_train_split*n_predictions) # At this period ensemble training ends end ensemble forecast is produced for end_ens_training + 1
 
 # Set Up Ensemble Forecast Dataset
-ensemble_fc_data = pd.DataFrame(columns = ["Date", "fc_Ensemble_Simple", "fc_Ensemble_RSME", "fc_Ensemble_Variance", "fc_Ensemble_ErrorCorrelation", "fc_Ensemble_Metamodel_SVR", "fc_Ensemble_RandomForest"])
+ensemble_predictions = pd.DataFrame(columns = ["Date", "fc_Ensemble_Simple", "fc_Ensemble_RSME", "fc_Ensemble_Variance", "fc_Ensemble_ErrorCorrelation", "fc_Ensemble_Metamodel_SVR", "fc_Ensemble_RandomForest"])
 
 
-
-for fc_period in range(end_training+1, n_predictions):
-    print(fc_period)
-    # Periode die vorgecastet wird = fc_period
-    ensemble_forecasts = []
+for i, fc_period in enumerate(range(end_ens_training, n_predictions)):
+    if i+1 == 1 or i==(n_predictions-end_ens_training) or (i+1) % 10 == 0:
+        print(f'Ensemble forecast {i+1} / {n_predictions-end_ens_training}')
+    # Periode an der vorgecastet wird = fc_period
+    current_ensemble_predictions = []
     current_train = predictions.iloc[0:fc_period,]
-    print(len(current_train))
 
-    individual_fc_next = predictions.iloc[fc_period:fc_period+1,]
-    #print(individual_fc_next)
-    ensemble_forecasts.append(predictions.index[fc_period])
-    #print(simple_average(individual_fc_next))
-    ensemble_forecasts.append(float(simple_average(individual_fc_next)))
-    ensemble_forecasts.append(float(ensemble_predictions_given_weights(individual_fc_next, compute_rmse_weights(current_train)))) 
-    ensemble_forecasts.append(float(ensemble_predictions_given_weights(individual_fc_next, compute_variance_weights(current_train))))
-    ensemble_forecasts.append(float(ensemble_predictions_given_weights(individual_fc_next, compute_error_correlation_weights(current_train,verbose = False))))
-    ensemble_forecasts.append(float(metamodel_svr(current_train, individual_fc_next)))      
-    ensemble_forecasts.append(float(metamodel_random_forest(current_train, individual_fc_next)))
-    #print(ensemble_forecasts)
-    #print(type(ensemble_forecasts))
-    #test = pd.DataFrame(ensemble_forecasts)
-    ensemble_fc_data.loc[len(ensemble_fc_data)] = ensemble_forecasts
-    #ensemble_fc_data = pd.concat([ensemble_fc_data, test], axis = 0)
-    
-print(ensemble_fc_data)
+    individual_preds_next = predictions.iloc[fc_period:fc_period+1,]
+
+    current_ensemble_predictions.append(predictions.index[fc_period])
+
+    current_ensemble_predictions.append(float(simple_average(individual_preds_next)))
+    current_ensemble_predictions.append(float(ensemble_predictions_given_weights(individual_preds_next, compute_rmse_weights(current_train)))) 
+    current_ensemble_predictions.append(float(ensemble_predictions_given_weights(individual_preds_next, compute_variance_weights(current_train))))
+    current_ensemble_predictions.append(float(ensemble_predictions_given_weights(individual_preds_next, compute_error_correlation_weights(current_train,verbose = False))))
+    current_ensemble_predictions.append(float(metamodel_svr(current_train, individual_preds_next)))      
+    current_ensemble_predictions.append(float(metamodel_random_forest(current_train, individual_preds_next)))
+
+    ensemble_predictions.loc[len(ensemble_predictions)] = current_ensemble_predictions
+        
+print(ensemble_predictions)
+print("...finished!")
+
+# Missing:
+# - append to normal forecasts
