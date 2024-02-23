@@ -5,7 +5,7 @@ import pandas as pd
 print('Loading helper functions...')
 
 
-def timeseries_to_array(timeseries, pop=True):
+def timeseries_to_array(timeseries, pop=False):
     """
     Convert a dictionary of time series data into a flattened array.
 
