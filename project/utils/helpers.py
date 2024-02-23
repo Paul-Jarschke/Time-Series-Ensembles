@@ -1,10 +1,11 @@
 from darts import TimeSeries
+import pandas as pd
 
 # Run Check
 print('Loading helper functions...')
 
 
-def timeseries_to_array(timeseries, pop=True):
+def timeseries_to_array(timeseries, pop=False):
     """
     Convert a dictionary of time series data into a flattened array.
 
@@ -96,4 +97,3 @@ def train_test_split(series, train_split=0.3):
     train, val = series[:train_size], series[train_size:]
 
     return train, val
-
