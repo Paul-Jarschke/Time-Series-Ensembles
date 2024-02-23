@@ -17,6 +17,8 @@ warnings.filterwarnings('ignore')
 
 
 
+# Input: preprocessed data (generic format)
+
 # Define the directory path and file name
 sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/data/simulations/'
 file_name = 'noisy_simdata.csv'
@@ -123,13 +125,16 @@ for model_name, model in models.items():
     print("...finished!\n")
     predictions[model_name] = pred
 
-predictions.insert(0, "Actual", value=y_train_full[init_train_size:])    
+predictions.insert(0, "Target", value=y_train_full[init_train_size:])    
 print(predictions)
 
 # Because training takes so long, interim results are (for now) exported as csv to work on ensembles for pipeline
 export_path = sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
 predictions.to_csv(os.path.join(export_path, f"historical_forecasts.csv"), index=True)
 
+
+# Output: 
+# predictions
 
 
 # ToDos:

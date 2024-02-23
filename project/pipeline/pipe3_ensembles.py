@@ -1,6 +1,11 @@
+# Input: predictions from pipe2
+
+
+
 #from pipeline.pipe2_forecasts import predictions
 
 # for now CSV import; later: uncomment import from pipe2 (for debugging it takes to long to run full pipe for now)
+# bzw return von pipe2 Funktion hier als input nehmen
 
 import pandas as pd
 import numpy as np
@@ -10,8 +15,8 @@ from utils.ensembling_methods import *
 file_path = r'C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\project\interim_results\historical_forecasts.csv'
 
 # Import the CSV file into a DataFrame
-predictions = pd.read_csv(file_path, index_col='Date', delimiter=';').iloc[:,:-1]
-predictions.rename(columns={'Actual': 'Target'}, inplace=True)
+predictions = pd.read_csv(file_path, index_col='Date', delimiter=';').iloc[:,:-1] # later obsolete
+predictions.rename(columns={'Actual': 'Target'}, inplace=True) # later obsolete
 
 # Display the DataFrame
 print(predictions)
@@ -48,9 +53,17 @@ for i, fc_period in enumerate(range(end_ens_training, n_predictions)):
     current_ensemble_predictions.append(float(metamodel_random_forest(current_train, individual_preds_next)))
 
     ensemble_predictions.loc[len(ensemble_predictions)] = current_ensemble_predictions
-        
+    
+# Set "Date" column as index and drop it
+ensemble_predictions.set_index("Date", inplace=True)            
 print(ensemble_predictions)
+print("...ensemble predictions finished!")
+
+# Append to individual predictions:
+print("...merging...")
+full_predictions = ensemble_predictions.merge(predictions, left_index=True, right_index=True, how='left')
+print(full_predictions)
 print("...finished!")
 
-# Missing:
-# - append to normal forecasts
+# Output:
+# return full_predictions
