@@ -1,4 +1,7 @@
 import numpy as np
+from utils.metrics import rmse, mape
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
 
 print('Loading metrics...')
 
@@ -83,7 +86,7 @@ def compute_rmse_weights(data):
     # Extract target 
     target = data['Target']
     
-    # Select columns containing predictions (excluding the first column)
+    # Select columns containing predictions (excluding the first column for actual values)
     prediction_columns = data.columns[1:]
 
     # Compute RMSE for each model
@@ -147,9 +150,9 @@ def compute_error_correlation_weights(data, verbose=True):
         dict: Dictionary containing model names as keys and their corresponding weights.
     """
     # Filter out non-numeric columns
-    numeric_data = data.select_dtypes(include=[np.number])
+    numeric_data = data.select_dtypes(include=[np.number]) # nötig? alle cols sind numeric
 
-    # Drop the 'Actual' column and compute errors for each model
+    # Drop the 'Target' column and compute errors for each model
     errors = numeric_data.drop(columns=['Target']).apply(lambda x: numeric_data['Target'] - x)
 
     # Compute the number of models
@@ -205,10 +208,52 @@ def ensemble_predictions_given_weights(data, weights):
     Returns:
         numpy.ndarray: Weighted average predictions.
     """
-    # Select columns containing predictions (excluding the first two columns)
+    # Select columns containing predictions (excluding the first column for actual values)
     prediction_columns = data.columns[1:]
 
     # Compute weighted average predictions
     weighted_predictions = np.sum(data[prediction_columns].values * np.array(list(weights.values())), axis=1)
 
     return weighted_predictions
+
+def metamodel_svr(train_data, next_indiv_fc, kernel='linear'):
+    # Prepare features (predictions of forecasting models) and target variable (actual values) for training
+    #X = df.drop(['Date', 'Target'], axis=1) # nur target reicht
+    X = train_data.drop(['Target'], axis=1) # nur target reicht
+    y = train_data['Target']
+    
+    # Initialize the SVR
+    svr = SVR(kernel= kernel)  # You can choose different kernels like 'rbf', 'poly', etc.
+    
+    # Train the SVR
+    svr.fit(X, y)
+    
+    # Prepare features for prediction
+    #next_indiv_fc = next_indiv_fc.drop(['Date', 'Target'], axis=1)
+    next_indiv_fc = next_indiv_fc.drop(['Target'], axis=1)
+    
+    # Make predictions for all periods
+    predictions = svr.predict(next_indiv_fc)
+    
+    return predictions
+
+def metamodel_random_forest(train_data, next_indiv_fc, n_estimators=100, random_state=None):
+    # Prepare features (predictions of forecasting models) and target variable (actual values)
+    #X = df.drop(['Date', 'Target'], axis=1) # nur target reicht
+    X = train_data.drop(['Target'], axis=1) # nur target reicht
+    y = train_data['Target']
+    
+    # Initialize the Random Forest Regressor
+    rf_regressor = RandomForestRegressor(n_estimators=n_estimators, random_state=random_state)
+    
+    # Train the Random Forest Regressor
+    rf_regressor.fit(X, y)
+    
+    # Prepare features for prediction
+    #next_indiv_fc = next_indiv_fc.drop(['Date', 'Target'], axis=1)
+    next_indiv_fc = next_indiv_fc.drop(['Target'], axis=1)
+    
+    # Make predictions for all periods
+    predictions = rf_regressor.predict(next_indiv_fc)
+    
+    return predictions
