@@ -97,7 +97,7 @@ for model_name, model in models.items():
             else:
                 X_pred_SARIMAX = None
             pr = model_sarima.predict(1, X=X_pred_SARIMAX)
-            # model update params (new model uses old params is initialization => faster autofit)
+            # model update params (new model uses old params as initialization => faster autofit)
             sarima_predictions = pd.concat([sarima_predictions, pr], axis = 0)
             p, d, q = model_sarima.get_fitted_params()['order']
             P, D, Q, sp = model_sarima.get_fitted_params()['seasonal_order']
