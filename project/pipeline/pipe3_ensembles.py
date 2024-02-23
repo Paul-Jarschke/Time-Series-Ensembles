@@ -4,7 +4,7 @@
 
 import pandas as pd
 import numpy as np
-from utils.weigthing_methods import *
+from utils.ensembling_methods import *
 
 # Define the file path
 file_path = r'C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\project\interim_results\historical_forecasts.csv'
