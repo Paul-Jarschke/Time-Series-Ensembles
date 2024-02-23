@@ -90,7 +90,7 @@ for model_name, model in models.items():
             # note: Implementation of UpdateRefitEvery class... (consider later)
                 # this will probably speed up process
                 # e.g., refit model every 6th or 12th period
-                # I will do that romorrow
+                # I will do that tomorrow
             if h == 0 or (h+1) == H or ((h+1) % 5) == 0:
                 print(f"{model_name} forecast {h+1} / {H}")
             model_sarima.fit(y_train_full_SARIMAX[:(init_train_size+h-cov_bool)], X=X_train_full_SARIMAX) 

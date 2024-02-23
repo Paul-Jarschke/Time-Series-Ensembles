@@ -8,8 +8,8 @@
 # bzw return von pipe2 Funktion hier als input nehmen
 
 import pandas as pd
-import numpy as np
 from utils.ensembling_methods import *
+import os
 
 # Define the file path
 file_path = r'C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\project\interim_results\historical_forecasts.csv'
@@ -65,5 +65,9 @@ full_predictions = ensemble_predictions.merge(predictions, left_index=True, righ
 print(full_predictions)
 print("...finished!")
 
-# Output:
+# Later output:
 # return full_predictions
+
+# Because training takes so long, interim results are (for now) exported as csv to work further on pipeline; makes debugging easier
+export_path = sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
+predictions.to_csv(os.path.join(export_path, f"full_predictions.csv"), index=True)
