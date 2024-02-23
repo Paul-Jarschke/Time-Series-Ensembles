@@ -36,8 +36,8 @@ predictors_names = ["x" + str(x + 1) for x in range(df.shape[1]-1)] # allows tha
 contains_covariates = bool(predictors_names)
 
 # Training Subset
-train_split = 0.3
-init_train_size = int(df.shape[0] * train_split)
+fc_train_split = 0.3
+init_train_size = int(df.shape[0] * fc_train_split)
 y_train_full = df['y']
 y_train_init = df['y'][:init_train_size]
 
