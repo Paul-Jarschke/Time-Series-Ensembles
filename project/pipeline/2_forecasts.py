@@ -1,4 +1,4 @@
-from forecasting_models import models
+from ..models.forecasting_models import models
 import pandas as pd
 from utils.helpers import transform_to_darts_format
 from sktime.split import ExpandingWindowSplitter
