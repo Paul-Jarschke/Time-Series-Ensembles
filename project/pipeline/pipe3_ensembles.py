@@ -30,7 +30,7 @@ ensemble_predictions = pd.DataFrame(columns = ["Date", "fc_Ensemble_Simple", "fc
 
 
 for i, fc_period in enumerate(range(end_ens_training, n_predictions)):
-    if i+1 == 1 or i==(n_predictions-end_ens_training) or (i+1) % 10 == 0:
+    if i+1 == 1 or i+1==(n_predictions-end_ens_training) or (i+1) % 10 == 0:
         print(f'Ensemble forecast {i+1} / {n_predictions-end_ens_training}')
     # Periode an der vorgecastet wird = fc_period
     current_ensemble_predictions = []
