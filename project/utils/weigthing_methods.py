@@ -1,7 +1,55 @@
 import numpy as np
-from metrics import rmse
 
-print(rmse([1,2,3], [2,3,4]))
+print('Loading metrics...')
+
+def rmse(predictions, targets):
+    """
+    Calculate the Root Mean Squared Error (RMSE) between predicted values and targets.
+
+    Parameters:
+        predictions (array-like): Array containing predicted values.
+        targets (array-like): Array containing target values.
+
+    Returns:
+        float: RMSE value.
+    """
+    # Convert input arrays to numpy arrays to ensure compatibility
+    predictions = np.array(predictions)
+    targets = np.array(targets)
+
+    # Calculate the root mean squared error
+    rmse = np.sqrt(((predictions - targets) ** 2).mean())
+
+    return rmse
+
+
+def mape(predictions, targets):
+    """
+    Calculates the Mean Absolute Percentage Error (MAPE) between predicted values and targets.
+
+    Parameters:
+        predictions (array-like): Array containing the predicted values.
+        targets (array-like): Array containing target values.
+
+    Returns:
+        float: MAPE value.
+    """
+    # Convert input arrays to numpy arrays to ensure compatibility
+    predictions = np.array(predictions)
+    targets = np.array(targets)
+    
+    # Calculate absolute percentage error
+    abs_percentage_error = np.abs((targets - predictions) / targets)
+    
+    # Replace infinite values with NaNs to handle cases where target is zero
+    abs_percentage_error[np.isinf(abs_percentage_error)] = np.nan
+    
+    # Calculate mean absolute percentage error (ignoring nan values)
+    mape = np.nanmean(abs_percentage_error) * 100
+    
+    return mape
+
+
 
 def simple_average(data):
     """
@@ -14,7 +62,7 @@ def simple_average(data):
         numpy.ndarray: Averaged predictions.
     """
     # Select columns containing predictions (excluding the first two columns)
-    prediction_columns = data.columns[2:]
+    prediction_columns = data.columns[1:]
 
     # Average predictions across all models
     averaged_predictions = np.mean(data[prediction_columns], axis=1)
@@ -34,10 +82,10 @@ def compute_rmse_weights(data):
     """
     
     # Extract target 
-    target = data['Actual']
+    target = data['Target']
     
     # Select columns containing predictions (excluding the first two columns)
-    prediction_columns = data.columns[2:]
+    prediction_columns = data.columns[1:]
 
     # Compute RMSE for each model
     rmse_values = {}
@@ -69,7 +117,7 @@ def compute_variance_weights(data):
         dict: Dictionary containing model names as keys and their respective weights.
     """
     # Select columns containing predictions (excluding the first two columns)
-    prediction_columns = data.columns[2:]
+    prediction_columns = data.columns[1:]
     
     # Compute prediction variances for each model
     prediction_variances = {}
@@ -103,7 +151,7 @@ def compute_error_correlation_weights(data, verbose=True):
     numeric_data = data.select_dtypes(include=[np.number])
 
     # Drop the 'Actual' column and compute errors for each model
-    errors = numeric_data.drop(columns=['Actual']).apply(lambda x: numeric_data['Actual'] - x)
+    errors = numeric_data.drop(columns=['Target']).apply(lambda x: numeric_data['Target'] - x)
 
     # Compute the number of models
     num_models = len(errors.columns)
@@ -127,7 +175,7 @@ def compute_error_correlation_weights(data, verbose=True):
 
     # Divide each sum by the total sum of all elements in the inverse error matrix to normalize the weights
     total_sum = np.sum(inverse_error_matrix)
-    model_names = data.columns[2:]  # Extract model names
+    model_names = data.columns[1:]  # Extract model names
 
     # Compute model weights
     model_weights = {model: row_sum / total_sum for model, row_sum in zip(model_names, row_sums)}    
@@ -159,7 +207,7 @@ def ensemble_predictions_given_weights(data, weights):
         numpy.ndarray: Weighted average predictions.
     """
     # Select columns containing predictions (excluding the first two columns)
-    prediction_columns = data.columns[2:]
+    prediction_columns = data.columns[1:]
 
     # Compute weighted average predictions
     weighted_predictions = np.sum(data[prediction_columns].values * np.array(list(weights.values())), axis=1)
