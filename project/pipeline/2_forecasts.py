@@ -32,6 +32,8 @@ df.set_index('Date', inplace=True)
 
 # Convert DataFrame to TimeSeries and split target and predictors
 predictors_names = ["x" + str(x + 1) for x in range(df.shape[1]-1)] # allows that the number of predictors can be generic; ensure in data preprocessing that target is named 'y' and predictors 'x1', 'x2' etc.
+# Indicator if DataFrame includes covariates
+contains_covariates = bool(predictors_names)
 
 # Training Subset
 train_split = 0.3
@@ -39,17 +41,23 @@ init_train_size = int(df.shape[0] * train_split)
 y_train_full = df['y']
 y_train_init = df['y'][:init_train_size]
 
-X_train_full = df[predictors_names]
+if contains_covariates:
+    X_train_full = df[predictors_names]
 
 # Create a DataFrame to store predictions
 predictions = pd.DataFrame()
 predictions.index.name = "Date" 
 
-#XGB_hist_forecast = model.historical_forecasts(series = target, start = train_size, future_covariates = predictors, stride = 1, forecast_horizon = fc_horizon)
-
 for model_name, model in models.items():
+    # Skip covariate models if dataset does not include covariates
+    if not contains_covariates and (model_name == "AutoSARIMAX" or model_name == "XGBoost (+ covs)"):
+        continue
+      
+    # Fit the model and make historical expanding window one-step ahead predictions   
     print(f'Now generating expanding window predictions for Model: {model_name}')
-    # Fit the model and make one-step ahead predictions
+    
+    
+    # Darts models need different input format
     if "XGBoost" in model_name:
         y_train_darts = transform_to_darts_format(y_train_full)
         if "covs" in model_name: 
@@ -58,6 +66,7 @@ for model_name, model in models.items():
         else:
             pred = model.historical_forecasts(series=y_train_darts, start=init_train_size, stride=1, forecast_horizon=1, show_warnings=False).pd_dataframe()
         pred.set_index(pd.PeriodIndex(pd.to_datetime(pred.index, format='%d-%m-%Y'), freq='M'), inplace=True)
+        
     elif "AutoSARIMA" in model_name:
         if model_name == "AutoSARIMAX":
             X_train_full_SARIMAX = X_train_full.copy().shift(1)
