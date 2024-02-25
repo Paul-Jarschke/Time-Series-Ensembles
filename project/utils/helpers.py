@@ -99,14 +99,34 @@ def train_test_split(series, train_split=0.3):
     return train, val
 
 
-# Transform pandas object to darts TimeSeries format
 def transform_to_darts_format(pandas_object):
-    pandas_object_copy = pandas_object.copy() # otherwise it changes the index globally
-    pandas_object_copy.index = pandas_object_copy.index.to_timestamp()
+    """
+    Transforms a pandas DataFrame or Series object into a darts TimeSeries format.
+
+    Parameters:
+    pandas_object (DataFrame or Series): The pandas object to be transformed.
+
+    Returns:
+    TimeSeries: The transformed darts TimeSeries object.
+
+    Note:
+    If a DataFrame is passed, the index of the DataFrame is converted to timestamps
+    before creating the TimeSeries object.
+    """
+    # Create a copy of the input pandas object to avoid changing the index globally
+    pandas_object_copy = pandas_object.copy()
     
+    # Convert the index of the pandas object to timestamps
+    pandas_object_copy.index = pandas_object_copy.index.to_timestamp()
+
+    # Check if the pandas object is a DataFrame
     if isinstance(pandas_object_copy, pd.DataFrame):
+        # If Treu create a darts TimeSeries object
         darts_ts = TimeSeries.from_dataframe(pandas_object_copy)
-        
+
+    # Check if the pandas object is a Series
     elif isinstance(pandas_object_copy, pd.Series):
+        # If True, create a darts TimeSeries object
         darts_ts = TimeSeries.from_series(pandas_object_copy)
+        
     return darts_ts
