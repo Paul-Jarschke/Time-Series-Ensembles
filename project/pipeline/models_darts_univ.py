@@ -1,3 +1,6 @@
+print('Loading Univariate darts models...')
+
+
 # External Modules
 import pandas as pd
 from darts.models import XGBModel, NaiveDrift, NaiveMovingAverage, AutoARIMA, RandomForest
