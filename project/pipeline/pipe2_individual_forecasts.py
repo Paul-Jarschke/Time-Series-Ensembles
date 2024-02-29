@@ -1,15 +1,11 @@
 from models.forecasting_models import models
 from pipeline.pipe1_data_preprocessing import target, covariates
+from paths import *
 
 
-
+# todo: add/create timestamp folder to export
 # todo: paths generisch definieren anhand von project libray
-export_path = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
-
-
-# Funktion ab hier. Das oben muss noch ins preprocessing
-
-# comments fehlen noch
+# todo: docstring, comments fehlen noch
 
 ###############################################################
 # inputs:
@@ -152,5 +148,5 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     return individual_predictions
 
 
-individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, init_train_ratio=0.3)
+individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, init_train_ratio=0.3, csv_export=EXPORT_DIR)
 print(individual_predictions)

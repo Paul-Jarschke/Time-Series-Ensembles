@@ -4,6 +4,8 @@ print(individual_predictions)
 
 export_path = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
 
+# todo: comment and streamlining
+
 def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, csv_export=False):
     
     import pandas as pd
