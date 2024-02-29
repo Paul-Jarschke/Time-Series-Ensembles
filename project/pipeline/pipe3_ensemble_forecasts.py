@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from paths import *
 
-from pipeline.pipe2_individual_forecasts import individual_predictions
+#from pipeline.pipe2_individual_forecasts import individual_predictions
 
 # todo: comment, docstring 
 # #todo: streamlining
@@ -62,5 +62,3 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
     return full_predictions
 
 
-full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=EXPORT_DIR)
-print(full_predictions)

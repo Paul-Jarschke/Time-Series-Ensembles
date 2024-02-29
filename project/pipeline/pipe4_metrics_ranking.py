@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error 
 from paths import *
 
-from pipe3_ensemble_forecasts import full_predictions
+#from pipe3_ensemble_forecasts import full_predictions
 
 # todo: streamline code
 # todo: use pauls mse and mape functions
@@ -52,5 +52,3 @@ def pipe4_metrics_ranking(full_predictions, csv_export=False):
     
     return metrics_ranking
 
-metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR)
-print(metrics_ranking)

@@ -1,7 +1,15 @@
+import pandas as pd  
+import os
+import warnings
+from utils.helpers import transform_to_darts_format
+from sktime.split import ExpandingWindowSplitter
 from paths import *
 
-from models.forecasting_models import models
-from pipeline.pipe1_data_preprocessing import target, covariates
+#from models.forecasting_models import models
+#from pipeline.pipe1_data_preprocessing import target, covariates
+
+# Turn off warnings
+warnings.filterwarnings('ignore')
 
 
 # todo: add/create timestamp folder to export
@@ -18,14 +26,6 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
     print("=======================================================")
     
-    import pandas as pd  
-    import os
-    import warnings
-    from utils.helpers import transform_to_darts_format
-    from sktime.split import ExpandingWindowSplitter
-    
-    # Turn off warnings
-    warnings.filterwarnings('ignore')
     
     # Training Subset
     print("Splitting data for individual forecasts")
@@ -146,7 +146,3 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
         print("...finished!\n")
     
     return individual_predictions
-
-# todo: Diese Funktionen am Ende jedes pipe files in run_pipeline.py packen
-individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, init_train_ratio=0.3, csv_export=EXPORT_DIR)
-print(individual_predictions)
