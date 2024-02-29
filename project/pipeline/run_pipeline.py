@@ -8,6 +8,7 @@
 
 # todo: create timestamp folder for data storage
 # todo: create log file storing relevant information like hyperparameter settings on top, data properties, and then console output
+# todo: Print total time elapsed to console and log(auch in zwischensteps)
 
 # Input: pandas dataframe oder series!
 import pandas as pd
