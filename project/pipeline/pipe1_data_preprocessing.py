@@ -14,10 +14,11 @@ file_path = sim_dir + file_name
 df = pd.read_csv(file_path, index_col = "Date")
 
 
-def pipe1_data_preprocessing(df):
-    print("=======================================================")
-    print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
-    print("=======================================================")
+def pipe1_data_preprocessing(df, verbose=False):
+    if verbose:
+        print("=======================================================")
+        print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
+        print("=======================================================")
     
     # index in index abspeichern, nicht als Spalte! wichtig für preprocessing
     # # if Bedingung: if freq is not given or gibt error:

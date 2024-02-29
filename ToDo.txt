@@ -7,7 +7,6 @@ run_pipeline():
 - print total time elapsed to console and log(auch in zwischensteps)
 - add all relevant input arguments from inner functions
 - csv export: if True but path not defined export in working directory
-- add verbose
 
 pipe1_data_preprocessing():
 - everything

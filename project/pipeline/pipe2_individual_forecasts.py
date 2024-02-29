@@ -13,14 +13,16 @@ warnings.filterwarnings('ignore')
 # preprocessed data (generic format):  target, covariates
 ###############################################################
 
-def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25):
-    print("=======================================================")
-    print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
-    print("=======================================================")
+def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25, verbose=False):
+    if verbose:
+        print("=======================================================")
+        print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
+        print("=======================================================")
     
     
     # Training Subset
-    print("Splitting data for individual forecasts")
+    if verbose:
+        print("Splitting data for individual forecasts")
     init_train_size = int(target.shape[0] * indiv_init_train_ratio)
     y_train_full = target
 
@@ -40,7 +42,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             continue
         
         # Fit the model and make historical expanding window one-step ahead predictions   
-        print(f'Now generating {H} expanding window predictions for individual model: {model_name}')
+        if verbose:
+            print(f'Now generating {H} expanding window predictions for individual model: {model_name}')
         
         # Darts models need different input format
         if "XGBoost" in model_name:
@@ -74,7 +77,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             
             refit_freq = H // (1/autosarimax_refit_interval) # 25 % intervals => consider deacreasing this to 20% or 10%
             
-            print("Auto-fitting model...")
+            if verbose:
+                print("Auto-fitting model...")
             
             # In loop we forecast are at period t+k and forecast period t+k+1 until all H periods are forecasted
             for k in range(H):
@@ -103,7 +107,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
                         'maxiter': 15
                         }      
                         model.set_params(**updated_params)
-                        print("...automatic refitting...")
+                        if verbose:
+                            print("...automatic refitting...")
                     model.fit(y=current_y_train_ARIMA, X=current_X_train_ARIMA) 
                 else:
                 # In all other periods just update parameters/coefficients
@@ -116,7 +121,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
                     X_pred_SARIMAX = None
                 
                 if k == 0 or (k+1) == H or ((k+1) % 5) == 0:
-                    print(f"{model_name} forecast {k+1} / {H}")
+                    if verbose:
+                        print(f"{model_name} forecast {k+1} / {H}")
                 prediction = model.predict(1, X=X_pred_SARIMAX)
                 model_predictions = pd.concat([model_predictions, prediction], axis = 0)
                 
@@ -126,15 +132,16 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             model_predictions= model.update_predict(y_train_full, cv)
         
         # Store predictions in a new column
-        print("...finished!\n")
+        if verbose:
+            print("...finished!\n")
         individual_predictions[model_name] = model_predictions
 
     individual_predictions.insert(0, "Target", value=y_train_full[init_train_size:])    
 
     if isinstance(csv_export, (os.PathLike, str)):
-        
-        print("Exporting individual forecasts as csv...")
         individual_predictions.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
-        print("...finished!\n")
+        if verbose:
+            print("Exporting individual forecasts as csv...")
+            print("...finished!\n")
     
     return individual_predictions

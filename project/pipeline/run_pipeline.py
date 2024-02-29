@@ -22,16 +22,18 @@ file_path = sim_dir + file_name
 df = pd.read_csv(file_path, index_col = "Date")
 
 
-def run_pipeline(df):
+def run_pipeline(df, verbose=False):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
     Args:
-    - df: input data containing targets and covariates. pandas DataFrame or Series
+    - df: pandas DataFrame or Series, input data containing targets and covariates. 
+    - verbose: bool, whether to print intermediate steps (default: False).
     - target:
     - covariates:
     - models:
     - init_splits:
+    - verbose:
     
     Returns:
     - target:
@@ -42,20 +44,24 @@ def run_pipeline(df):
     """
     # Pipeline step 1: Perform data preprocessing
     target, covariates = pipe1_data_preprocessing(df=df)
-    print("Target:", target.name)
-    print("Covariates:", ", ".join(covariates.columns))
+    if verbose:
+        print("Target:", target.name)
+        print("Covariates:", ", ".join(covariates.columns))
     
     # Pipeline step 2: Compute individual predictions
-    individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, indiv_init_train_ratio=0.3, csv_export=EXPORT_DIR)
-    print(individual_predictions, "\n") 
+    individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, indiv_init_train_ratio=0.3, csv_export=EXPORT_DIR, verbose=verbose)
+    if verbose:
+        print(individual_predictions, "\n")
     
     # Pipeline step 3: Compute ensemble predictions
-    full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=EXPORT_DIR)
-    print(full_predictions, "\n") 
+    full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=EXPORT_DIR, verbose=verbose)
+    if verbose:
+        print(full_predictions, "\n")
     
     # Pipeline step 4: Ranking by metrics
-    metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR)
-    print(metrics_ranking, "\n") 
+    metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR, verbose=verbose)
+    if verbose:
+        print(full_predictions, "\n")
     
     # Return results
     return target, covariates, individual_predictions, full_predictions, metrics_ranking
@@ -65,6 +71,6 @@ def run_pipeline(df):
 ################
 
 # Later in notebook maybe
-target, covariates, individual_predictions, full_predictions, metrics_ranking = run_pipeline(df=df)
+target, covariates, individual_predictions, full_predictions, metrics_ranking = run_pipeline(df=df, verbose=True)
     
     

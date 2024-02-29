@@ -4,7 +4,7 @@ import numpy as np
 import os
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error 
 
-def pipe4_metrics_ranking(full_predictions, csv_export=False):
+def pipe4_metrics_ranking(full_predictions, csv_export=False, verbose=False):
     print("############################################")
     print("## Step 4: Creating Metrics Ranking Table ##")
     print("############################################")
@@ -39,9 +39,10 @@ def pipe4_metrics_ranking(full_predictions, csv_export=False):
     
     # If desired, export results as csv
     if isinstance(csv_export, (os.PathLike, str)):
-        print("Exporting metrics ranking as csv...")
         metrics_ranking.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
-        print("...finished!\n")
+        if verbose:
+            print("Exporting metrics ranking as csv...")
+            print("...finished!\n")
     
     return metrics_ranking
 

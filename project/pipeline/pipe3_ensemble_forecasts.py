@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 
-def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, csv_export=False):
+def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, csv_export=False, verbose=False):
     print("#############################################")
     print("## Step 3: Historical Ensemble Predictions ##")
     print("#############################################")
@@ -17,8 +17,9 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
 
 
     for i, fc_period in enumerate(range(end_ens_training, n_predictions)):
-        if i+1 == 1 or i+1==(n_predictions-end_ens_training) or (i+1) % 10 == 0:
-            print(f'Ensemble forecast {i+1} / {n_predictions-end_ens_training}')
+        if verbose:
+            if i+1 == 1 or i+1==(n_predictions-end_ens_training) or (i+1) % 10 == 0:
+                print(f'Ensemble forecast {i+1} / {n_predictions-end_ens_training}')
         # Periode an der vorgecastet wird = fc_period
         current_ensemble_predictions = []
         current_train = individual_predictions.iloc[0:fc_period,]
@@ -37,20 +38,22 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
         ensemble_predictions.loc[len(ensemble_predictions)] = current_ensemble_predictions
         
     # Set "Date" column as index and drop it
-    ensemble_predictions.set_index("Date", inplace=True)            
-    print(ensemble_predictions)
-    print("...ensemble predictions finished!")
-
+    ensemble_predictions.set_index("Date", inplace=True)
+    if verbose:            
+        print(ensemble_predictions)
+        print("...ensemble predictions finished!")
     # Append to individual predictions:
-    print("...merging...")
+        print("...merging...")
     full_predictions = ensemble_predictions.merge(individual_predictions, left_index=True, right_index=True, how='left')
     print(full_predictions)
 
     if isinstance(csv_export, (os.PathLike, str)):
-        print("Exporting ensemble forecasts as csv...")
+        if verbose:
+            print("Exporting ensemble forecasts as csv...")
         full_predictions.to_csv(os.path.join(csv_export, f"full_predictions.csv"), index=True)
         
-    print("...finished!")
+    if verbose:  
+        print("...finished!")
     
     return full_predictions
 
