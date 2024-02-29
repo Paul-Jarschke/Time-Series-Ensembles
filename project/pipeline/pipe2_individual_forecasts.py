@@ -3,7 +3,7 @@ from pipeline.pipe1_data_preprocessing import target, covariates
 
 
 
-
+# todo: paths generisch definieren anhand von project libray
 export_path = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
 
 
@@ -16,7 +16,7 @@ export_path = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/G
 # preprocessed data (generic format):  target, covariates
 ###############################################################
 
-def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio=0.3, csv_export=None):
+def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25):
     
     print("=======================================================")
     print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
@@ -83,7 +83,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
             model_predictions.index.name = "Date" 
             
             # Define at what frequency ARIMA model is refitted
-            refit_freq = H // 4 # 25 % intervals => consider deacreasing this to 20% or 10%
+            
+            refit_freq = H // (1/autosarimax_refit_interval) # 25 % intervals => consider deacreasing this to 20% or 10%
             
             print("Auto-fitting model...")
             
@@ -143,6 +144,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     individual_predictions.insert(0, "Target", value=y_train_full[init_train_size:])    
 
     if isinstance(csv_export, (os.PathLike, str)):
+        # todo:if path not defined export in working directory
         print("Exporting individual forecasts as csv...")
         individual_predictions.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
         print("...finished!\n")
