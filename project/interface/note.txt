@@ -1,0 +1,2 @@
+ich hätte vorgeschlagen hier rein alle Jupyter notebooks zu machen, die code executen und tables, plots etc. displayen.
+# also hier ist dann am ende das user interface, damit man nicht an den modulen (python files) rumschrauben muss

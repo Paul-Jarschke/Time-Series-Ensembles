@@ -1,6 +1,10 @@
 General:
 - add a small testing dataframe to test pipeline a bit faster...
 
+=========
+PIPELINE:
+=========
+
 run_pipeline():
 - create timestamp folder for data storage
 - create log file storing relevant information like hyperparameter settings on top, data properties, and then console output
@@ -15,6 +19,7 @@ pipe1_data_preprocessing():
 pipe2_individual_forecasts():
 - docstring, comments fehlen noch
 - # Todo: check if SARIMAX loop takes updated params (trace = True)
+- make more generic for all models that have fit and predict method; consider removing historical forecast method etc => as in arima
 
 pipe3_ensemble_forecasts():
 - comment, docstring 
@@ -24,3 +29,9 @@ pipe4_metrics_ranking():
 - streamline code
 - use pauls mse and mape functions
 
+
+=========
+Interface
+=========
+run_pipeline.ipynb:
+- # monthly in print durch if bedingung ersetzen, welche df.index.freq erkennt

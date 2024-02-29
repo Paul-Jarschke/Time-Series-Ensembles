@@ -16,9 +16,9 @@ df = pd.read_csv(file_path, index_col = "Date")
 
 def pipe1_data_preprocessing(df, verbose=False):
     if verbose:
-        print("=======================================================")
-        print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
-        print("=======================================================")
+        print("=====================================================")
+        print("== Starting Step 1 in Pipeline: Data Preprocessing ==")
+        print("=====================================================")
     
     # index in index abspeichern, nicht als Spalte! wichtig für preprocessing
     # # if Bedingung: if freq is not given or gibt error:
@@ -38,7 +38,11 @@ def pipe1_data_preprocessing(df, verbose=False):
     covariates = df.iloc[:, 1:] # default: None    
     target.index = pd.PeriodIndex(target.index, freq=infered_freq)
     #if covariates is not None:
-    covariates.index = pd.PeriodIndex(covariates.index, freq=infered_freq)   
+    covariates.index = pd.PeriodIndex(covariates.index, freq=infered_freq)  
+    
+    if verbose:
+        print("Target:", target.name)
+        print("Covariates:", ", ".join(covariates.columns)) 
           
     return target, covariates      
 

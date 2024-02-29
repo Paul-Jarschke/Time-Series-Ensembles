@@ -1,8 +1,6 @@
 # Import modules
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
-import matplotlib.pyplot as plt
 import os
 from SARIMAX_sim_class import SARIMAX_Simulation
 

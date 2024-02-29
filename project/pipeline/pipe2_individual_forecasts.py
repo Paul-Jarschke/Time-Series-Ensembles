@@ -15,25 +15,32 @@ warnings.filterwarnings('ignore')
 
 def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25, verbose=False):
     if verbose:
-        print("=======================================================")
+        print("\n=======================================================")
         print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
         print("=======================================================")
     
     
-    # Training Subset
-    if verbose:
-        print("Splitting data for individual forecasts")
+    # Calculate initial train size
     init_train_size = int(target.shape[0] * indiv_init_train_ratio)
+        
+    # Define training variables
     y_train_full = target
 
     X_train_full = covariates
+    
+    # Define full forecast horizon
+    H = y_train_full.shape[0] - init_train_size
+    
+    if verbose:
+        print(f"Splitting data for individual forecasts (train/test ratio: {int(indiv_init_train_ratio*100)}/{int(100-indiv_init_train_ratio*100)})...")
+        print(f"Initial training set has {init_train_size} observations and goes from {target.index[0]} to {target.index[init_train_size-1]}")
+        print(f"There are {H} periods to be forecasted by the individual models {target.index[init_train_size]} to {target.index[-1]}")
     
     # Create a DataFrame to store all models' predictions
     individual_predictions = pd.DataFrame()
     individual_predictions.index.name = "Date" 
 
-    # Define full forecast horizon
-    H = y_train_full.shape[0] - init_train_size
+    
 
     for model_name, model in models.items():
 
@@ -120,7 +127,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
                 else:
                     X_pred_SARIMAX = None
                 
-                if k == 0 or (k+1) == H or ((k+1) % 5) == 0:
+                if k == 0 or (k+1) == H or ((k+1) % 10) == 0:
                     if verbose:
                         print(f"{model_name} forecast {k+1} / {H}")
                 prediction = model.predict(1, X=X_pred_SARIMAX)
@@ -144,4 +151,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             print("Exporting individual forecasts as csv...")
             print("...finished!\n")
     
+    if verbose:
+        print(individual_predictions, "\n")
+        
     return individual_predictions
