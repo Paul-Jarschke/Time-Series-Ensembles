@@ -3,25 +3,17 @@ import os
 import warnings
 from utils.helpers import transform_to_darts_format
 from sktime.split import ExpandingWindowSplitter
-from paths import *
 
-#from models.forecasting_models import models
-#from pipeline.pipe1_data_preprocessing import target, covariates
 
 # Turn off warnings
 warnings.filterwarnings('ignore')
-
-
-# todo: add/create timestamp folder to export
-# todo: paths generisch definieren anhand von project libray
-# todo: docstring, comments fehlen noch
 
 ###############################################################
 # inputs:
 # preprocessed data (generic format):  target, covariates
 ###############################################################
 
-def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25):
+def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25):
     print("=======================================================")
     print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
     print("=======================================================")
@@ -29,7 +21,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     
     # Training Subset
     print("Splitting data for individual forecasts")
-    init_train_size = int(target.shape[0] * init_train_ratio)
+    init_train_size = int(target.shape[0] * indiv_init_train_ratio)
     y_train_full = target
 
     X_train_full = covariates
@@ -99,8 +91,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
                         p, d, q = sarima_fitted_params['order']
                         P, D, Q, sp = sarima_fitted_params['seasonal_order']
 
-                        # Todo: check if it takes updated params (trace = True)
-                        updated_params = params = {
+                        
+                        updated_params = {
                         'start_p': p,
                         'd': d,
                         'start_q': q,
@@ -140,7 +132,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     individual_predictions.insert(0, "Target", value=y_train_full[init_train_size:])    
 
     if isinstance(csv_export, (os.PathLike, str)):
-        # todo:if path not defined export in working directory
+        
         print("Exporting individual forecasts as csv...")
         individual_predictions.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
         print("...finished!\n")

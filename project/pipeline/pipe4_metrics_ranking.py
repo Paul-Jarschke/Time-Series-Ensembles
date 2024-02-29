@@ -1,13 +1,8 @@
 # later wrapper function here will need Input full_predictions from pipe3
 import pandas as pd
 import numpy as np
+import os
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error 
-from paths import *
-
-#from pipe3_ensemble_forecasts import full_predictions
-
-# todo: streamline code
-# todo: use pauls mse and mape functions
 
 def pipe4_metrics_ranking(full_predictions, csv_export=False):
     print("############################################")
@@ -44,8 +39,6 @@ def pipe4_metrics_ranking(full_predictions, csv_export=False):
     
     # If desired, export results as csv
     if isinstance(csv_export, (os.PathLike, str)):
-        # todo:if path not defined, export in working directory
-        # todo: add to timestamp folder
         print("Exporting metrics ranking as csv...")
         metrics_ranking.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
         print("...finished!\n")

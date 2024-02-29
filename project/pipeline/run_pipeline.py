@@ -1,16 +1,4 @@
-# run pipeline wrapper function here
-
-
-# takes df as input
-# takes arguments passed to pipe1, pipe2, pipe3, pipe4 ... as input
-
 # WORK IN PROGRESS
-
-# todo: create timestamp folder for data storage
-# todo: create log file storing relevant information like hyperparameter settings on top, data properties, and then console output
-# todo: Print total time elapsed to console and log(auch in zwischensteps)
-
-# Input: pandas dataframe oder series!
 import pandas as pd
 from paths import *
 from models.forecasting_models import models
@@ -33,24 +21,50 @@ file_path = sim_dir + file_name
 # Read and preprocess Dataset
 df = pd.read_csv(file_path, index_col = "Date")
 
-# todo add all relevant input args
+
 def run_pipeline(df):
+    """
+    Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
+
+    Args:
+    - df: input data containing targets and covariates. pandas DataFrame or Series
+    - target:
+    - covariates:
+    - models:
+    - init_splits:
+    
+    Returns:
+    - target:
+    - covariates:
+    - individual_predictions:
+    - full_predictions:
+    - metrics_ranking:
+    """
+    # Pipeline step 1: Perform data preprocessing
     target, covariates = pipe1_data_preprocessing(df=df)
-    # print colname target, covariates
-    # Target: ...
-    # Covariates: ...
+    print("Target:", target.name)
+    print("Covariates:", ", ".join(covariates.columns))
     
-    individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, init_train_ratio=0.3, csv_export=EXPORT_DIR)
-    print(f"{individual_predictions}\n") 
+    # Pipeline step 2: Compute individual predictions
+    individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, indiv_init_train_ratio=0.3, csv_export=EXPORT_DIR)
+    print(individual_predictions, "\n") 
     
+    # Pipeline step 3: Compute ensemble predictions
     full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=EXPORT_DIR)
-    print(f"{full_predictions}\n") 
+    print(full_predictions, "\n") 
     
+    # Pipeline step 4: Ranking by metrics
     metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR)
-    print(f"{metrics_ranking}\n") 
+    print(metrics_ranking, "\n") 
     
-    return metrics_ranking # return irgendwie alle als objekt? Dictionary, damit auch Plots damit arbeiten können?
-    
-metrics_ranking = run_pipeline(df=df)
+    # Return results
+    return target, covariates, individual_predictions, full_predictions, metrics_ranking
+
+################
+# Run pipeline    
+################
+
+# Later in notebook maybe
+target, covariates, individual_predictions, full_predictions, metrics_ranking = run_pipeline(df=df)
     
     

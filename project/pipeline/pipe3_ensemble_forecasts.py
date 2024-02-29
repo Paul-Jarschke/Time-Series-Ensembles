@@ -1,12 +1,7 @@
 from utils.ensembling_methods import simple_average, compute_rmse_weights, compute_variance_weights, compute_error_correlation_weights, ensemble_predictions_given_weights, metamodel_random_forest, metamodel_svr
 import pandas as pd
 import os
-from paths import *
 
-#from pipeline.pipe2_individual_forecasts import individual_predictions
-
-# todo: comment, docstring 
-# #todo: streamlining
 
 def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, csv_export=False):
     print("#############################################")
@@ -52,8 +47,6 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
     print(full_predictions)
 
     if isinstance(csv_export, (os.PathLike, str)):
-        # todo: if path not defined export in working directory
-        # todo: add to timestamp folder
         print("Exporting ensemble forecasts as csv...")
         full_predictions.to_csv(os.path.join(csv_export, f"full_predictions.csv"), index=True)
         
