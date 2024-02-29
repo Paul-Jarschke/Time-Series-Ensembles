@@ -148,8 +148,8 @@ noisy_df.columns = ['y', "x1", "x2", "x3"]
 noisy_df.index.name = "Date"
 #noisy_df.insert(0, 'Date', endo_ts.index.to_series())
 
-# Format 'date' index as monthly 'DD-MM-YYYY' PeriodIndex
-noisy_df.index = pd.PeriodIndex(noisy_df.index, freq = "M").to_timestamp().strftime('%d-%m-%Y')
+# Format periodic 'date' index to ISO YYYY-MM-DD format
+noisy_df.index = pd.PeriodIndex(noisy_df.index, freq = "M").to_timestamp().strftime('%Y-%m-%d')
 
 
 

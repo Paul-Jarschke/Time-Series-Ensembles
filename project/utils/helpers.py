@@ -110,13 +110,12 @@ def transform_to_darts_format(pandas_object):
     TimeSeries: The transformed darts TimeSeries object.
 
     Note:
-    If a DataFrame is passed, the index of the DataFrame is converted to timestamps
-    before creating the TimeSeries object.
+    The index of the DataFrame is converted to DatetimeIndex before creating the TimeSeries object.
     """
     # Create a copy of the input pandas object to avoid changing the index globally
     pandas_object_copy = pandas_object.copy()
     
-    # Convert the index of the pandas object to timestamps
+    # Convert the index of the pandas object to DatetimeIndex 
     pandas_object_copy.index = pandas_object_copy.index.to_timestamp()
 
     # Check if the pandas object is a DataFrame

@@ -7,7 +7,7 @@ from sktime.forecasting.exp_smoothing import ExponentialSmoothing
 from sktime.forecasting.theta import ThetaForecaster
 from sktime.forecasting.trend import STLForecaster
 from darts.models import XGBModel
-
+#from sktime.forecasting.stream._update import UpdateRefitsEvery
 
 ##################
 ## Naive (last) ##
@@ -26,12 +26,13 @@ model_naive_drift = NaiveForecaster(
 #################
 ## Auto-SARIMA ##
 #################
+import pandas as pd
 model_SARIMA = AutoARIMA(
     seasonal=True,
     stationary=False,
     d=1,
-    sp=12,
     trace=False,
+    update_pdq=False,
     with_intercept="auto",
     max_p=6,
     max_q=6,
@@ -46,8 +47,8 @@ model_SARIMAX = AutoARIMA(
     seasonal=True,
     stationary=False,
     d=1,
-    sp=12,
     trace=False,
+    update_pdq=False,
     with_intercept="auto",
     max_p=6,
     max_q=6,
@@ -83,18 +84,15 @@ model_STL = STLForecaster(
 var_lags = 12
 
 model_XGB = XGBModel(
-    lags=var_lags,
-    lags_future_covariates=None
+    lags=var_lags
 )
 
 #############################
 ## XGBoost with Covariates ##
 #############################
-var_lags = 12
-
 model_XGB_covs = XGBModel(
     lags=var_lags,
-    lags_future_covariates=(var_lags,0)
+    lags_past_covariates=var_lags
 )
 
 
@@ -109,6 +107,6 @@ models = {"Naive": model_naive,
           "Theta": model_theta,
           "STL": model_STL,
           "XGBoost": model_XGB,
-          "XGBoost (+ covs)": model_XGB_covs
+          "XGBoost (+ X)": model_XGB_covs
           }
 
