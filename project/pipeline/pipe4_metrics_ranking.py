@@ -45,6 +45,6 @@ def pipe4_metrics_ranking(full_predictions, csv_export=False, verbose=False):
             print("...finished!\n")
             
     if verbose:
-        print(full_predictions, "\n")
+        print(metrics_ranking, "\n")
     return metrics_ranking
 

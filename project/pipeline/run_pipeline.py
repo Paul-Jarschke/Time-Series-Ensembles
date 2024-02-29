@@ -26,6 +26,11 @@ def run_pipeline(df, verbose=False):
     - full_predictions:
     - metrics_ranking:
     """
+    if verbose:
+        print("=======================")
+        print("== Starting Pipeline ==")
+        print("=======================")
+        
     # Pipeline step 1: Perform data preprocessing
     target, covariates = pipe1_data_preprocessing(df=df, verbose=verbose)
     
@@ -37,6 +42,9 @@ def run_pipeline(df, verbose=False):
     
     # Pipeline step 4: Ranking by metrics
     metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR, verbose=verbose)
+    
+    if verbose:
+        print("Finished pipeline!")
     
     # Return results
     return target, covariates, individual_predictions, full_predictions, metrics_ranking

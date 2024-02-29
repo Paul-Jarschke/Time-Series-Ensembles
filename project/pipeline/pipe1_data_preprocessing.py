@@ -15,8 +15,15 @@ df = pd.read_csv(file_path, index_col = "Date")
 
 
 def pipe1_data_preprocessing(df, verbose=False):
+    
+    
+
     if verbose:
-        print("=====================================================")
+        print("Data Insights:")
+        print(df.head(), "\n")
+        print(f"Monthly data from goes from {df.index[0]} to {df.index[-1]}, resulting in {len(df)} observations.")
+        
+        print("\n=====================================================")
         print("== Starting Step 1 in Pipeline: Data Preprocessing ==")
         print("=====================================================")
     

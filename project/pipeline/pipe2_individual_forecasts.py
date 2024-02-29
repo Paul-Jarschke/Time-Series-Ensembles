@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 # preprocessed data (generic format):  target, covariates
 ###############################################################
 
-def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25, verbose=False):
+def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.33, verbose=False):
     if verbose:
         print("\n=======================================================")
         print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
@@ -34,7 +34,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
     if verbose:
         print(f"Splitting data for individual forecasts (train/test ratio: {int(indiv_init_train_ratio*100)}/{int(100-indiv_init_train_ratio*100)})...")
         print(f"Initial training set has {init_train_size} observations and goes from {target.index[0]} to {target.index[init_train_size-1]}")
-        print(f"There are {H} periods to be forecasted by the individual models {target.index[init_train_size]} to {target.index[-1]}")
+        print(f"There are {H} periods to be forecasted by the individual models {target.index[init_train_size]} to {target.index[-1]}\n")
     
     # Create a DataFrame to store all models' predictions
     individual_predictions = pd.DataFrame()
@@ -82,7 +82,7 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             
             # Define at what frequency ARIMA model is refitted
             
-            refit_freq = H // (1/autosarimax_refit_interval) # 25 % intervals => consider deacreasing this to 20% or 10%
+            refit_freq = (H // (1/autosarimax_refit_interval) + 1) # 33 % intervals => consider deacreasing this to 20% or 10% 
             
             if verbose:
                 print("Auto-fitting model...")
@@ -152,6 +152,6 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             print("...finished!\n")
     
     if verbose:
-        print(individual_predictions, "\n")
+        print(individual_predictions.head(), "\n")
         
     return individual_predictions

@@ -17,7 +17,7 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
     if verbose:
         print(f"Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: {int(ens_init_train_ratio*100)}/{int(100-ens_init_train_ratio*100)})...")
         print(f"Initial training set has {ens_init_train_size} observations and goes from {individual_predictions.index[0]} to {individual_predictions.index[ens_init_train_size-1]}")
-        print(f"There are {H_ens} periods to be forecasted by the individual models {individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}")
+        print(f"There are {H_ens} periods to be forecasted by the individual models {individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}\n")
 
     # Set Up Ensemble Forecast Dataset
     ensemble_predictions = pd.DataFrame(columns = ["Date", "Ensemble_Simple", "Ensemble_RSME", "Ensemble_Variance", "Ensemble_ErrorCorrelation", "Ensemble_Metamodel_SVR", "Ensemble_RandomForest"])
@@ -47,12 +47,11 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
     # Set "Date" column as index and drop it
     ensemble_predictions.set_index("Date", inplace=True)
     if verbose:            
-        print(ensemble_predictions)
+        print(ensemble_predictions.head())
         print("...ensemble predictions finished!")
     # Append to individual predictions:
         print("...merging...")
     full_predictions = ensemble_predictions.merge(individual_predictions, left_index=True, right_index=True, how='left')
-    print(full_predictions)
 
     if isinstance(csv_export, (os.PathLike, str)):
         if verbose:
@@ -61,7 +60,6 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
         
     if verbose:  
         print("...finished!")
-        print(full_predictions, "\n")
     
     return full_predictions
 
