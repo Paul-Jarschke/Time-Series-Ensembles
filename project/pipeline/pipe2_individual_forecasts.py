@@ -1,6 +1,7 @@
+from paths import *
+
 from models.forecasting_models import models
 from pipeline.pipe1_data_preprocessing import target, covariates
-from paths import *
 
 
 # todo: add/create timestamp folder to export
@@ -13,7 +14,6 @@ from paths import *
 ###############################################################
 
 def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio=0.3, csv_export=False, autosarimax_refit_interval=0.25):
-    
     print("=======================================================")
     print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
     print("=======================================================")
@@ -147,6 +147,6 @@ def pipe2_individual_forecasts(models, target, covariates=None, init_train_ratio
     
     return individual_predictions
 
-
+# todo: Diese Funktionen am Ende jedes pipe files in run_pipeline.py packen
 individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates, init_train_ratio=0.3, csv_export=EXPORT_DIR)
 print(individual_predictions)

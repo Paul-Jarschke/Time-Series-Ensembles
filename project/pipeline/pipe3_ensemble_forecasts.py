@@ -1,17 +1,14 @@
+from utils.ensembling_methods import simple_average, compute_rmse_weights, compute_variance_weights, compute_error_correlation_weights, ensemble_predictions_given_weights, metamodel_random_forest, metamodel_svr
+import pandas as pd
+import os
+from paths import *
+
 from pipeline.pipe2_individual_forecasts import individual_predictions
 
-print(individual_predictions)
-
-export_path = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/interim_results/'
-
-# todo: comment and streamlining
+# todo: comment, docstring 
+# #todo: streamlining
 
 def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, csv_export=False):
-    
-    import pandas as pd
-    from utils.ensembling_methods import simple_average, compute_rmse_weights, compute_variance_weights, compute_error_correlation_weights, ensemble_predictions_given_weights, metamodel_random_forest, metamodel_svr
-    import os
-    
     print("#############################################")
     print("## Step 3: Historical Ensemble Predictions ##")
     print("#############################################")
@@ -53,15 +50,17 @@ def pipe3_ensemble_forecasts(individual_predictions, ens_init_train_ratio=0.3, c
     print("...merging...")
     full_predictions = ensemble_predictions.merge(individual_predictions, left_index=True, right_index=True, how='left')
     print(full_predictions)
-    print("...finished!")
 
     if isinstance(csv_export, (os.PathLike, str)):
-        # todo:if path not defined export in working directory
-        print("Exporting individual forecasts as csv...")
+        # todo: if path not defined export in working directory
+        # todo: add to timestamp folder
+        print("Exporting ensemble forecasts as csv...")
         full_predictions.to_csv(os.path.join(csv_export, f"full_predictions.csv"), index=True)
-        print("...finished!")
+        
+    print("...finished!")
     
     return full_predictions
 
 
-full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=export_path)
+full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3, csv_export=EXPORT_DIR)
+print(full_predictions)
