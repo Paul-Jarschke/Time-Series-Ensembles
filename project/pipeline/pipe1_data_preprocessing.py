@@ -9,14 +9,11 @@ file_name = 'noisy_simdata.csv'
 # Combine the directory path and file name
 file_path = sim_dir + file_name
 
-
 # Read and preprocess Dataset
 df = pd.read_csv(file_path, index_col = "Date")
 
 
 def pipe1_data_preprocessing(df, verbose=False):
-    
-    
 
     if verbose:
         print("Data Insights:")

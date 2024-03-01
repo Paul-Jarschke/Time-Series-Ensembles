@@ -4,6 +4,7 @@ import numpy as np
 import os
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error 
 
+
 def pipe4_metrics_ranking(full_predictions, csv_export=False, verbose=False):
     print("\n############################################")
     print("## Step 4: Creating Metrics Ranking Table ##")
@@ -47,4 +48,3 @@ def pipe4_metrics_ranking(full_predictions, csv_export=False, verbose=False):
     if verbose:
         print(metrics_ranking, "\n")
     return metrics_ranking
-
