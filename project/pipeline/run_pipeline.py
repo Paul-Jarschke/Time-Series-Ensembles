@@ -1,5 +1,4 @@
 from paths import *
-from models.forecasting_models import models
 
 from pipeline.pipe1_data_preprocessing import pipe1_data_preprocessing
 from pipeline.pipe2_individual_forecasts import pipe2_individual_forecasts
@@ -7,7 +6,7 @@ from pipeline.pipe3_ensemble_forecasts import pipe3_ensemble_forecasts
 from pipeline.pipe4_metrics_ranking import pipe4_metrics_ranking
 
 
-def run_pipeline(df, verbose=False):
+def run_pipeline(df, forecasting_models, ensemble_methods, metrics, verbose=False):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
@@ -36,16 +35,16 @@ def run_pipeline(df, verbose=False):
     target, covariates = pipe1_data_preprocessing(df=df, verbose=verbose)
 
     # Pipeline step 2: Compute individual predictions
-    individual_predictions = pipe2_individual_forecasts(models=models, target=target, covariates=covariates,
+    individual_predictions = pipe2_individual_forecasts(models=forecasting_models, target=target, covariates=covariates,
                                                         indiv_init_train_ratio=0.3, csv_export=EXPORT_DIR,
                                                         verbose=verbose)
 
     # Pipeline step 3: Compute ensemble predictions
-    full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, ens_init_train_ratio=0.3,
+    full_predictions = pipe3_ensemble_forecasts(individual_predictions=individual_predictions, methods=ensemble_methods, ens_init_train_ratio=0.3,
                                                 csv_export=EXPORT_DIR, verbose=verbose)
 
     # Pipeline step 4: Ranking by metrics
-    metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, csv_export=EXPORT_DIR, verbose=verbose)
+    metrics_ranking = pipe4_metrics_ranking(full_predictions=full_predictions, metrics=metrics, csv_export=EXPORT_DIR, verbose=verbose)
 
     if verbose:
         print("Finished pipeline!")

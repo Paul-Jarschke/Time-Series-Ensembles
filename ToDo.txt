@@ -1,6 +1,17 @@
 =========
 PIPELINE:
 =========
+individual:
+- fix theta (nimmt einfach past avg)
+- forecasting models.py genau so aufarbeiten wie ensemble
+- infer sp for STL and theta (nicht geben!); auch xgboost lag
+
+ensemble:
+- add voting as method?
+
+=========
+PIPELINE:
+=========
 
 run_pipeline():
 - create timestamp folder for data storage
@@ -16,17 +27,15 @@ pipe1_data_preprocessing():
 - add arguments target_colnme und cov colname, wenn nicht assume that target is in first col und rest are covariates
 
 pipe2_individual_forecasts():
-- docstring, comments fehlen noch
+- docstring, comments
 - check if SARIMAX loop takes updated params (trace = True)
 - make more generic for all models that have fit and predict method; consider removing historical forecast method etc => as in arima
 
 pipe3_ensemble_forecasts():
 - comment, docstring 
-- streamlining code
 
 pipe4_metrics_ranking():
-- streamline code
-- use pauls mse and mape functions
+- comment, docstring
 
 
 =========

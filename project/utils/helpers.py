@@ -69,7 +69,6 @@ def prepare_eurusd_data(data, n=1000):
     return series, target_series, cov_series, dates
 
 
-
 def train_test_split(series, train_split=0.3):
     """
     Split a time series into training and validation sets.

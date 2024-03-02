@@ -28,6 +28,9 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
 
     X_train_full = covariates
 
+    # Infer frequency
+    inferred_sp = 12 if target.index.freq == "M" else NotImplementedError("Implement me for daily etc")
+
     # Define full forecast horizon
     H = y_train_full.shape[0] - init_train_size
 
@@ -66,6 +69,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
 
         elif "AutoSARIMA" in model_name:
 
+            X_train_full_lagged = None
+
             if model_name == "AutoSARIMAX":
                 lag_indicator = True
                 # Lag X by one period (we only know value at time of prediction)
@@ -75,7 +80,6 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
                 lag_indicator = False
                 init_train_size_X = init_train_size
 
-            inferred_sp = 12 if target.index.freq == "M" else NotImplementedError("Implement me for daily etc")
             model.set_params(**{'sp': inferred_sp})
             model.set_tags(**{"X-y-must-have-same-index": False, 'handles-missing-data': True})
 
@@ -95,8 +99,8 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
 
                 current_y_train_arima = y_train_full[int(lag_indicator):(init_train_size + k)]
 
-                current_X_train_arima = X_train_full_lagged[
-                                        :(init_train_size_X + k)] if model_name == "AutoSARIMAX" else None
+                current_X_train_arima = X_train_full_lagged[:(init_train_size_X + k)] if (
+                        model_name == "AutoSARIMAX") else None
 
                 # Refit ARIMA model (including order) at period 0 and each "refit_freq"th period
                 if k % refit_freq == 0:
@@ -146,10 +150,12 @@ def pipe2_individual_forecasts(models, target, covariates=None, indiv_init_train
             print("...finished!\n")
         individual_predictions[model_name] = model_predictions
 
+    if verbose:
+        print("Individual predictions finished!")
     individual_predictions.insert(0, "Target", value=y_train_full[init_train_size:])
 
     if isinstance(csv_export, (os.PathLike, str)):
-        individual_predictions.to_csv(os.path.join(csv_export, f"historical_forecasts.csv"), index=True)
+        individual_predictions.to_csv(os.path.join(csv_export, f"individual_predictions.csv"), index=True)
         if verbose:
             print("Exporting individual forecasts as csv...")
             print("...finished!\n")
