@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 # ------------------------------------------------
 # Setting weighting schemes
-weighting_schemes = {
+WEIGHTING_SCHEMES = {
     'Simple': equal_weights,
     'Inv_RMSE': inv_rmse_weights,
     'Inv_Variance': inv_variance_weights,
@@ -14,7 +14,7 @@ weighting_schemes = {
 }
 
 # Setting meta models
-metamodels = {
+METAMODELS = {
     'SVR': {
         # Model object
         'model': SVR,
@@ -33,7 +33,7 @@ metamodels = {
 # ------------------------------------------------
 
 # Do not change
-ensemble_methods = {
-    'weighted': weighting_schemes,
-    'meta': metamodels
+ENS_METHODS = {
+    'weighted': WEIGHTING_SCHEMES,
+    'meta': METAMODELS
 }

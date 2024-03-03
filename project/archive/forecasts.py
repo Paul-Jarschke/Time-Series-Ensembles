@@ -66,8 +66,8 @@ for model_name, model in models.items():
 print(predictions)
 
 # ToDos:
-# - add XGBoost (with/without covariates to forecasting_models.py)
-# - Add SARIMA with covariates to forecasting_models.py
+# - add XGBoost (with/without covariates to forecasting.py)
+# - Add SARIMA with covariates to forecasting.py
 # - Implement expanding window approach (either manually with loop or using historical_forecast respectively ExpandingWindowSplitter and update_prpedict in sktime)
 # - add Cubic Splines to forecasting models (maybe not)
 

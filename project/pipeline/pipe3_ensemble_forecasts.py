@@ -9,7 +9,8 @@ import os
 
 
 def pipe3_ensemble_forecasts(individual_predictions, methods,
-                             ens_init_train_ratio=0.3, csv_export=False, verbose=False):
+                             ens_init_train_ratio=0.3,
+                             csv_export=False, verbose=False):
     if verbose:
         print("\n#############################################")
         print("## Step 3: Historical Ensemble Predictions ##")
@@ -45,11 +46,11 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
                 options = {}
 
             if verbose:
-                print(f"\nPerforming {model_name} {method} expanding window...")
+                print(f"\nPerforming {model_name} {method} expanding window forecasts...")
 
             for i, fc_period in enumerate(range(ens_init_train_size, n_predictions)):
                 if verbose:
-                    if (i + 1) == 1 or (i + 1) == (n_predictions - ens_init_train_size) or (i + 1) % 10 == 0:
+                    if (i + 1) == 1 or (i + 1) == (n_predictions - ens_init_train_size) or (i + 1) % 20 == 0:
                         print(f'Ensemble forecast {i + 1} / {n_predictions - ens_init_train_size}')
                 # Periode an der vorgecastet wird = fc_period
                 past_individual_predictions = individual_predictions.iloc[0:fc_period, :]

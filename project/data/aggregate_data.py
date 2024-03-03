@@ -35,3 +35,4 @@ def aggregate_data_daily(path, date=None, value_column='bid_open', method='mean'
         aggregated_df.dropna(subset=[value_column], inplace=True)
 
     return aggregated_df
+

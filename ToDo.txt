@@ -4,7 +4,6 @@ PIPELINE:
 individual:
 - fix theta (nimmt einfach past avg)
 - forecasting models.py genau so aufarbeiten wie ensemble
-- infer sp for STL and theta (nicht geben!); auch xgboost lag
 
 ensemble:
 - add voting as method?
@@ -21,10 +20,9 @@ run_pipeline():
 - csv export: if True but path not defined export in working directory
 
 pipe1_data_preprocessing():
-- everything
-- make generic for daily  data etc.
 - monthly in print durch if bedingung ersetzen, welche df.index.freq erkennt
 - add arguments target_colnme und cov colname, wenn nicht assume that target is in first col und rest are covariates
+- test with exchange rate data
 
 pipe2_individual_forecasts():
 - docstring, comments

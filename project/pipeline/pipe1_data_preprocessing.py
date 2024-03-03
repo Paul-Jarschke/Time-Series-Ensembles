@@ -1,77 +1,102 @@
-# Wird noch ordentlich in Funktion gewrapped und auch auf externe Daten / daily data anwendbar
-
 import pandas as pd
+from utils.helpers import identify_date_column, target_covariate_split
 
-# Define the directory path and file name
-sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/data/simulations/'
-file_name = 'noisy_simdata.csv'
-
-# Combine the directory path and file name
-file_path = sim_dir + file_name
-
-# Read and preprocess Dataset
-df = pd.read_csv(file_path, index_col = "Date")
+# For debugging:
+# from paths import *
+# import os
+# FILE_PATH = os.path.join(SIMDATA_DIR, 'noisy_simdata.csv')
+# df = pd.read_csv(FILE_PATH)
 
 
-def pipe1_data_preprocessing(df, verbose=False):
+def pipe1_data_preprocessing(df,
+                             date_col='infer', date_format=None,
+                             target='infer', covariates='infer', exclude=None,
+                             verbose=False, *args, **kwargs):
 
     if verbose:
-        print("Data Insights:")
-        print(df.head(), "\n")
-        print(f"Monthly data from goes from {df.index[0]} to {df.index[-1]}, resulting in {len(df)} observations.")
-        
         print("\n=====================================================")
         print("== Starting Step 1 in Pipeline: Data Preprocessing ==")
         print("=====================================================")
-    
-    # index in index abspeichern, nicht als Spalte! wichtig für preprocessing
-    # # if Bedingung: if freq is not given or gibt error:
-    
-    infered_freq = pd.infer_freq(df.index)
-    df.index = pd.to_datetime(df.index)
-    df.index.freq = infered_freq # or given freq     
-      
-    if "M" in infered_freq:
-        infered_freq = "M"  
-        
-    # Convert DataFrame to TimeSeries and split target and predictors
-    
-    # Indicator if DataFrame includes covariates
-    #contains_covariates = bool(predictors_names)  
-    target = df['y']
-    covariates = df.iloc[:, 1:] # default: None    
-    target.index = pd.PeriodIndex(target.index, freq=infered_freq)
-    #if covariates is not None:
-    covariates.index = pd.PeriodIndex(covariates.index, freq=infered_freq)  
-    
+
+    # Transform positional indices of target, covariate, and exclude to labels
+    # + input validation
+    # Target
+    initial_column_names = df.columns
+    if isinstance(target, int):
+        target = initial_column_names[target]
+    elif not isinstance(target, str):
+        raise ValueError('Target must be provided as str or positional int.')
+    # Covariates
+    if isinstance(covariates, int):
+        covariates = initial_column_names[covariates]
+    elif isinstance(covariates, list):
+        covariates = [element if isinstance(element, str) else initial_column_names[element] for element in covariates]
+    elif not isinstance(covariates, str) and covariates is not None:
+        raise ValueError('If not None, covariates must be provided as str, positional int or list of str/int.')
+    # Excluded columns
+    if isinstance(exclude, int):
+        covariates = initial_column_names[exclude]
+    elif isinstance(exclude, list):
+        exclude = [element if isinstance(element, str) else initial_column_names[element] for element in exclude]
+    elif not isinstance(exclude, str) and exclude is not None:
+        raise ValueError('If not None, excluded columns must be provided as str, positional int or list of str/int.')
+
+    # Identify position and name of date column if not provided
+    # Transform positional index to column label
+    if isinstance(date_col, int):
+        date_col = df.columns[date_col]
+    # Identify position and name of date column if not provided and set as index
+    elif date_col == 'infer':
+        if verbose:
+            print('Searching for time information...')
+        date_col = identify_date_column(df, date_format=date_format)
+        if verbose:
+            print(f'Dates found in \'{date_col}\' column!')
+    elif isinstance(date_col, str):
+        pass
+    else:
+        raise ValueError('date_col must be either \'infer\' or of type str or positional int.')
+    # Set given/inferred date_col as the index column if it is not yet in the index
+    if date_col != 'index':
+        df.set_index(date_col, inplace=True)
+
+    # Transform index to DateTime Index
+    df.index = pd.to_datetime(arg=df.index, format=date_format, *args, **kwargs)
+
+    # Infer frequency
+    inferred_freq = pd.infer_freq(df.index)
+    df.index.freq = inferred_freq
+    if verbose:
+        frequency_mapping = {
+            'D': 'daily',
+            'W': 'weekly',
+            'MS': 'monthly',
+            'M': 'monthly'
+        }
+        inferred_frequency_string = frequency_mapping[inferred_freq] if (
+                inferred_freq in frequency_mapping.keys()) else inferred_freq
+        # print('Inferring frequency...')
+        print(f'Inferred frequency: {inferred_frequency_string}')
+        print(f"{inferred_frequency_string.capitalize()} data from goes",
+              f"from {df.index[0].date()} to {df.index[-1].date()},",
+              f"resulting in {len(df)} observations.\n")
+
+    # Split DataFrame into target and covariates (if exist)
+    target, covariates = target_covariate_split(df, target=target, covariates=covariates, exclude=exclude)
+
+    # Print selected covariates and target
     if verbose:
         print("Target:", target.name)
-        print("Covariates:", ", ".join(covariates.columns)) 
-          
-    return target, covariates      
+        print("Covariates:", ", ".join(covariates.columns))
+
+    # Give data insight:
+    if verbose:
+        print("Data Insight:")
+        print(pd.concat([target, covariates], axis=1).head(), "\n")
+
+    return target, covariates
 
 
-
-        #input pandas dataframe
-        # argument for target
-        #argument for covariates
-        # argument for data
-        # argument freq
-
-        # date="index", freq="infer", 
-
-        # # if not "index" please provide an array-like, pandas Series of dates, DatetimeIndex or PeriodIndex as input
-        #     if date != "index":
-        #         target.index, covariates.index = date
-        #         covariates.index = date
-                
-        #     if freq == "infer":
-        #         freq = pd.infer_freq(target.index)
-        
-        #     # change "MS" and "ME" to "M" for PeriodIndex
-        #     if "M" in freq:
-        #         freq = "M"
-                
-        #             # Change data index to period index for sktime
-        #     target.index = pd.PeriodIndex(target.index, freq=infered_freq)
-
+# For debugging:
+# y, X = pipe1_data_preprocessing(df=df, models=forecasting_models, verbose=True)
+# print(y, X)
