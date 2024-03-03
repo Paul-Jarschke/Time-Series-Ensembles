@@ -53,6 +53,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             models=forecasting_models,
             target=target, covariates=covariates,
             indiv_init_train_ratio=indiv_init_train_ratio,
+            autosarimax_refit_interval=autosarimax_refit_interval,
             csv_export=EXPORT_DIR, verbose=verbose
         )
     )

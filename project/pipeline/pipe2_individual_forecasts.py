@@ -133,6 +133,7 @@ def pipe2_individual_forecasts(models, target, covariates=None,
                     # - and make own .update_predict method for ARIMA (wrap in class)
 
                     # Define at what frequency ARIMA model is being refitted
+                    autosarimax_refit_interval = 1 if autosarimax_refit_interval is None else autosarimax_refit_interval
                     refit_freq = (H // (
                             1 / autosarimax_refit_interval) + 1)  # 33 % intervals => consider lowering to 20% or 10%
 
@@ -150,9 +151,11 @@ def pipe2_individual_forecasts(models, target, covariates=None,
                         current_X_train_arima = X_train_transformed[:current_train_size] \
                             if X_train_transformed is not None else None
 
-                        # Refit ARIMA model (including order) at period 0 and each "refit_freq"th period
+                        # Refit and Update AutoSARIMA(X) Model
+
+                        # Refit:
                         if k % refit_freq == 0:
-                            if k != 0:
+                            if k != 0:  # refit model at period 0 and every "refit_freq"th period
                                 # Initialize model with previous parameters (speed up fitting)
                                 sarima_fitted_params = model.get_fitted_params(deep=True)
                                 p, d, q = sarima_fitted_params['order']
@@ -172,6 +175,8 @@ def pipe2_individual_forecasts(models, target, covariates=None,
                                 if verbose:
                                     print("...automatic refitting...")
                             model.fit(y=current_y_train_arima, X=current_X_train_arima)
+
+                        # Update:
                         else:
                             # In all other periods just update parameters/coefficients
                             model.update(y=current_y_train_arima, X=current_X_train_arima)
@@ -180,11 +185,12 @@ def pipe2_individual_forecasts(models, target, covariates=None,
                             if verbose:
                                 print(f"{model_name} forecast {k + 1} / {H}")
 
-                        # last known X as predictor
+                        # Predict:
+                        # Select last known X as predictor if using a covariate model
                         X_pred_sarimax = (X_train_transformed[init_train_size - lag_indicator + k:
                                                               init_train_size - lag_indicator + k + 1]
                                           if covmodel_bool else None)
-                        # Predict
+                        # Perform prediction
                         prediction = model.predict(fh=1, X=X_pred_sarimax)
                         model_predictions = pd.concat([model_predictions, prediction], axis=0)
 
