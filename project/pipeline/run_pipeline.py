@@ -11,7 +11,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
                  agg_method=None, agg_freq=None,
                  autosarimax_refit_interval=None,
                  indiv_init_train_ratio=0.3, ens_init_train_ratio=0.3,
-                 errors='raise', verbose=False):
+                 sort_by='MAPE',
+                 errors='raise', verbose=False,
+                 *args, **kwargs):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
@@ -43,7 +45,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             date_col=date_col, date_format=date_format,
             target=target, covariates=covariates, exclude=exclude,
             agg_method=agg_method, agg_freq=agg_freq,
-            errors=errors, verbose=verbose
+            errors=errors, verbose=verbose,
+            *args, **kwargs
         )
     )
 
@@ -54,7 +57,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             target=target, covariates=covariates,
             indiv_init_train_ratio=indiv_init_train_ratio,
             autosarimax_refit_interval=autosarimax_refit_interval,
-            csv_export=EXPORT_DIR, verbose=verbose
+            csv_export=EXPORT_DIR, verbose=verbose,
+            *args, **kwargs
         )
     )
 
@@ -64,7 +68,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             individual_predictions=individual_predictions,
             methods=ensemble_methods,
             ens_init_train_ratio=ens_init_train_ratio,
-            csv_export=EXPORT_DIR, verbose=verbose
+            csv_export=EXPORT_DIR, verbose=verbose,
+            *args, **kwargs
         )
     )
 
@@ -73,7 +78,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
         pipe4_metrics_ranking(
             full_predictions=full_predictions,
             metrics=metrics,
-            csv_export=EXPORT_DIR, verbose=verbose
+            sort_by=sort_by,
+            csv_export=EXPORT_DIR, verbose=verbose,
+            *args, **kwargs
         )
     )
 

@@ -6,7 +6,7 @@ import os
 # full_predictions = pd.read_csv(os.path.join(EXPORT_DIR, "full_predictions.csv"), index_col=0)
 
 
-def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, verbose=False, sort_by="MAPE"):
+def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, sort_by="MAPE", verbose=False, ):
 
     if verbose:
         print("\n############################################")
