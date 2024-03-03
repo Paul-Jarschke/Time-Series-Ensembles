@@ -119,7 +119,7 @@ def inv_error_cov_weights(predictions, verbose=True):
     # => not the real covariance
 
     # Divide by n to obtain the error covariance matrix
-    #C /= len(errors)
+    # C /= len(errors)
     # Calculate Error Covariance Matrix
     C = errors.cov()
     # Compute the inverse matrix
@@ -144,7 +144,8 @@ def compute_weighted_predictions(next_individual_predictions, weights, verbose=F
     Compute weighted ensemble predictions using provided weights
 
     Parameters:
-        next_individual_predictions (DataFrame): DataFrame containing predictions from individual models that should be ensembled.
+        next_individual_predictions (DataFrame): DataFrame containing predictions from individual models \
+        that should be ensembled.
         weights (dict): Dictionary containing model names as keys and their respective weights as items.
 
     Returns:

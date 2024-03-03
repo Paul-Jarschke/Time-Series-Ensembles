@@ -10,23 +10,17 @@ from darts.models import XGBModel
 
 print("Loading individual forecasting models...")
 
-################
-# Naive (last) #
-################
+# Naive (last)
 model_naive = NaiveForecaster(
     strategy="last"
 )
 
-#################
-# Naive (drift) #
-#################
+# Naive (drift)
 model_naive_drift = NaiveForecaster(
     strategy="drift"
 )
 
-###############
-# Auto-SARIMA #
-###############
+# Auto-SARIMA
 model_SARIMA = AutoARIMA(
     seasonal=True,
     stationary=False,
@@ -40,31 +34,22 @@ model_SARIMA = AutoARIMA(
     # simple_differencing=True
 )
 
-################################
-# Simple Exponential Smoothing #
-################################
+# Simple Exponential Smoothing
 model_ES = ExponentialSmoothing(
 )
 
-#################
-# Cubic Splines #
-#################
+# Cubic Splines
+# (placeholder)
 
-#########
-# Theta #
-#########
+# Theta
 model_theta = ThetaForecaster(
 )
 
-#######
-# STL #
-#######
+# STL
 model_STL = STLForecaster(
 )
 
-###########
-# XGBoost #
-###########
+# XGBoost
 var_lags = 10
 
 # Without covariates

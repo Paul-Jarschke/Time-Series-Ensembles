@@ -1,8 +1,5 @@
 import pandas as pd
 
-print('Loading aggregation function...')
-
-
 def aggregate_data(data, agg_freq: str, date_col='index', columns='all', method='mean', drop_nan=True):
     """
     Aggregate data to specified frequency by specified method.

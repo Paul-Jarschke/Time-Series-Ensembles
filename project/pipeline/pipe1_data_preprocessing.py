@@ -1,6 +1,7 @@
 import pandas as pd
 from utils.helpers import identify_date_column, target_covariate_split
 from utils.mappings import FREQ_MAPPING
+from utils.aggregate_data import aggregate_data
 
 # For debugging:
 # from paths import *
@@ -18,7 +19,7 @@ def pipe1_data_preprocessing(df,
     if verbose:
         print("\n=====================================================")
         print("== Starting Step 1 in Pipeline: Data Preprocessing ==")
-        print("=====================================================")
+        print("=====================================================\n")
 
     # Transform positional indices of target, covariate, and exclude to labels
     # + input validation
@@ -80,11 +81,11 @@ def pipe1_data_preprocessing(df,
     if agg_method is not None and agg_freq is not None:
         agg_mapped_frequency = FREQ_MAPPING[agg_freq] if (
                 agg_freq in FREQ_MAPPING.keys()) else agg_freq
-        print(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method {agg_method}'
-              + ' and dropping NaNs'
-              + '...'
-              )
-        from utils.aggregate_data import aggregate_data
+        if verbose:
+            print(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method \'{agg_method}\''
+                  + ' and dropping NaNs'
+                  + '...'
+                  )
         df = aggregate_data(data=df, method=agg_method, agg_freq=agg_freq, drop_nan=True)
         print(f'...finished! Data now has {len(df)} observations.\n')
     elif (agg_method is not None) ^ (agg_freq is not None):
@@ -101,7 +102,7 @@ def pipe1_data_preprocessing(df,
 
     # Give data insight:
     if verbose:
-        print("Data Insight:")
+        print("\nData Insight:")
         print(pd.concat([target, covariates], axis=1).head(), "\n")
 
     return target, covariates

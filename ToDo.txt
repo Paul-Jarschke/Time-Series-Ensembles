@@ -8,10 +8,6 @@ individual:
 ensemble:
 - add voting as method?
 
-=========
-PIPELINE:
-=========
-
 run_pipeline():
 - create timestamp folder for data storage
 - create log file storing relevant information like hyperparameter settings on top, data properties, and then console output
@@ -20,7 +16,6 @@ run_pipeline():
 pipe1_data_preprocessing():
 - monthly in print durch if bedingung ersetzen, welche df.index.freq erkennt
 - add arguments target_colnme und cov colname, wenn nicht assume that target is in first col und rest are covariates
-- test with exchange rate data
 
 pipe2_individual_forecasts():
 - docstring, comments
@@ -34,9 +29,3 @@ pipe3_ensemble_forecasts():
 
 pipe4_metrics_ranking():
 - comment, docstring
-
-
-=========
-Interface
-=========
-

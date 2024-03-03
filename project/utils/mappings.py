@@ -32,11 +32,11 @@ FREQ_MAPPING = {
 
 # Mapping frequency aliases to periodicity number
 SEASONAL_FREQ_MAPPING = {
-    'MS': 12,
-    'M': 12,
-    'B': 252,
-    'D': 365,
-    'W': 52,
-    'Q': 4,
-    'Y': 10
+    'MS': 12,  # 12 months per year
+    'M': 12,  # 12 months per year
+    'B': 5,  # 5 business days per week
+    'D': 7,  # 7 days per week
+    'W': 4,  # 4 weeks per month
+    'Q': 4,  # 4 quarters per year
+    'Y': 10  # 10 years per decade
 }

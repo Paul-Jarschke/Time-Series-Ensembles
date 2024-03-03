@@ -5,28 +5,35 @@ from utils.transformers import TRANSFORMERS
 from utils.mappings import SEASONAL_FREQ_MAPPING
 from sktime.split import ExpandingWindowSplitter
 
-# Turn off warnings
-warnings.filterwarnings('ignore')
 
-
-def pipe2_individual_forecasts(models, target, covariates=None,
-                               indiv_init_train_ratio=0.3,
+def pipe2_individual_forecasts(models,
+                               target, covariates=None,
+                               select_models='all',
+                               forecast_init_train=0.3,
                                autosarimax_refit_interval=0.33,
-                               csv_export=False, verbose=False):
+                               csv_export=False, verbose=False,
+                               *args, **kwargs):
     if verbose:
         print("\n=======================================================")
         print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
-        print("=======================================================")
+        print("=======================================================\n")
 
     # Calculate initial train size
-    init_train_size = int(target.shape[0] * indiv_init_train_ratio)
+    init_train_size = int(target.shape[0] * forecast_init_train)
 
     # Define target training variables
     y_train_full = target
 
-    # Infer frequency
+    # Infer seasonal frequency
     inferred_seasonal_freq = SEASONAL_FREQ_MAPPING[target.index.freqstr] \
         if target.index.freqstr in SEASONAL_FREQ_MAPPING.keys() else None
+
+    if inferred_seasonal_freq > init_train_size:
+        warnings.warn('Too few observations provided for seasonal models. '
+                      'If you provide such models, consider removing them!')
+
+    # Turn off warnings
+    warnings.filterwarnings('ignore')
 
     # Calculate full forecast horizon
     H = y_train_full.shape[0] - init_train_size
@@ -34,10 +41,10 @@ def pipe2_individual_forecasts(models, target, covariates=None,
     if verbose:
         print(
             f"Splitting data (train/test ratio:",
-            f"{int(indiv_init_train_ratio * 100)}/{int(100 - indiv_init_train_ratio * 100)})...\n",
-            f"Initial training set has {init_train_size} observations",
-            f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}\n",
-            f"There are {H} periods to be forecasted:",
+            f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
+            f"\nInitial training set has {init_train_size} observations",
+            f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}",
+            f"\nThere are {H} periods to be forecasted:",
             f"{target.index[init_train_size].date()} to {target.index[-1].date()}\n"
         )
 
@@ -54,7 +61,14 @@ def pipe2_individual_forecasts(models, target, covariates=None,
     X_train_transformed = None
 
     # Loop over type of model (with or without covariates)
-    for covariates_indicator, model_dict in models.items():
+    for covariates_indicator, models_dict in models.items():
+
+        # Remove models specified by user from current models dictionary
+        models_to_remove = [model for model in models_dict.keys() if model not in select_models]
+        for model in models_to_remove:
+            models_dict.pop(model)
+
+        # Set object that indicates if it is a covariate model or not
         covmodel_bool = True if covariates_indicator == 'covariates' else False
         # Define X_train_full depending on covmodel_bool
         X_train_full = covariates if covmodel_bool else None
@@ -62,10 +76,11 @@ def pipe2_individual_forecasts(models, target, covariates=None,
         # Loop over individual model in each sub-dictionary
         # Skip covariates models when no covariates are specified
         if covmodel_bool and covariates is None:
-            print(f'Since no covariates are given, skipping covariate models {model_dict.values()}')
+            print(f'Since no covariates are given, skipping covariate models {", ".join(models_dict.keys())}')
             continue
 
-        for model_name, model in model_dict.items():
+        for model_name, model in models_dict.items():
+
             # Find out model source
             # everything before first point and remove the "<class " part of the string
             model_source = str(type(model)).split('.')[0][8:]
@@ -116,15 +131,18 @@ def pipe2_individual_forecasts(models, target, covariates=None,
 
             # sktime models
             elif 'sktime' in model_source:
-                # Adjust sktime specific parameters and tags
-                if model_name != 'Naive': # sNaive performs bad. Does not make sense to use this.
+                # Adjust sktime specific parameters
+                # Seasonal periodicity
+                if model_name != 'Naive':  # sNaive performs bad. Does not make sense to use this.
                     model.set_params(**{'sp': inferred_seasonal_freq})
-                model.set_tags(**{"X-y-must-have-same-index": False, 'handles-missing-data': True})
+
                 # all sktime models but ARIMA
                 if 'ARIMA' not in model_name:
                     cv = ExpandingWindowSplitter(fh=1, initial_window=init_train_size, step_length=1)
                     model.fit(y_train_transformed[:init_train_size])
                     model_predictions = model.update_predict(y_train_transformed, cv)
+
+                # ARIMA
                 else:
                     # Extra treatment for ARIMA model (Updating and Refitting each period would take too much time here)
                     # Outlook:
@@ -201,10 +219,10 @@ def pipe2_individual_forecasts(models, target, covariates=None,
 
             # Save model information to avoid double transforming when no change in model source
             last_model_source = model_source
-            last_model_target = covmodel_bool
+            last_covmodel_bool = covmodel_bool
 
     if verbose:
-        print("Individual predictions finished!")
+        print("\nIndividual predictions finished!")
 
     target_output = y_train_full[init_train_size:]
     period_freq = 'M' if y_train_full.index.freqstr == 'MS' else y_train_full.index.freqstr
@@ -214,11 +232,11 @@ def pipe2_individual_forecasts(models, target, covariates=None,
     if isinstance(csv_export, (os.PathLike, str)):
         individual_predictions.to_csv(os.path.join(csv_export, f"individual_predictions.csv"), index=True)
         if verbose:
-            print("Exporting individual forecasts as csv...")
+            print("\nExporting individual forecasts as csv...")
             print("...finished!\n")
 
     if verbose:
-        print(individual_predictions.head(), "\n")
+        print("Insights into models' predictions:\n", individual_predictions.head(), "\n")
 
     return individual_predictions
 

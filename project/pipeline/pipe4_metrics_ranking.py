@@ -6,12 +6,14 @@ import os
 # full_predictions = pd.read_csv(os.path.join(EXPORT_DIR, "full_predictions.csv"), index_col=0)
 
 
-def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, sort_by="MAPE", verbose=False, *args, **kwargs):
+def pipe4_metrics_ranking(full_predictions, metrics,
+                          csv_export=False, sort_by="MAPE", verbose=False,
+                          *args, **kwargs):
 
     if verbose:
         print("\n############################################")
         print("## Step 4: Creating Metrics Ranking Table ##")
-        print("############################################")
+        print("############################################\n")
         print(f'Calculating {", ".join(metrics.keys())} per model...')
     
     # Extract actual values
@@ -21,6 +23,7 @@ def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, sort_by="
     model_names = full_predictions.columns
     metrics_dict = {'Model': model_names}
     for model_name in model_names:
+
         Y_predicted = full_predictions[model_name]  # Predicted values
 
         # Calculate metrics
@@ -37,13 +40,12 @@ def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, sort_by="
     if verbose:
         print("Ranking models ...")
     for metric_name, metric_values in metrics_df.items():
-        if 'Model' in metric_name:
+        if 'Model' in metric_name:  # No ranking for 'Model' column
             continue
-        metrics_df[f'{metric_name}_Ranking'] = [int(rank) for rank in metric_values.rank()]
-
+        metrics_df[f'{metric_name} Ranking'] = [int(rank) for rank in metric_values.rank()]
 
     # Sort the DataFrame based on selected metric
-    metrics_ranking = metrics_df.sort_values(by=f'{sort_by}_Ranking')
+    metrics_ranking = metrics_df.sort_values(by=f'{sort_by} Ranking')
 
     # Reset the index
     metrics_ranking.reset_index(drop=True, inplace=True)
@@ -52,11 +54,11 @@ def pipe4_metrics_ranking(full_predictions, metrics, csv_export=False, sort_by="
     if isinstance(csv_export, (os.PathLike, str)):
         metrics_ranking.to_csv(os.path.join(csv_export, f"metrics_ranking.csv"), index=True)
         if verbose:
-            print("Exporting metrics ranking as csv...")
+            print("\nExporting metrics ranking as csv...")
             
     if verbose:
         print("...finished!\n")
-        print(metrics_ranking, "\n")
+        print('\n Results:\n', metrics_ranking)
     return metrics_ranking
 
 # pipe4_metrics_ranking(full_predictions, metrics=metrics, csv_export=EXPORT_DIR)

@@ -9,8 +9,8 @@ from pipeline.pipe4_metrics_ranking import pipe4_metrics_ranking
 def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
                  date_col='infer', date_format=None, target='infer', covariates='infer', exclude=None,
                  agg_method=None, agg_freq=None,
-                 autosarimax_refit_interval=None,
-                 indiv_init_train_ratio=0.3, ens_init_train_ratio=0.3,
+                 select_individual_models='all', autosarimax_refit_interval=None, forecast_init_train=0.3,
+                 select_ensemble_methods='all', ensemble_init_train=0.3,
                  sort_by='MAPE',
                  csv_export=EXPORT_DIR, errors='raise', verbose=False,
                  *args, **kwargs):
@@ -34,9 +34,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     - metrics_ranking:
     """
     if verbose:
-        print("=======================")
-        print("== Starting Pipeline ==")
-        print("=======================")
+        print("================================================================================="
+              "\nStarting  Pipeline...")
 
     # Pipeline step 1: Perform data preprocessing
     target, covariates = (
@@ -53,9 +52,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     # Pipeline step 2: Compute individual predictions
     individual_predictions = (
         pipe2_individual_forecasts(
-            models=forecasting_models,
+            models=forecasting_models, select_models=select_individual_models,
             target=target, covariates=covariates,
-            indiv_init_train_ratio=indiv_init_train_ratio,
+            forecast_init_train=forecast_init_train,
             autosarimax_refit_interval=autosarimax_refit_interval,
             csv_export=csv_export, verbose=verbose,
             *args, **kwargs
@@ -66,8 +65,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     full_predictions = (
         pipe3_ensemble_forecasts(
             individual_predictions=individual_predictions,
-            methods=ensemble_methods,
-            ens_init_train_ratio=ens_init_train_ratio,
+            methods=ensemble_methods, select_methods=select_ensemble_methods,
+            ensemble_init_train=ensemble_init_train,
             csv_export=csv_export, verbose=verbose,
             *args, **kwargs
         )
@@ -85,7 +84,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     )
 
     if verbose:
-        print("Finished pipeline!")
+        print("\nFinished Pipeline!\n"
+              "================================================================================="
+              )
 
     # Return results
     return target, covariates, individual_predictions, full_predictions, metrics_ranking
