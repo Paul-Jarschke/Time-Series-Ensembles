@@ -28,7 +28,7 @@ class SARIMAX_Simulation(sm.tsa.SARIMAX):
             exog = pd.concat(exog, axis=1)
         self.exog = exog
 
-        # Set number of simulations
+        # Set number of simulated
         self.nsimulations = nsimulations if nsimulations is not None else len(self.months)
         if self.nsimulations != len(self.months):
             raise ValueError("'nsimulations' does not equal the number of periods between 'start' and 'end'.")

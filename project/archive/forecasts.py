@@ -14,7 +14,7 @@ print(models)
 
 
 # Define the directory path and file name
-sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/data/simulations/'
+sim_dir = r'/data/simulated/'
 file_name = 'noisy_simdata.csv'
 
 # Combine the directory path and file name

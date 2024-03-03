@@ -14,7 +14,7 @@ end = "12/2023"
 #nsimulations = years * 12 
 
 # Directory to store simulated data
-sim_dir = r'C:/Users/Work/OneDrive/GAU/3. Semester/Statistisches Praktikum/Git/NEW_Ensemble_Techniques_TS_FC/project/data/simulations/'
+sim_dir = r'/data/simulated/'
 
 # Set Seed
 seed = 42

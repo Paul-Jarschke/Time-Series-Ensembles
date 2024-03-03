@@ -4,7 +4,7 @@ import os
 
 # For debugging
 # from paths import *
-# individual_predictions = pd.read_csv(os.path.join(EXPORT_DIR, "historical_predictions.csv"), sep=";", index_col=0)
+# individual_predictions = pd.read_csv(os.path.join(EXPORT_DIR, "individual_predictions.csv"), sep=";", index_col=0)
 # individual_predictions = individual_predictions.drop(columns=['Theta']) # remove me later!
 
 
