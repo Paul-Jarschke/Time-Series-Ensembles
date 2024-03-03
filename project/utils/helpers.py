@@ -1,5 +1,6 @@
 from darts import TimeSeries
 import pandas as pd
+import os
 
 # Run Check
 print('Loading helper functions...')
@@ -214,3 +215,34 @@ def target_covariate_split(df, target='infer', covariates='infer', exclude=None)
         #     raise ValueError("Provided covariates must be provided either as int, str, or list of int/str.")
 
     return target, covariates
+
+
+def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
+    """
+        Read a CSV file from the specified directory path and return it as a pandas DataFrame.
+
+        Parameters:
+        - PATH (str): The directory path where the CSV file is located.
+        - file_name (str): The name of the CSV file.
+        - date_col (int, optional): The column index to be used as the index for the DataFrame. Default is first column.
+        - columns (list of int/str, optional): Subset of columns to select, denoted either \
+        by column labels or column indices stored in a list-like object.
+        - *args: Additional positional arguments to be passed to pandas.read_csv().
+        - **kwargs: Additional keyword arguments to be passed to pandas.read_csv().
+
+        Returns:
+        - df (pandas DataFrame): The DataFrame containing the data from the CSV file.
+        """
+
+    # Ensure that file has csv ending
+    if not file_name.endswith('.csv'):
+        file_name += '.csv'
+
+    # Combine the directory path and file name
+    FILE = os.path.join(PATH, file_name)
+
+    # Read data, set time index end select columns
+    columns = None if columns == 'all' else columns
+    df = pd.read_csv(FILE, index_col=date_col, usecols=columns, *args, **kwargs)
+
+    return df

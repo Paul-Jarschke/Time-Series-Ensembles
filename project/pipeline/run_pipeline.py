@@ -1,4 +1,4 @@
-from paths import *
+from utils.paths import *
 
 from pipeline.pipe1_data_preprocessing import pipe1_data_preprocessing
 from pipeline.pipe2_individual_forecasts import pipe2_individual_forecasts
@@ -8,6 +8,8 @@ from pipeline.pipe4_metrics_ranking import pipe4_metrics_ranking
 
 def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
                  date_col='infer', date_format=None, target='infer', covariates='infer', exclude=None,
+                 agg_method=None, agg_freq=None,
+                 autosarimax_refit_interval=None,
                  indiv_init_train_ratio=0.3, ens_init_train_ratio=0.3,
                  errors='raise', verbose=False):
     """
@@ -39,8 +41,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
         pipe1_data_preprocessing(
             df=df,
             date_col=date_col, date_format=date_format,
-            target=target, covariates=covariates,
-            exclude=exclude,
+            target=target, covariates=covariates, exclude=exclude,
+            agg_method=agg_method, agg_freq=agg_freq,
             errors=errors, verbose=verbose
         )
     )

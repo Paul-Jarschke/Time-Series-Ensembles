@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import warnings
 from utils.transformers import TRANSFORMERS
+from utils.mappings import SEASONAL_FREQ_MAPPING
 from sktime.split import ExpandingWindowSplitter
 
 # Turn off warnings
@@ -24,16 +25,8 @@ def pipe2_individual_forecasts(models, target, covariates=None,
     y_train_full = target
 
     # Infer frequency
-    seasonal_freq_mapping = {
-        'MS': 12,
-        'M': 12,
-        'D': 365,
-        'W': 52,
-        'Q': 4,
-        'Y': 10
-    }
-    inferred_seasonal_freq = seasonal_freq_mapping[target.index.freqstr] \
-        if target.index.freqstr in seasonal_freq_mapping.keys() else None
+    inferred_seasonal_freq = SEASONAL_FREQ_MAPPING[target.index.freqstr] \
+        if target.index.freqstr in SEASONAL_FREQ_MAPPING.keys() else None
 
     # Calculate full forecast horizon
     H = y_train_full.shape[0] - init_train_size

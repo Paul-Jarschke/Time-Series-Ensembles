@@ -1,5 +1,6 @@
 import pandas as pd
 from utils.helpers import identify_date_column, target_covariate_split
+from utils.mappings import FREQ_MAPPING
 
 # For debugging:
 # from paths import *
@@ -11,6 +12,7 @@ from utils.helpers import identify_date_column, target_covariate_split
 def pipe1_data_preprocessing(df,
                              date_col='infer', date_format=None,
                              target='infer', covariates='infer', exclude=None,
+                             agg_method=None, agg_freq=None,
                              verbose=False, *args, **kwargs):
 
     if verbose:
@@ -67,27 +69,35 @@ def pipe1_data_preprocessing(df,
     inferred_freq = pd.infer_freq(df.index)
     df.index.freq = inferred_freq
     if verbose:
-        frequency_mapping = {
-            'D': 'daily',
-            'W': 'weekly',
-            'MS': 'monthly',
-            'M': 'monthly'
-        }
-        inferred_frequency_string = frequency_mapping[inferred_freq] if (
-                inferred_freq in frequency_mapping.keys()) else inferred_freq
+        mapped_inferred_frequency = FREQ_MAPPING[inferred_freq] if (
+                inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
         # print('Inferring frequency...')
-        print(f'Inferred frequency: {inferred_frequency_string}')
-        print(f"{inferred_frequency_string.capitalize()} data from goes",
-              f"from {df.index[0].date()} to {df.index[-1].date()},",
+        print(f'Inferred frequency: {mapped_inferred_frequency}')
+        print(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()},",
               f"resulting in {len(df)} observations.\n")
 
+    # If desired, data aggregation
+    if agg_method is not None and agg_freq is not None:
+        agg_mapped_frequency = FREQ_MAPPING[agg_freq] if (
+                agg_freq in FREQ_MAPPING.keys()) else agg_freq
+        print(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method {agg_method}'
+              + ' and dropping NaNs'
+              + '...'
+              )
+        from utils.aggregate_data import aggregate_data
+        df = aggregate_data(data=df, method=agg_method, agg_freq=agg_freq, drop_nan=True)
+        print(f'...finished! Data now has {len(df)} observations.\n')
+    elif (agg_method is not None) ^ (agg_freq is not None):
+        raise ValueError('Arguments \'agg_method\' and \'agg_freq\' must always be specified together.')
+
     # Split DataFrame into target and covariates (if exist)
+    print('Selecting target' + (' and covariates' if covariates is not None else '') + '...')
     target, covariates = target_covariate_split(df, target=target, covariates=covariates, exclude=exclude)
 
     # Print selected covariates and target
     if verbose:
         print("Target:", target.name)
-        print("Covariates:", ", ".join(covariates.columns))
+        print("Covariates:", ", ".join(covariates.columns) if covariates is not None else 'None')
 
     # Give data insight:
     if verbose:
