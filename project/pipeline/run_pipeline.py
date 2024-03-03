@@ -12,7 +12,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
                  autosarimax_refit_interval=None,
                  indiv_init_train_ratio=0.3, ens_init_train_ratio=0.3,
                  sort_by='MAPE',
-                 errors='raise', verbose=False,
+                 csv_export=EXPORT_DIR, errors='raise', verbose=False,
                  *args, **kwargs):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
@@ -57,7 +57,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             target=target, covariates=covariates,
             indiv_init_train_ratio=indiv_init_train_ratio,
             autosarimax_refit_interval=autosarimax_refit_interval,
-            csv_export=EXPORT_DIR, verbose=verbose,
+            csv_export=csv_export, verbose=verbose,
             *args, **kwargs
         )
     )
@@ -68,7 +68,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             individual_predictions=individual_predictions,
             methods=ensemble_methods,
             ens_init_train_ratio=ens_init_train_ratio,
-            csv_export=EXPORT_DIR, verbose=verbose,
+            csv_export=csv_export, verbose=verbose,
             *args, **kwargs
         )
     )
@@ -79,7 +79,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             full_predictions=full_predictions,
             metrics=metrics,
             sort_by=sort_by,
-            csv_export=EXPORT_DIR, verbose=verbose,
+            csv_export=csv_export, verbose=verbose,
             *args, **kwargs
         )
     )
