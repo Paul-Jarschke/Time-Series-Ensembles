@@ -1,23 +1,25 @@
 import pandas as pd
-import os
 import warnings
-from utils.helpers import vprint
+from utils.helpers import vprint, csv_exporter
 from utils.transformers import TRANSFORMERS
 from utils.mappings import SEASONAL_FREQ_MAPPING
 from sktime.split import ExpandingWindowSplitter
 
 
-def pipe2_individual_forecasts(models,
-                               target, covariates=None,
-                               select_models='all',
+def pipe2_individual_forecasts(target_covariates_tuple,
+                               models, select_models='all',
                                forecast_init_train=0.3,
                                autosarimax_refit_interval=0.33,
-                               csv_export=False, verbose=False,
+                               export_path=None, verbose=False,
                                *args, **kwargs):
 
     vprint("\n======================================================="
            "\n== Starting Step 2 in Pipeline: Individual Forecasts =="
            "\n=======================================================\n")
+
+    # Extract tuple elements
+    target = target_covariates_tuple[0]
+    covariates = target_covariates_tuple[1]
 
     # Calculate initial train size
     init_train_size = int(target.shape[0] * forecast_init_train)
@@ -40,17 +42,17 @@ def pipe2_individual_forecasts(models,
     H = y_train_full.shape[0] - init_train_size
 
     vprint(
-         f"Splitting data (train/test ratio:",
-         f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
-         f"\nInitial training set has {init_train_size} observations",
-         f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}",
-         f"\nThere are {H} periods to be forecasted:",
+         f"Splitting data (train/test ratio: "
+         f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})..."
+         f"\nInitial training set has {init_train_size} observations ",
+         f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}"
+         f"\nThere are {H} periods to be forecasted: ",
          f"{target.index[init_train_size].date()} to {target.index[-1].date()}\n"
     )
 
     # Create a DataFrame to store all models' predictions
     individual_predictions = pd.DataFrame()
-    individual_predictions.index.name = "Date"
+    individual_predictions.index.name = 'Date'
 
     # Initialize last model_source and covmodel_bool objects
     last_model_source = None
@@ -76,17 +78,17 @@ def pipe2_individual_forecasts(models,
         # Loop over individual model in each sub-dictionary
         # Skip covariates models when no covariates are specified
         if covmodel_bool and covariates is None:
-            vprint(f'Since no covariates are given, skipping covariate models {", ".join(models_dict.keys())}')
+            vprint(f"Since no covariates are given, skipping covariate models {', '.join(models_dict.keys())}")
             continue
 
         for model_name, model in models_dict.items():
 
             # Find out model source
-            # everything before first point and remove the "<class " part of the string
+            # everything before first point and remove the '<class ' part of the string
             model_source = str(type(model)).split('.')[0][8:]
             # Add covariate information to model name
             model_name = model_name + (' with covariates' if covmodel_bool else '')
-            vprint(f'Now generating {H} one-step ahead expanding window predictions from model:',
+            vprint(f'Now generating {H} one-step ahead expanding window predictions from model: '
                    f'{model_name} ({model_source})'
                    )
 
@@ -113,7 +115,7 @@ def pipe2_individual_forecasts(models,
 
             # Set up empty DataFrame
             model_predictions = pd.DataFrame()
-            model_predictions.index.name = "Date"
+            model_predictions.index.name = 'Date'
 
             # darts models:
             if 'darts' in model_source:
@@ -154,7 +156,7 @@ def pipe2_individual_forecasts(models,
                     refit_freq = (H // (
                             1 / autosarimax_refit_interval) + 1)  # 33 % intervals => consider lowering to 20% or 10%
 
-                    vprint("Auto-fitting model...")
+                    vprint('Auto-fitting model...')
 
                     # sktime.lagged transformer removes the first period due to NaNs => positional indices change
                     lag_indicator = 1 if 'lagged' in model_source else 0
@@ -171,7 +173,7 @@ def pipe2_individual_forecasts(models,
 
                         # Refit:
                         if k % refit_freq == 0:
-                            if k != 0:  # refit model at period 0 and every "refit_freq"th period
+                            if k != 0:  # refit model at period 0 and every 'refit_freq'th period
                                 # Initialize model with previous parameters (speed up fitting)
                                 sarima_fitted_params = model.get_fitted_params(deep=True)
                                 p, d, q = sarima_fitted_params['order']
@@ -188,7 +190,7 @@ def pipe2_individual_forecasts(models,
                                     'maxiter': 15
                                 }
                                 model.set_params(**updated_params)
-                                vprint("...automatic refitting...")
+                                vprint('...automatic refitting...')
                             model.fit(y=current_y_train_arima, X=current_X_train_arima)
 
                         # Update:
@@ -197,7 +199,7 @@ def pipe2_individual_forecasts(models,
                             model.update(y=current_y_train_arima, X=current_X_train_arima)
 
                         if k == 0 or (k + 1) == H or ((k + 1) % 10) == 0:
-                            vprint(f"{model_name} forecast {k + 1} / {H}")
+                            vprint(f'{model_name} forecast {k + 1} / {H}')
 
                         # Predict:
                         # Select last known X as predictor if using a covariate model
@@ -209,26 +211,26 @@ def pipe2_individual_forecasts(models,
                         model_predictions = pd.concat([model_predictions, prediction], axis=0)
 
             # Store predictions in a new column
-            vprint("...finished!\n")
+            vprint('...finished!\n')
             individual_predictions[model_name] = model_predictions
 
             # Save model information to avoid double transforming when no change in model source
             last_model_source = model_source
             last_covmodel_bool = covmodel_bool
 
-    vprint("\nIndividual predictions finished!")
+    vprint('\nIndividual predictions finished!\n'
+           '\nInsights into models\' predictions:',
+           individual_predictions.head(), '\n'
+           )
 
     target_output = y_train_full[init_train_size:]
     period_freq = 'M' if y_train_full.index.freqstr == 'MS' else y_train_full.index.freqstr
     target_output.index = pd.PeriodIndex(target_output.index, freq=period_freq)
-    individual_predictions.insert(0, "Target", value=target_output)
+    individual_predictions.insert(0, 'Target', value=target_output)
 
-    if isinstance(csv_export, (os.PathLike, str)):
-        individual_predictions.to_csv(os.path.join(csv_export, f"individual_predictions.csv"), index=True)
-        vprint("\nExporting individual forecasts as csv...\n"
-               "...finished!\n")
+    # If path is specified, export results as .csv
+    csv_exporter(export_path, individual_predictions)
 
-    vprint("Insights into models' predictions:\n", individual_predictions.head(), "\n")
 
     return individual_predictions
 

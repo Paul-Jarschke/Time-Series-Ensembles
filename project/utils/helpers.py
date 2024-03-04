@@ -1,4 +1,5 @@
 from darts import TimeSeries
+import logging
 import pandas as pd
 import inspect
 import os
@@ -235,18 +236,62 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
         - df (pandas DataFrame): The DataFrame containing the data from the CSV file.
         """
 
-    # Ensure that file has csv ending
-    if not file_name.endswith('.csv'):
-        file_name += '.csv'
+    # Remove '.csv' from file_name
+    if file_name.endswith('.csv'):
+        file_name = file_name.replace('csv', '')
 
     # Combine the directory path and file name
-    FILE = os.path.join(PATH, file_name)
+    FILE = os.path.join(PATH, file_name + '.csv')
 
     # Read data, set time index end select columns
     columns = None if columns == 'all' else columns
     df = pd.read_csv(FILE, index_col=date_col, usecols=columns, *args, **kwargs)
 
+    # Pass file name (without '.csv') as a flag to DataFrame
+    df.attrs = {'file_name': file_name}
+
     return df
+
+
+def csv_exporter(export_path,  *args, file_name=None):
+    """
+        Export pandas DataFrames to CSV files.
+
+        This function exports DataFrames to CSV files. The export_path specifies the directory where
+        the CSV files will be saved. Each DataFrame is saved as a separate CSV file with the name
+        corresponding to the variable name of the DataFrame.
+
+        Parameters:
+            export_path (str or os.PathLike): The directory path where the CSV files will be saved.
+            file_name (str with '.csv' ending, optional): Export file name. If not defined, infers it from object name.
+            *args: Variable-length argument list of DataFrames to export.
+
+        Notes:
+            This function relies on the 'verbose' variable being accessible from the calling scope.
+
+        Raises:
+            KeyError: If the 'verbose' variable is not found in the calling scope.
+
+        Example:
+            csv_exporter("/path/to/export", df1, df2)
+            # This will export df1 and df2 as CSV files to the "/path/to/export" directory.
+        """
+    parent_objects = inspect.currentframe().f_back.f_locals
+    try:
+        verbose = parent_objects['verbose']
+    except KeyError:
+        raise KeyError("'verbose' variable not found in the calling scope. Make sure it's defined.")
+
+    if isinstance(export_path, (os.PathLike, str)):
+        for df in args:
+            if isinstance(file_name, str):
+                df.to_csv(os.path.join(export_path, f"{file_name}"), index=True)
+                vprint(f"Exporting DataFrame as csv...")
+            for par_obj_name, par_obj in parent_objects.items():
+                if par_obj is df:
+                    df.to_csv(os.path.join(export_path, f"{par_obj_name}.csv"), index=True)
+                    vprint(f"Exporting {par_obj_name.replace('_', ' ')} as csv...")
+        vprint("...finished!\n")
 
 
 def vprint(*args):
@@ -257,5 +302,37 @@ def vprint(*args):
     - *args: Strings to be printed.
     """
     if inspect.currentframe().f_back.f_locals['verbose']:
-        print(*args)
+        # print(*args)
+        # logging.info('\033[0m' + arg)
+        for arg in args:
+            logging.info(arg)
+
+
+def strfdelta(tdelta):
+    """
+    Format a timedelta object into a string of hours, minutes, and seconds.
+
+    Parameters:
+        tdelta (timedelta): A timedelta object representing the time difference.
+
+    Returns:
+        str: A formatted string representing the time difference in the format 'HHh MMm SSs'.
+    """
+    # Extract seconds
+    s = tdelta.seconds
+
+    # hours
+    hours = s // 3600
+    # remaining seconds
+    s = s - (hours * 3600)
+    # minutes
+    minutes = s // 60
+    # remaining seconds
+    seconds = s - (minutes * 60)
+
+    # total time
+    formatted_tdelta = '{:02}h {:02}m {:02}s'.format(int(hours), int(minutes), int(seconds))
+    formatted_tdelta = formatted_tdelta.replace('00h ', '').replace('00m ', '')
+
+    return formatted_tdelta
 

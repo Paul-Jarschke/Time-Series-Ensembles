@@ -8,15 +8,6 @@ individual:
 ensemble:
 - add voting as method?
 
-run_pipeline():
-- create timestamp folder for data storage
-- create log file storing relevant information like hyperparameter settings on top, data properties, and then console output
-- print total time elapsed to console and log(auch in zwischensteps)
-
-pipe1_data_preprocessing():
-- monthly in print durch if bedingung ersetzen, welche df.index.freq erkennt
-- add arguments target_colnme und cov colname, wenn nicht assume that target is in first col und rest are covariates
-
 pipe2_individual_forecasts():
 - docstring, comments
 - check if SARIMAX loop takes updated params (trace = True)

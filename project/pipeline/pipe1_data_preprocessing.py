@@ -17,8 +17,8 @@ def pipe1_data_preprocessing(df,
                              verbose=False, *args, **kwargs):
 
     vprint("\n====================================================="
-           "\n=== Starting Step 1 in Pipeline: Data Preprocessing =="
-           "\n======================================================\n")
+           "\n== Starting Step 1 in Pipeline: Data Preprocessing =="
+           "\n=====================================================\n")
 
     # Transform positional indices of target, covariate, and exclude to labels
     # + input validation
@@ -61,7 +61,7 @@ def pipe1_data_preprocessing(df,
         df.set_index(date_col, inplace=True)
 
     # Transform index to DateTime Index
-    df.index = pd.to_datetime(arg=df.index, format=date_format, *args, **kwargs)
+    df.index = pd.to_datetime(arg=df.index, format=date_format)
 
     # Infer frequency
     inferred_freq = pd.infer_freq(df.index)
@@ -71,7 +71,7 @@ def pipe1_data_preprocessing(df,
             inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
     # vprint('Inferring frequency...')
     vprint(f'Inferred frequency: {mapped_inferred_frequency}')
-    vprint(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()},",
+    vprint(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()}, "
            f"resulting in {len(df)} observations.\n")
 
     # If desired, data aggregation
@@ -79,9 +79,9 @@ def pipe1_data_preprocessing(df,
         agg_mapped_frequency = FREQ_MAPPING[agg_freq] if (
                 agg_freq in FREQ_MAPPING.keys()) else agg_freq
         vprint(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method \'{agg_method}\''
-              + ' and dropping NaNs'
-              + '...'
-              )
+               + ' and dropping NaNs'
+               + '...'
+               )
         df = aggregate_data(data=df, method=agg_method, agg_freq=agg_freq, drop_nan=True)
         vprint(f'...finished!' 
                f'\nData now has {len(df)} observations.\n')
@@ -93,14 +93,16 @@ def pipe1_data_preprocessing(df,
     target, covariates = target_covariate_split(df, target=target, covariates=covariates, exclude=exclude)
 
     # Print selected covariates and target
-    vprint("Target:", target.name)
-    vprint("Covariates:", ", ".join(covariates.columns) if covariates is not None else 'None')
+    vprint("Target: " + target.name)
+    vprint("Covariates: " + (", ".join(covariates.columns) if covariates is not None else 'None'))
 
     # Give data insight:
-    vprint("\nData Insight:")
-    vprint(pd.concat([target, covariates], axis=1).head(), "\n")
+    vprint("\nData Insight:\n")
+    vprint(pd.concat([target, covariates], axis=1).head())
 
-    return target, covariates
+    output_tuple = (target, covariates)
+
+    return output_tuple
 
 
 # For debugging:

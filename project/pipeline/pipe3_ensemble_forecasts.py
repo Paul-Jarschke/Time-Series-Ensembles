@@ -1,23 +1,22 @@
 import pandas as pd
-from utils.helpers import vprint
+from utils.helpers import vprint, csv_exporter
 from utils.ensembling import get_ensemble_prediction
-import os
 
 # For debugging
 # from paths import *
-# individual_predictions = pd.read_csv(os.path.join(EXPORT_DIR, "individual_predictions.csv"), sep=";", index_col=0)
+# individual_predictions = pd.read_csv(os.path.join(EXPORT_DIR, 'individual_predictions.csv'), sep=';', index_col=0)
 # individual_predictions = individual_predictions.drop(columns=['Theta']) # remove me later!
 
 
 def pipe3_ensemble_forecasts(individual_predictions, methods,
                              select_methods='all',
                              ensemble_init_train=0.3,
-                             csv_export=False, verbose=False,
+                             export_path=None, verbose=False,
                              *args, **kwargs):
 
-    vprint("\n============================================="
-           "\n== Step 3: Historical Ensemble Predictions =="
-           "\n=============================================\n")
+    vprint('\n============================================='
+           '\n== Step 3: Historical Ensemble Predictions =='
+           '\n=============================================\n')
 
     # methods is a dictionary of weighting schemes and metamodels (docstring follows)
 
@@ -28,15 +27,15 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
 
     H_ens = n_predictions - ens_init_train_size
 
-    vprint(f"Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: "
-          f"{int(ensemble_init_train * 100)}/{int(100 - ensemble_init_train * 100)})...")
-    vprint(f"Initial training set has {ens_init_train_size} observations and goes from "
-          f"{individual_predictions.index[0]} to {individual_predictions.index[ens_init_train_size-1]}")
-    vprint(f"There are {H_ens} periods to be forecasted by the individual models "
-          f"{individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}")
+    vprint(f'Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: '
+           f'{int(ensemble_init_train * 100)}/{int(100 - ensemble_init_train * 100)})...')
+    vprint(f'Initial training set has {ens_init_train_size} observations and goes from '
+           f'{individual_predictions.index[0]} to {individual_predictions.index[ens_init_train_size-1]}')
+    vprint(f'There are {H_ens} periods to be forecasted by the individual models '
+           f'{individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}')
 
     model_ens_predictions = pd.Series()
-    ens_predictions_df = pd.DataFrame()
+    ensemble_predictions = pd.DataFrame()
 
     for ensemble_approach, methods_dict in methods.items():
 
@@ -47,7 +46,7 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
 
         for method_name, method in methods_dict.items():
 
-            ens_col_name = f"{ensemble_approach.capitalize()} Ensemble: {method_name}"
+            ens_col_name = f'{ensemble_approach.capitalize()} Ensemble: {method_name}'
             if isinstance(method, dict):
                 args = method.get('args')
                 method = method.get('model')
@@ -76,25 +75,22 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
                 else:
                     model_ens_predictions = pd.concat([model_ens_predictions, next_ens_prediction])
 
-            vprint("...finished!")
-            ens_predictions_df[ens_col_name] = model_ens_predictions
+            vprint('...finished!')
+            ensemble_predictions[ens_col_name] = model_ens_predictions
 
-    vprint("\nEnsemble predictions finished!\n"
-           "\nInsights into ensembles' predictions:\n", ens_predictions_df.head(),
-           "\n\nMerging...")
+    vprint('\nEnsemble predictions finished!\n'
+           '\nInsights into ensembles\' predictions:',
+           ensemble_predictions.head())
 
     # Merge with individual predictions
-    full_predictions = ens_predictions_df.merge(individual_predictions, left_index=True, right_index=True, how='left')
+    vprint('\nMerging...')
+    full_predictions = ensemble_predictions.merge(individual_predictions, left_index=True, right_index=True, how='left')
+    vprint('...finished!\n')
 
-    if isinstance(csv_export, (os.PathLike, str)):
-        vprint("\nExporting ensemble forecasts as csv...")
-        ens_predictions_df.to_csv(os.path.join(csv_export, f"ensemble_predictions.csv"), index=True)
-        full_predictions.to_csv(os.path.join(csv_export, f"full_predictions.csv"), index=True)
-
-    vprint("...finished!\n")
-    # vprint(full_predictions.head(), "\n")
+    # If path is specified, export results as .csv
+    csv_exporter(export_path, ensemble_predictions, full_predictions)
 
     return full_predictions
 
 # For debugging
-# pipe3_ensemble_forecasts(individual_predictions, csv_export=EXPORT_DIR)
+# pipe3_ensemble_forecasts(individual_predictions, export_path=EXPORT_DIR)
