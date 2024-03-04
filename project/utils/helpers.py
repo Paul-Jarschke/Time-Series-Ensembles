@@ -1,5 +1,6 @@
 from darts import TimeSeries
 import pandas as pd
+import inspect
 import os
 
 # Run Check
@@ -246,3 +247,15 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
     df = pd.read_csv(FILE, index_col=date_col, usecols=columns, *args, **kwargs)
 
     return df
+
+
+def vprint(*args):
+    """
+    Print function that only prints when globally verbose is True.
+
+    Parameters:
+    - *args: Strings to be printed.
+    """
+    if inspect.currentframe().f_back.f_locals['verbose']:
+        print(*args)
+

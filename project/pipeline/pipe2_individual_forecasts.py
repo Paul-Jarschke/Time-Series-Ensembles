@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import warnings
+from utils.helpers import vprint
 from utils.transformers import TRANSFORMERS
 from utils.mappings import SEASONAL_FREQ_MAPPING
 from sktime.split import ExpandingWindowSplitter
@@ -13,10 +14,10 @@ def pipe2_individual_forecasts(models,
                                autosarimax_refit_interval=0.33,
                                csv_export=False, verbose=False,
                                *args, **kwargs):
-    if verbose:
-        print("\n=======================================================")
-        print("== Starting Step 2 in Pipeline: Individual Forecasts ==")
-        print("=======================================================\n")
+
+    vprint("\n======================================================="
+           "\n== Starting Step 2 in Pipeline: Individual Forecasts =="
+           "\n=======================================================\n")
 
     # Calculate initial train size
     init_train_size = int(target.shape[0] * forecast_init_train)
@@ -38,15 +39,14 @@ def pipe2_individual_forecasts(models,
     # Calculate full forecast horizon
     H = y_train_full.shape[0] - init_train_size
 
-    if verbose:
-        print(
-            f"Splitting data (train/test ratio:",
-            f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
-            f"\nInitial training set has {init_train_size} observations",
-            f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}",
-            f"\nThere are {H} periods to be forecasted:",
-            f"{target.index[init_train_size].date()} to {target.index[-1].date()}\n"
-        )
+    vprint(
+         f"Splitting data (train/test ratio:",
+         f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
+         f"\nInitial training set has {init_train_size} observations",
+         f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}",
+         f"\nThere are {H} periods to be forecasted:",
+         f"{target.index[init_train_size].date()} to {target.index[-1].date()}\n"
+    )
 
     # Create a DataFrame to store all models' predictions
     individual_predictions = pd.DataFrame()
@@ -76,7 +76,7 @@ def pipe2_individual_forecasts(models,
         # Loop over individual model in each sub-dictionary
         # Skip covariates models when no covariates are specified
         if covmodel_bool and covariates is None:
-            print(f'Since no covariates are given, skipping covariate models {", ".join(models_dict.keys())}')
+            vprint(f'Since no covariates are given, skipping covariate models {", ".join(models_dict.keys())}')
             continue
 
         for model_name, model in models_dict.items():
@@ -86,10 +86,9 @@ def pipe2_individual_forecasts(models,
             model_source = str(type(model)).split('.')[0][8:]
             # Add covariate information to model name
             model_name = model_name + (' with covariates' if covmodel_bool else '')
-            if verbose:
-                print(f'Now generating {H} one-step ahead expanding window predictions from model:',
-                      f'{model_name} ({model_source})'
-                      )
+            vprint(f'Now generating {H} one-step ahead expanding window predictions from model:',
+                   f'{model_name} ({model_source})'
+                   )
 
             if model_source == 'sktime' and covmodel_bool:
                 model_source = model_source + '.lagged'
@@ -155,8 +154,7 @@ def pipe2_individual_forecasts(models,
                     refit_freq = (H // (
                             1 / autosarimax_refit_interval) + 1)  # 33 % intervals => consider lowering to 20% or 10%
 
-                    if verbose:
-                        print("Auto-fitting model...")
+                    vprint("Auto-fitting model...")
 
                     # sktime.lagged transformer removes the first period due to NaNs => positional indices change
                     lag_indicator = 1 if 'lagged' in model_source else 0
@@ -190,8 +188,7 @@ def pipe2_individual_forecasts(models,
                                     'maxiter': 15
                                 }
                                 model.set_params(**updated_params)
-                                if verbose:
-                                    print("...automatic refitting...")
+                                vprint("...automatic refitting...")
                             model.fit(y=current_y_train_arima, X=current_X_train_arima)
 
                         # Update:
@@ -200,8 +197,7 @@ def pipe2_individual_forecasts(models,
                             model.update(y=current_y_train_arima, X=current_X_train_arima)
 
                         if k == 0 or (k + 1) == H or ((k + 1) % 10) == 0:
-                            if verbose:
-                                print(f"{model_name} forecast {k + 1} / {H}")
+                            vprint(f"{model_name} forecast {k + 1} / {H}")
 
                         # Predict:
                         # Select last known X as predictor if using a covariate model
@@ -213,16 +209,14 @@ def pipe2_individual_forecasts(models,
                         model_predictions = pd.concat([model_predictions, prediction], axis=0)
 
             # Store predictions in a new column
-            if verbose:
-                print("...finished!\n")
+            vprint("...finished!\n")
             individual_predictions[model_name] = model_predictions
 
             # Save model information to avoid double transforming when no change in model source
             last_model_source = model_source
             last_covmodel_bool = covmodel_bool
 
-    if verbose:
-        print("\nIndividual predictions finished!")
+    vprint("\nIndividual predictions finished!")
 
     target_output = y_train_full[init_train_size:]
     period_freq = 'M' if y_train_full.index.freqstr == 'MS' else y_train_full.index.freqstr
@@ -231,12 +225,10 @@ def pipe2_individual_forecasts(models,
 
     if isinstance(csv_export, (os.PathLike, str)):
         individual_predictions.to_csv(os.path.join(csv_export, f"individual_predictions.csv"), index=True)
-        if verbose:
-            print("\nExporting individual forecasts as csv...")
-            print("...finished!\n")
+        vprint("\nExporting individual forecasts as csv...\n"
+               "...finished!\n")
 
-    if verbose:
-        print("Insights into models' predictions:\n", individual_predictions.head(), "\n")
+    vprint("Insights into models' predictions:\n", individual_predictions.head(), "\n")
 
     return individual_predictions
 

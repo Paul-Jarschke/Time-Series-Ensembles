@@ -1,3 +1,4 @@
+from utils.helpers import vprint
 import pandas as pd
 import os
 
@@ -10,11 +11,11 @@ def pipe4_metrics_ranking(full_predictions, metrics,
                           csv_export=False, sort_by="MAPE", verbose=False,
                           *args, **kwargs):
 
-    if verbose:
-        print("\n############################################")
-        print("## Step 4: Creating Metrics Ranking Table ##")
-        print("############################################\n")
-        print(f'Calculating {", ".join(metrics.keys())} per model...')
+    vprint("\n============================================"
+           "\n== Step 4: Creating Metrics Ranking Table =="
+           "\n============================================\n")
+
+    vprint(f'Calculating {", ".join(metrics.keys())} per model...')
     
     # Extract actual values
     Y_actual = full_predictions.pop('Target')
@@ -37,8 +38,7 @@ def pipe4_metrics_ranking(full_predictions, metrics,
     metrics_df = pd.DataFrame(metrics_dict)
 
     # Rank the models based on metric columns
-    if verbose:
-        print("Ranking models ...")
+    vprint("Ranking models ...")
     for metric_name, metric_values in metrics_df.items():
         if 'Model' in metric_name:  # No ranking for 'Model' column
             continue
@@ -53,12 +53,12 @@ def pipe4_metrics_ranking(full_predictions, metrics,
     # If desired, export results as csv
     if isinstance(csv_export, (os.PathLike, str)):
         metrics_ranking.to_csv(os.path.join(csv_export, f"metrics_ranking.csv"), index=True)
-        if verbose:
-            print("\nExporting metrics ranking as csv...")
-            
-    if verbose:
-        print("...finished!\n")
-        print('\n Results:\n', metrics_ranking)
+        vprint("\nExporting metrics ranking as csv...")
+
+    vprint('...finished!\n'
+           '\nResults:\n',
+           metrics_ranking)
+
     return metrics_ranking
 
 # pipe4_metrics_ranking(full_predictions, metrics=metrics, csv_export=EXPORT_DIR)

@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.helpers import identify_date_column, target_covariate_split
+from utils.helpers import identify_date_column, target_covariate_split, vprint
 from utils.mappings import FREQ_MAPPING
 from utils.aggregate_data import aggregate_data
 
@@ -16,10 +16,9 @@ def pipe1_data_preprocessing(df,
                              agg_method=None, agg_freq=None,
                              verbose=False, *args, **kwargs):
 
-    if verbose:
-        print("\n=====================================================")
-        print("== Starting Step 1 in Pipeline: Data Preprocessing ==")
-        print("=====================================================\n")
+    vprint("\n====================================================="
+           "\n=== Starting Step 1 in Pipeline: Data Preprocessing =="
+           "\n======================================================\n")
 
     # Transform positional indices of target, covariate, and exclude to labels
     # + input validation
@@ -50,11 +49,9 @@ def pipe1_data_preprocessing(df,
         date_col = df.columns[date_col]
     # Identify position and name of date column if not provided and set as index
     elif date_col == 'infer':
-        if verbose:
-            print('Searching for time information...')
+        vprint('Searching for time information...')
         date_col = identify_date_column(df, date_format=date_format)
-        if verbose:
-            print(f'Dates found in \'{date_col}\' column!')
+        vprint(f'Dates found in \'{date_col}\' column!')
     elif isinstance(date_col, str):
         pass
     else:
@@ -69,41 +66,39 @@ def pipe1_data_preprocessing(df,
     # Infer frequency
     inferred_freq = pd.infer_freq(df.index)
     df.index.freq = inferred_freq
-    if verbose:
-        mapped_inferred_frequency = FREQ_MAPPING[inferred_freq] if (
-                inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
-        # print('Inferring frequency...')
-        print(f'Inferred frequency: {mapped_inferred_frequency}')
-        print(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()},",
-              f"resulting in {len(df)} observations.\n")
+
+    mapped_inferred_frequency = FREQ_MAPPING[inferred_freq] if (
+            inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
+    # vprint('Inferring frequency...')
+    vprint(f'Inferred frequency: {mapped_inferred_frequency}')
+    vprint(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()},",
+           f"resulting in {len(df)} observations.\n")
 
     # If desired, data aggregation
     if agg_method is not None and agg_freq is not None:
         agg_mapped_frequency = FREQ_MAPPING[agg_freq] if (
                 agg_freq in FREQ_MAPPING.keys()) else agg_freq
-        if verbose:
-            print(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method \'{agg_method}\''
-                  + ' and dropping NaNs'
-                  + '...'
-                  )
+        vprint(f'Aggregating data to frequency \'{agg_mapped_frequency}\' using method \'{agg_method}\''
+              + ' and dropping NaNs'
+              + '...'
+              )
         df = aggregate_data(data=df, method=agg_method, agg_freq=agg_freq, drop_nan=True)
-        print(f'...finished! Data now has {len(df)} observations.\n')
+        vprint(f'...finished!' 
+               f'\nData now has {len(df)} observations.\n')
     elif (agg_method is not None) ^ (agg_freq is not None):
         raise ValueError('Arguments \'agg_method\' and \'agg_freq\' must always be specified together.')
 
     # Split DataFrame into target and covariates (if exist)
-    print('Selecting target' + (' and covariates' if covariates is not None else '') + '...')
+    vprint('Selecting target' + (' and covariates' if covariates is not None else '') + '...')
     target, covariates = target_covariate_split(df, target=target, covariates=covariates, exclude=exclude)
 
     # Print selected covariates and target
-    if verbose:
-        print("Target:", target.name)
-        print("Covariates:", ", ".join(covariates.columns) if covariates is not None else 'None')
+    vprint("Target:", target.name)
+    vprint("Covariates:", ", ".join(covariates.columns) if covariates is not None else 'None')
 
     # Give data insight:
-    if verbose:
-        print("\nData Insight:")
-        print(pd.concat([target, covariates], axis=1).head(), "\n")
+    vprint("\nData Insight:")
+    vprint(pd.concat([target, covariates], axis=1).head(), "\n")
 
     return target, covariates
 

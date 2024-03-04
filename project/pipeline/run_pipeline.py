@@ -1,4 +1,5 @@
 from utils.paths import *
+from utils.helpers import vprint
 
 from pipeline.pipe1_data_preprocessing import pipe1_data_preprocessing
 from pipeline.pipe2_individual_forecasts import pipe2_individual_forecasts
@@ -33,9 +34,8 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     - full_predictions:
     - metrics_ranking:
     """
-    if verbose:
-        print("================================================================================="
-              "\nStarting  Pipeline...")
+    vprint("================================================================================="
+           "\nStarting  Pipeline...")
 
     # Pipeline step 1: Perform data preprocessing
     target, covariates = (
@@ -83,10 +83,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
         )
     )
 
-    if verbose:
-        print("\nFinished Pipeline!\n"
-              "================================================================================="
-              )
+    vprint("\n\nFinished Pipeline!\n"
+           "================================================================================="
+           )
 
     # Return results
     return target, covariates, individual_predictions, full_predictions, metrics_ranking

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from utils.metrics import rmse
+# from utils.helpers import vprint
 
 def equal_weights(predictions):
     """
@@ -153,16 +154,15 @@ def compute_weighted_predictions(next_individual_predictions, weights, verbose=F
     """
 
     # Print information about the computed weights if verbose is True
-    # if verbose:
-    #   sum_weights = sum(weights.values())
-    #   min_weight = min(weights.values())
-    #   max_weight = max(weights.values())
-    #
-    #   print(f'Checking weights...')
-    #   print(f'Sum of weights: {sum_weights}')
-    #   print(f'Range of weights: [{min_weight}, {max_weight}]\n')
-    #   print(f'Weights:')
-    #   print(weights)
+    # vsum_weights = sum(weights.values())
+    # vmin_weight = min(weights.values())
+    # vmax_weight = max(weights.values())
+
+    # vprint(f'Checking weights...')
+    # vprint(f'Sum of weights: {sum_weights}')
+    # vprint(f'Range of weights: [{min_weight}, {max_weight}]\n')
+    # vprint(f'Weights:')
+    # vprint(weights)
 
     # Exclude target
     if 'Target' in next_individual_predictions.columns:

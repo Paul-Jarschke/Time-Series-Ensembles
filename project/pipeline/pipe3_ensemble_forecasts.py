@@ -1,4 +1,5 @@
 import pandas as pd
+from utils.helpers import vprint
 from utils.ensembling import get_ensemble_prediction
 import os
 
@@ -13,10 +14,10 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
                              ensemble_init_train=0.3,
                              csv_export=False, verbose=False,
                              *args, **kwargs):
-    if verbose:
-        print("\n#############################################")
-        print("## Step 3: Historical Ensemble Predictions ##")
-        print("#############################################\n")
+
+    vprint("\n============================================="
+           "\n== Step 3: Historical Ensemble Predictions =="
+           "\n=============================================\n")
 
     # methods is a dictionary of weighting schemes and metamodels (docstring follows)
 
@@ -27,13 +28,12 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
 
     H_ens = n_predictions - ens_init_train_size
 
-    if verbose:
-        print(f"Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: "
-              f"{int(ensemble_init_train * 100)}/{int(100 - ensemble_init_train * 100)})...")
-        print(f"Initial training set has {ens_init_train_size} observations and goes from "
-              f"{individual_predictions.index[0]} to {individual_predictions.index[ens_init_train_size-1]}")
-        print(f"There are {H_ens} periods to be forecasted by the individual models "
-              f"{individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}")
+    vprint(f"Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: "
+          f"{int(ensemble_init_train * 100)}/{int(100 - ensemble_init_train * 100)})...")
+    vprint(f"Initial training set has {ens_init_train_size} observations and goes from "
+          f"{individual_predictions.index[0]} to {individual_predictions.index[ens_init_train_size-1]}")
+    vprint(f"There are {H_ens} periods to be forecasted by the individual models "
+          f"{individual_predictions.index[ens_init_train_size]} to {individual_predictions.index[-1]}")
 
     model_ens_predictions = pd.Series()
     ens_predictions_df = pd.DataFrame()
@@ -45,22 +45,22 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
         for method in methods_to_remove:
             methods_dict.pop(method)
 
-        for model_name, model in methods_dict.items():
+        for method_name, method in methods_dict.items():
 
-            ens_col_name = f"Ens: {model_name} ({ensemble_approach})"
-            if isinstance(model, dict):
-                args = model.get('args')
-                model = model.get('model')
+            ens_col_name = f"{ensemble_approach.capitalize()} Ensemble: {method_name}"
+            if isinstance(method, dict):
+                args = method.get('args')
+                method = method.get('model')
             else:
                 args = {}
 
-            if verbose:
-                print(f"\nPerforming {model_name} {methods_dict} expanding window forecasts...")
+            vprint(f'\nNow generating {H_ens} one-step ahead expanding window predictions from ensemble model: '
+                   f'\'{ensemble_approach.capitalize()} - {method_name}\'')
 
             for i, fc_period in enumerate(range(ens_init_train_size, n_predictions)):
-                if verbose:
-                    if (i + 1) == 1 or (i + 1) == (n_predictions - ens_init_train_size) or (i + 1) % 20 == 0:
-                        print(f'Ensemble forecast {i + 1} / {n_predictions - ens_init_train_size}')
+
+                if (i + 1) == 1 or (i + 1) == (n_predictions - ens_init_train_size) or (i + 1) % 20 == 0:
+                    vprint(f'Ensemble forecast {i + 1} / {n_predictions - ens_init_train_size}')
                 # fc_period: Period at which forecast is made
                 past_individual_predictions = individual_predictions.iloc[0:fc_period, :]
 
@@ -68,7 +68,7 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
 
                 next_ens_prediction = get_ensemble_prediction(
                     past_individual_predictions, next_individual_predictions,
-                    method=ensemble_approach, model=model, verbose=verbose, **args
+                    method=ensemble_approach, model=method, verbose=verbose, **args
                 )
 
                 if i == 0:
@@ -76,27 +76,23 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
                 else:
                     model_ens_predictions = pd.concat([model_ens_predictions, next_ens_prediction])
 
-            if verbose:
-                print("...finished!")
+            vprint("...finished!")
             ens_predictions_df[ens_col_name] = model_ens_predictions
 
-    if verbose:
-        print("\nEnsemble predictions finished!")
-        print("\nInsights into ensembles' predictions:\n",ens_predictions_df.head())
-        print("\nMerging...")
+    vprint("\nEnsemble predictions finished!\n"
+           "\nInsights into ensembles' predictions:\n", ens_predictions_df.head(),
+           "\n\nMerging...")
 
     # Merge with individual predictions
     full_predictions = ens_predictions_df.merge(individual_predictions, left_index=True, right_index=True, how='left')
 
     if isinstance(csv_export, (os.PathLike, str)):
-        if verbose:
-            print("\nExporting ensemble forecasts as csv...")
+        vprint("\nExporting ensemble forecasts as csv...")
         ens_predictions_df.to_csv(os.path.join(csv_export, f"ensemble_predictions.csv"), index=True)
         full_predictions.to_csv(os.path.join(csv_export, f"full_predictions.csv"), index=True)
 
-    if verbose:
-        print("...finished!")
-        # print(full_predictions.head(), "\n")
+    vprint("...finished!\n")
+    # vprint(full_predictions.head(), "\n")
 
     return full_predictions
 
