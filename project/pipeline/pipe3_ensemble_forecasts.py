@@ -47,6 +47,7 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
     printed_k = ([ceil(x) for x in np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)]
                  * H_ensemble)
 
+    # Ensemble approach: weighted and meta
     for ensemble_approach, methods_dict in methods.items():
 
         # Remove methods specified by user from current methods dictionary
@@ -54,6 +55,7 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
         for method in methods_to_remove:
             methods_dict.pop(method)
 
+        # Methods:
         for method_name, method in methods_dict.items():
 
             ens_col_name = f'{ensemble_approach.capitalize()} Ensemble: {method_name}'
@@ -66,11 +68,12 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
             vprint(f'\nNow generating {H_ensemble} one-step ahead expanding window predictions from ensemble model: '
                    f'\'{ensemble_approach.capitalize()} - {method_name}\'')
 
+            # Expanding window approach starts here
             # We are at period t+k and forecast period t+k+1
             # Loop until until all H periods are forecasted
             # thus: k = [0, ... , H-1]
             for k in range(H_ensemble):
-                # Print forecast updates
+                # Print forecast updates (console output)
                 if k in printed_k:
                     vprint(f'Ensemble forecast {k + 1} / {H_ensemble}')
                 # Current train size = Period at which forecast is made:
@@ -101,7 +104,8 @@ def pipe3_ensemble_forecasts(individual_predictions, methods,
 
     # Merge with individual predictions
     vprint('\nMerging...')
-    full_predictions = individual_predictions.merge(ensemble_predictions, left_index=True, right_index=True, how='inner')
+    full_predictions = individual_predictions.merge(ensemble_predictions,
+                                                    left_index=True, right_index=True, how='inner')
     vprint('...finished!\n')
 
     # If path is specified, export results as .csv

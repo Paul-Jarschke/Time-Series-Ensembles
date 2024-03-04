@@ -182,7 +182,7 @@ def compute_metamodel_prediction(train_data, next_indiv_predictions, metamodel, 
     predictions = train_data
 
     # Set up Meta-Model with arguments
-    model = metamodel(*args, **kwargs)
+    model = metamodel(*args, **kwargs) # models.ensembling
 
     # Train Meta-Model
     model.fit(predictions, target)
@@ -203,6 +203,8 @@ def get_ensemble_prediction(past_individual_predictions, next_indiv_predictions,
                             *args, **kwargs):
     # scheme is either a metamodel with fit and predict method or a weighting scheme that returns a dictionary with
     # model names (keys) and corresponding weights (values)
+
+    # Meta models
     if method == "meta":
         # Check if metamodel is provided
         if model is not None:
@@ -216,8 +218,12 @@ def get_ensemble_prediction(past_individual_predictions, next_indiv_predictions,
                 raise ValueError('Meta model must have \'fit\' and \'predict\' methods.')
         else:
             raise ValueError("meta_model must be defined")
+
+    # Weighted 'models'
     elif method == "weighted":
-        weights = model(predictions=past_individual_predictions)
+        # Calculate weights
+        weights = model(predictions=past_individual_predictions, next_prdictions=next_indiv_predictions)
+
         expected_length_weights = len(past_individual_predictions.columns)
         expected_length_weights -= 1 if ('Target' in past_individual_predictions.columns) else 0
         if len(weights) != expected_length_weights:

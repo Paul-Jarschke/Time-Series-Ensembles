@@ -82,6 +82,7 @@ def pipe1_data_preprocessing(df,
                + ' and dropping NaNs'
                + '...'
                )
+        # Source data aggregation function
         df = aggregate_data(data=df, method=agg_method, agg_freq=agg_freq, drop_nan=True)
         vprint(f'...finished!' 
                f'\nData now has {len(df)} observations.\n')
@@ -96,7 +97,7 @@ def pipe1_data_preprocessing(df,
     vprint("Target: " + target.name)
     vprint("Covariates: " + (", ".join(covariates.columns) if covariates is not None else 'None'))
 
-    # Give data insight:
+    # Give data insight
     vprint("\nData Insight:\n")
     vprint(pd.concat([target, covariates], axis=1).head())
 

@@ -149,7 +149,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                 if 'ARIMA' not in model_name:
                     cv = ExpandingWindowSplitter(fh=1, initial_window=init_trainsize, step_length=1)
                     model.fit(y_train_transformed[:init_trainsize])
-                    model_predictions = model.update_predict(y_train_transformed, cv)
+                    model_predictions = model.update_predict(y_train_transformed, cv=cv)
 
                 # ARIMA
                 else:
