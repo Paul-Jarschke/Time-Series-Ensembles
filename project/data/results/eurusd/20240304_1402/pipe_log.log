@@ -1,0 +1,130 @@
+=================================================================================
+[2024-03-04 14:02] Starting  Pipeline...
+
+=====================================================
+== Starting Step 1 in Pipeline: Data Preprocessing ==
+=====================================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: 15T
+Data from goes from 2020-01-01 to 2020-04-14, resulting in 10000 observations.
+
+Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
+...finished!
+Data now has 74 observations.
+
+Selecting target and covariates...
+Target: bid_close
+Covariates: None
+
+Data Insight:
+
+            bid_close
+datetime             
+2020-01-02    1.11702
+2020-01-03    1.11599
+2020-01-06    1.11948
+2020-01-07    1.11530
+2020-01-08    1.11124
+[Time elapsed: 00s]
+
+
+=======================================================
+== Starting Step 2 in Pipeline: Individual Forecasts ==
+=======================================================
+
+Splitting data (train/test ratio: 30/70)...
+Initial training set has 22 observations 
+and goes from 2020-01-02 to 2020-01-31
+There are 52 periods to be forecasted: 
+2020-02-03 to 2020-04-14
+
+Now generating 52 one-step ahead expanding window predictions from model: Naive (sktime)
+...finished!
+
+Since no covariates are given, skipping covariate models 
+
+Individual predictions finished!
+
+Insights into models' predictions:
+              Naive
+Date               
+2020-02-03  1.10885
+2020-02-04  1.10618
+2020-02-05  1.10440
+2020-02-06  1.09994
+2020-02-07  1.09802
+
+
+Exporting individual predictions as csv...
+...finished!
+
+[Time elapsed: 01s]
+
+
+=============================================
+== Step 3: Historical Ensemble Predictions ==
+=============================================
+
+Splitting forecast data (n = 52) for ensemble forecasts (train/test ratio: 30/70)...
+Initial training set has 15 observations and goes from 2020-02-03 to 2020-02-21
+There are 37 periods to be forecasted by the individual models 2020-02-24 to 2020-04-14
+
+Now generating 37 one-step ahead expanding window predictions from ensemble model: 'Weighted - Simple'
+Ensemble forecast 1 / 37
+Ensemble forecast 2 / 37
+...finished!
+
+Now generating 37 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+Ensemble forecast 1 / 37
+Ensemble forecast 2 / 37
+...finished!
+
+Ensemble predictions finished!
+
+Insights into ensembles' predictions:
+            Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+Date                                                                  
+2020-02-24                    1.08379                          1.08379
+2020-02-25                    1.08481                          1.08481
+2020-02-26                    1.08792                          1.08792
+2020-02-27                    1.08857                          1.08857
+2020-02-28                    1.09958                          1.09958
+
+Merging...
+...finished!
+
+Exporting ensemble predictions as csv...
+Exporting full predictions as csv...
+...finished!
+
+[Time elapsed: 01s]
+
+
+============================================
+== Step 4: Creating Metrics Ranking Table ==
+============================================
+
+Calculating MAPE, RMSE, SMAPE per model...
+Ranking models ...
+...finished!
+
+Exporting metrics ranking as csv...
+...finished!
+
+Results:
+                             Model      MAPE      RMSE     SMAPE  \
+0                            Naive  0.604318  0.008753  0.402667   
+1        Weighted Ensemble: Simple  0.604318  0.008753  0.402667   
+2  Weighted Ensemble: Inverse RMSE  0.604318  0.008753  0.402667   
+
+   MAPE Ranking  RMSE Ranking  SMAPE Ranking  
+0             2             2              2  
+1             2             2              2  
+2             2             2              2  
+
+
+[2024-03-04 14:02] Finished Pipeline!
+[Total time elapsed: 01s]
+=================================================================================

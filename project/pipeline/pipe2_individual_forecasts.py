@@ -1,5 +1,7 @@
 import pandas as pd
 import warnings
+import numpy as np
+from math import ceil
 from utils.helpers import vprint, csv_exporter
 from utils.transformers import TRANSFORMERS
 from utils.mappings import SEASONAL_FREQ_MAPPING
@@ -22,7 +24,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
     covariates = target_covariates_tuple[1]
 
     # Calculate initial train size
-    init_train_size = int(target.shape[0] * forecast_init_train)
+    init_trainsize = int(target.shape[0] * forecast_init_train)
 
     # Define target training variables
     y_train_full = target
@@ -31,7 +33,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
     inferred_seasonal_freq = SEASONAL_FREQ_MAPPING[target.index.freqstr] \
         if target.index.freqstr in SEASONAL_FREQ_MAPPING.keys() else None
 
-    if inferred_seasonal_freq > init_train_size:
+    if inferred_seasonal_freq > init_trainsize:
         warnings.warn('Too few observations provided for seasonal models. '
                       'If you provide such models, consider removing them!')
 
@@ -39,15 +41,15 @@ def pipe2_individual_forecasts(target_covariates_tuple,
     warnings.filterwarnings('ignore')
 
     # Calculate full forecast horizon
-    H = y_train_full.shape[0] - init_train_size
+    H = y_train_full.shape[0] - init_trainsize
 
     vprint(
          f"Splitting data (train/test ratio: "
          f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})..."
-         f"\nInitial training set has {init_train_size} observations ",
-         f"and goes from {target.index[0].date()} to {target.index[init_train_size - 1].date()}"
+         f"\nInitial training set has {init_trainsize} observations ",
+         f"and goes from {target.index[0].date()} to {target.index[init_trainsize - 1].date()}"
          f"\nThere are {H} periods to be forecasted: ",
-         f"{target.index[init_train_size].date()} to {target.index[-1].date()}\n"
+         f"{target.index[init_trainsize].date()} to {target.index[-1].date()}\n"
     )
 
     # Create a DataFrame to store all models' predictions
@@ -61,6 +63,12 @@ def pipe2_individual_forecasts(target_covariates_tuple,
     # Initialize transformed datasets
     y_train_transformed = None
     X_train_transformed = None
+
+    # Set percentage interval for printing forecast updates
+    # (e.g., print 0.2 means printing at 0%, 20%, 40%, 60%, 80%, and 100%)
+    # Include first and last prediction in console output
+    printout_percentage_interval = 0.2
+    printed_k = [ceil(x) for x in np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)] * H
 
     # Loop over type of model (with or without covariates)
     for covariates_indicator, models_dict in models.items():
@@ -120,7 +128,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
             # darts models:
             if 'darts' in model_source:
                 model_predictions = model.historical_forecasts(
-                    series=y_train_transformed, start=init_train_size, stride=1,
+                    series=y_train_transformed, start=init_trainsize, stride=1,
                     forecast_horizon=1, past_covariates=X_train_transformed,
                     show_warnings=False).pd_dataframe()
                 # Transform back to periodIndex (nicer outputs)
@@ -139,8 +147,8 @@ def pipe2_individual_forecasts(target_covariates_tuple,
 
                 # all sktime models but ARIMA
                 if 'ARIMA' not in model_name:
-                    cv = ExpandingWindowSplitter(fh=1, initial_window=init_train_size, step_length=1)
-                    model.fit(y_train_transformed[:init_train_size])
+                    cv = ExpandingWindowSplitter(fh=1, initial_window=init_trainsize, step_length=1)
+                    model.fit(y_train_transformed[:init_trainsize])
                     model_predictions = model.update_predict(y_train_transformed, cv)
 
                 # ARIMA
@@ -161,12 +169,14 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                     # sktime.lagged transformer removes the first period due to NaNs => positional indices change
                     lag_indicator = 1 if 'lagged' in model_source else 0
 
-                    # In loop, we forecast at period t+k and forecast period t+k+1 until all H periods are forecasted
+                    # We are at period t+k and forecast period t+k+1
+                    # Loop until until all H periods are forecasted
+                    # thus: k = [0, ... , H-1]
                     for k in range(H):
-                        current_train_size = init_train_size - lag_indicator + k
-                        current_y_train_arima = y_train_transformed[:current_train_size]
+                        current_trainsize = init_trainsize - lag_indicator + k
+                        current_y_train_arima = y_train_transformed[:current_trainsize]
 
-                        current_X_train_arima = X_train_transformed[:current_train_size] \
+                        current_X_train_arima = X_train_transformed[:current_trainsize] \
                             if X_train_transformed is not None else None
 
                         # Refit and Update AutoSARIMA(X) Model
@@ -198,13 +208,14 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                             # In all other periods just update parameters/coefficients
                             model.update(y=current_y_train_arima, X=current_X_train_arima)
 
-                        if k == 0 or (k + 1) == H or ((k + 1) % 10) == 0:
+                        # Print forecast update
+                        if k in printed_k:
                             vprint(f'{model_name} forecast {k + 1} / {H}')
 
                         # Predict:
                         # Select last known X as predictor if using a covariate model
-                        X_pred_sarimax = (X_train_transformed[init_train_size - lag_indicator + k:
-                                                              init_train_size - lag_indicator + k + 1]
+                        X_pred_sarimax = (X_train_transformed[current_trainsize:
+                                                              current_trainsize + 1]
                                           if covmodel_bool else None)
                         # Perform prediction
                         prediction = model.predict(fh=1, X=X_pred_sarimax)
@@ -223,14 +234,13 @@ def pipe2_individual_forecasts(target_covariates_tuple,
            individual_predictions.head(), '\n'
            )
 
-    target_output = y_train_full[init_train_size:]
+    target_output = y_train_full[init_trainsize:]
     period_freq = 'M' if y_train_full.index.freqstr == 'MS' else y_train_full.index.freqstr
     target_output.index = pd.PeriodIndex(target_output.index, freq=period_freq)
     individual_predictions.insert(0, 'Target', value=target_output)
 
     # If path is specified, export results as .csv
     csv_exporter(export_path, individual_predictions)
-
 
     return individual_predictions
 
