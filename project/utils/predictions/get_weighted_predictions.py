@@ -12,11 +12,15 @@ def get_weighted_predictions(next_individual_predictions, weights):
     """
 
     # Exclude target column if present
-    if 'Target' in next_individual_predictions.columns:
-        next_individual_predictions = next_individual_predictions.drop(columns=['Target'])
+    if "Target" in next_individual_predictions.columns:
+        next_individual_predictions = next_individual_predictions.drop(
+            columns=["Target"]
+        )
 
     # Compute row-wise weighted average predictions
-    weighted_predictions = sum(next_individual_predictions[model] * weights[model] for model in
-                               next_individual_predictions.columns)
+    weighted_predictions = sum(
+        next_individual_predictions[model] * weights[model]
+        for model in next_individual_predictions.columns
+    )
 
     return weighted_predictions

@@ -5,7 +5,7 @@ from utils.paths import *
 
 class FunctionFinder:
     """A class to find and store functions from Python files in a given directory."""
-    
+
     def __init__(self):
         """Initialize the FunctionFinder."""
         self.functions = {}  # Dictionary to store functions
@@ -28,7 +28,7 @@ class FunctionFinder:
             directory = os.getcwd()
 
         # Temporary dictionary to store functions found
-        functions = {}  
+        functions = {}
 
         # Iterate over files in the specified directory and subdirectories
         functions = {}
@@ -36,18 +36,23 @@ class FunctionFinder:
             for filename in files:
 
                 # Check if the file is a Python file
-                if filename.endswith('.py') and "__init__" not in filename:
-                    
+                if filename.endswith(".py") and "__init__" not in filename:
+
                     # Remove the .py extension to get the module name
                     filename_no_py = filename[:-3]
 
                     # Generate module name from file path
-                    module_name = (root.replace(ROOT_DIR, "")[1:].replace("\\", ".").replace("\/", ".") +
-                                   "." + filename_no_py)
-                    
+                    module_name = (
+                        root.replace(ROOT_DIR, "")[1:]
+                        .replace("\\", ".")
+                        .replace("\/", ".")
+                        + "."
+                        + filename_no_py
+                    )
+
                     # Import the module
-                    module = importlib.import_module(module_name)  
-                    
+                    module = importlib.import_module(module_name)
+
                     # Iterate over objects in the module
                     for name in dir(module):
                         obj = getattr(module, name)
@@ -56,5 +61,5 @@ class FunctionFinder:
                             # Add the callable object to the dictionary
                             functions[name] = obj
 
-        # Update the functions attribute with the found functions                   
+        # Update the functions attribute with the found functions
         self.functions = functions

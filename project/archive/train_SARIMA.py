@@ -2,16 +2,16 @@ import pandas as pd
 from sktime.forecasting.arima import AutoARIMA
 
 # Define the directory path and file name
-sim_dir = r'/data/simulated/'
-file_name = 'noisy_simdata.csv'
+sim_dir = r"/data/simulated/"
+file_name = "noisy_simdata.csv"
 
 # Combine the directory path and file name
 file_path = sim_dir + file_name
 
 # Read and preprocess Dataset
 df = pd.read_csv(file_path)
-df['Date'] = pd.PeriodIndex(pd.to_datetime(df['Date'], format='%d-%m-%Y'), freq='M')
-df.set_index('Date', inplace=True)
+df["Date"] = pd.PeriodIndex(pd.to_datetime(df["Date"], format="%d-%m-%Y"), freq="M")
+df.set_index("Date", inplace=True)
 
 # Now you can work with the data DataFrame
 # For example, you can print the first few rows
@@ -21,7 +21,9 @@ print(df.head())
 
 
 # Convert DataFrame to TimeSeries and split target and predictors
-predictors_names = ["x" + str(x + 1) for x in range(df.shape[1]-1)] # allows that the number of predictors can be generic; ensure in data preprocessing that target is named 'y' and predictors 'x1', 'x2' etc.
+predictors_names = [
+    "x" + str(x + 1) for x in range(df.shape[1] - 1)
+]  # allows that the number of predictors can be generic; ensure in data preprocessing that target is named 'y' and predictors 'x1', 'x2' etc.
 df[predictors_names] = df[predictors_names].shift(1)
 df.dropna(inplace=True)
 
@@ -42,11 +44,11 @@ model = AutoARIMA(
     with_intercept="auto",
     max_p=12,
     max_q=12,
-    suppress_warnings=True
+    suppress_warnings=True,
 )
 
 # Train Model on Training Data
-model.fit(train['y'], None)
+model.fit(train["y"], None)
 
 prediction = model.predict(fc_horizon, current_predictors)
 

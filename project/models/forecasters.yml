@@ -1,70 +1,70 @@
-  without_covariates:
-#    Prophet:
-#      model: Prophet
-#      package: sktime
-#      options:
-#        freq: M
-#        add_seasonality:
-#          name: seasonality
-#          period: 12
-#          fourier_order: 12
-    Naive:
-      model: NaiveForecaster
-      package: sktime
-      options:
-        strategy: last
-    Naive (drift):
-      model: NaiveForecaster
-      package: sktime
-      options:
-        strategy: drift
-    AutoSARIMA:
-      model: AutoARIMA
-      package: sktime
-      options:
-        seasonal: True
-        stationary: False
-        d: 1
-        trace: False
-        update_pdq: False
-        with_intercept: auto
-        max_p: 6
-        max_q: 6
-        suppress_warnings: True
-    Exponential Smoothing:
-      model: ExponentialSmoothing
-      package: sktime
-      options: {}
-#    Theta:
-#      model: ThetaForecaster
-#      options: {}
-    STL:
-      model: STLForecaster
-      package: sktime
-      options: {}
-    XGBoost:
-      model: XGBModel
-      package: darts
-      options:
-        lags: 10
-  with_covariates:
-#    AutoSARIMAX:
-#      model: AutoARIMA
-#      package: sktime
-#      options:
-#        seasonal: True
-#        stationary: False
-#        d: 1
-#        trace: False
-#        update_pdq: False
-#        with_intercept: auto
-#        max_p: 6
-#        max_q: 6
-#        suppress_warnings: True
-    XGBoost:
-      model: XGBModel
-      package: darts
-      options:
-        lags: 10
-        lags_past_covariates: 10
+without_covariates:
+  #    Prophet:
+  #      model: Prophet
+  #      package: sktime
+  #      options:
+  #        freq: M
+  #        add_seasonality:
+  #          name: seasonality
+  #          period: 12
+  #          fourier_order: 12
+  Naive:
+    model: NaiveForecaster
+    package: sktime
+    options:
+      strategy: last
+  Naive (drift):
+    model: NaiveForecaster
+    package: sktime
+    options:
+      strategy: drift
+  AutoSARIMA:
+    model: AutoARIMA
+    package: sktime
+    options:
+      seasonal: True
+      stationary: False
+      d: 1
+      trace: False
+      update_pdq: False
+      with_intercept: auto
+      max_p: 6
+      max_q: 6
+      suppress_warnings: True
+  Exponential Smoothing:
+    model: ExponentialSmoothing
+    package: sktime
+    options: { }
+  #    Theta:
+  #      model: ThetaForecaster
+  #      options: {}
+  STL:
+    model: STLForecaster
+    package: sktime
+    options: { }
+  XGBoost:
+    model: XGBModel
+    package: darts
+    options:
+      lags: 10
+with_covariates:
+  #    AutoSARIMAX:
+  #      model: AutoARIMA
+  #      package: sktime
+  #      options:
+  #        seasonal: True
+  #        stationary: False
+  #        d: 1
+  #        trace: False
+  #        update_pdq: False
+  #        with_intercept: auto
+  #        max_p: 6
+  #        max_q: 6
+  #        suppress_warnings: True
+  XGBoost:
+    model: XGBModel
+    package: darts
+    options:
+      lags: 10
+      lags_past_covariates: 10
 

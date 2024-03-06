@@ -22,15 +22,25 @@ def prepare_eurusd_data(data, n=1000):
     df = data.head(n)
 
     # Save datetime column
-    dates = df['datetime']
+    dates = df["datetime"]
 
     # Reset index to a range of integers
     df.reset_index(drop=True, inplace=True)
-    df.drop('datetime', axis=1, inplace=True)
+    df.drop("datetime", axis=1, inplace=True)
 
     # Extract target and covariate columns
-    target_col = df['bid_open']
-    covariate_cols = df[['bid_high', 'bid_low', 'bid_close', 'ask_open', 'ask_high', 'ask_low', 'ask_close']]
+    target_col = df["bid_open"]
+    covariate_cols = df[
+        [
+            "bid_high",
+            "bid_low",
+            "bid_close",
+            "ask_open",
+            "ask_high",
+            "ask_low",
+            "ask_close",
+        ]
+    ]
 
     # Create Darts TimeSeries objects
     series = TimeSeries.from_dataframe(df)

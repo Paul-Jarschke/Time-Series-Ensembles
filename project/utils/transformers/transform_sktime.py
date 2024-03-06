@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def transform_to_sktime(*args, freq='infer'):
+def transform_to_sktime(*args, freq="infer"):
     """
     Transforms a pandas DataFrame or Series object into a sktime compatible format (PeriodIndex).
 
@@ -27,11 +27,13 @@ def transform_to_sktime(*args, freq='infer'):
             if not isinstance(sktime_object.index, pd.DatetimeIndex):
                 sktime_object.index = sktime_object.index.to_timestamp()
             # Infer frequency if not specified
-            if freq == 'infer':
+            if freq == "infer":
                 freq = pd.infer_freq(sktime_object.index)
 
             # Transform to PeriodIndex
-            freq = 'M' if freq == 'MS' else freq  # Somehow PeriodIndex only takes 'M' and not 'MS'
+            freq = (
+                "M" if freq == "MS" else freq
+            )  # Somehow PeriodIndex only takes 'M' and not 'MS'
             sktime_object.index = pd.PeriodIndex(sktime_object.index, freq=freq)
         else:
             raise ValueError("Input must be pandas DataFrame or Series object.")
@@ -60,7 +62,5 @@ def transform_sktime_lagged_covariates(*args):
         # covariates
         elif sktime_object is not None:
             sktime_object = sktime_object.shift(1).dropna().copy()
-        return_tuple = return_tuple + (sktime_object, )
+        return_tuple = return_tuple + (sktime_object,)
     return return_tuple
-
-

@@ -23,38 +23,49 @@ def run_pipeline(df, models, metrics,
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
     Args:
-        df (pandas.DataFrame or pandas.Series):     Input data containing targets and covariates.
-        models (dict):                              Dictionary containing the forecasters and ensemblers models.
-        metrics (list):                             List of metrics for model ranking.
-        date_col (str):                             Name of the date column in the input data (default: 'infer').
-        date_format (str):                          Format of the date column if date_col is specified (default: None).
-        target (str):                               Name of the target column in the input data (default: 'infer').
-        covariates (str):                           Names of covariates columns in the input data (default: 'infer').
-        exclude (list):                             List of columns to exclude from the input data (default: None).
-        agg_method (str):                           Aggregation method for preprocessing (default: None).
-        agg_freq (str):                             Aggregation frequency for preprocessing (default: None).
-        select_forecasters (str or list):           Selection of forecasters to use (default: 'all').
-        autosarimax_refit_interval (float):         Refit interval for autosarimax (default: 0.33).
-        forecast_init_train (float):                Initial training ratio for individual forecasters (default: 0.3).
-        select_ensemblers (str or list):            Selection of ensemblers to use (default: 'all').
-        ensemble_init_train (float):                Initial training ratio for ensemblers (default: 0.3).
-        sort_by (str):                              Metric to sort by for model ranking (default: 'MAPE').
-        export (bool or os.PathLike):               Whether to export results or the export path if provided (default: True).
-        errors (str):                               How to handle errors (default: 'raise').
-        verbose (bool):                             Whether to print intermediate steps (default: False).
-
+        df (pandas.DataFrame or pandas.Series):         Input data containing date, targets (and optionally covariates).
+        models (dict):                                  Dictionary containing the forecasters and ensemblers models.
+                                                        This can be imported from the 'models' module of the project.
+                                                        Edit '.yml' file to add/remove models.
+        metrics (dict):                                 List of performance metrics for model ranking. Can be imported
+                                                        from the 'metrics' module of the project.
+                                                        Edit '.yml' files to add/remove metrics.
+        date_col (str or int, optional):                Name or index of the date column in the input data
+                                                        (default: 'infer', searches for DateTimeIndex-like column).
+        date_format (str, optional):                    Custom format of the date column if date_col is specified
+                                                        (default: None, assumes ISO format YYYY-MM-DD).
+        target (str, int, optional):                    Name or positional index of the target column in the input data
+                                                        (default: 'infer', takes first column after the date was set).
+        covariates (str, int, or list, optional):       Names of covariates columns in the input data
+                                                        (default: 'infer', takes all columns after date and target
+                                                        are inferred.).
+        exclude (list, optional):                       List of columns (string or positional index) to exclude from the
+                                                        input data (default: None).
+        agg_method (str, optional):                     Aggregation method for preprocessing. One of the pandas methods
+                                                        'first', 'last', 'min', 'max', and 'mean' (default: None).
+        agg_freq (str, optional):                       DateTimeIndex aggregation frequency for preprocessing
+                                                        (default: None).
+        select_forecasters (str or list, optional):     Selection of forecasters to use (default: 'all').
+        autosarimax_refit_interval (float, optional):   Refit interval for autosarimax (default: 0.33).
+        forecast_init_train (float, optional):          Initial training ratio for forecasters (default: 0.3).
+        select_ensemblers (str or list, optional):      Selection of ensemblers to use (default: 'all').
+        ensemble_init_train (float, optional):          Initial training ratio for ensemblers (default: 0.3).
+        sort_by (str, optional):                        Metric to sort by for model ranking (default: 'MAPE').
+        export (bool or os.PathLike, optional):         If True but no path provided, exports to current working
+                                                        directory (default: True).
+        errors (str, optional):                         How to handle errors (default: 'raise').
+        verbose (bool, optional):                       Whether to log and print intermediate steps to console
+                                                        (default: False).
         *args: Variable length argument list.
         **kwargs: Arbitrary keyword arguments.
 
     Returns:
-        dict: Dictionary containing the following keys:
-            - 'target and covariates': Preprocessed target and covariates.
-            - 'individual_predictions': Individual predictions.
+        dict: Dictionary containing the following keys as pandas Series or DataFrames:
+            - 'target and covariates': Tuple of preprocessed target and covariates.
+            - 'individual_predictions': Individual forecasters' predictions.
             - 'full predictions': Full ensemble predictions.
             - 'metrics ranking': Rankings based on specified metrics.
     """
-
-    # Outlook: You could make this pipe more generic by looping over functions.
 
     # Save starting time
     start_pipe = datetime.now()
