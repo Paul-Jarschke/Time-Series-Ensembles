@@ -1,0 +1,17 @@
+weighted:
+  Simple: equal_weights
+  Inverse RMSE: inv_rmse_weights
+  Inverse Variance: inv_variance_weights
+  Inverse Error Covariance: inv_error_cov_weights
+meta:
+    SVR:
+      model: SVR
+      package: sklearn
+      options:
+        kernel: linear
+    RandomForest:
+      model: RandomForestRegressor
+      package: sklearn
+      options:
+        n_estimators: 100
+        random_state: null

@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-from darts import TimeSeries
 from sktime.forecasting.arima import AutoARIMA
 
 # Define the directory path and file name

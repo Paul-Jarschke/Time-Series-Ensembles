@@ -1,21 +1,21 @@
-from datetime import datetime
 import logging
 import sys
+from datetime import datetime
 
+from pipeline.processes.pipe1_data_preprocessing import pipe1_data_preprocessing
+from pipeline.processes.pipe2_individual_forecasts import pipe2_individual_forecasts
+from pipeline.processes.pipe3_ensemble_forecasts import pipe3_ensemble_forecasts
+from pipeline.processes.pipe4_metrics_ranking import pipe4_metrics_ranking
+from utils.helpers import strfdelta, vprint
 from utils.paths import *
-from utils.helpers import vprint, strfdelta
-
-from pipeline.pipe1_data_preprocessing import pipe1_data_preprocessing
-from pipeline.pipe2_individual_forecasts import pipe2_individual_forecasts
-from pipeline.pipe3_ensemble_forecasts import pipe3_ensemble_forecasts
-from pipeline.pipe4_metrics_ranking import pipe4_metrics_ranking
 
 
-def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
+# noinspection PyTypeChecker
+def run_pipeline(df, models, metrics,
                  date_col='infer', date_format=None, target='infer', covariates='infer', exclude=None,
                  agg_method=None, agg_freq=None,
-                 select_individual_models='all', autosarimax_refit_interval=None, forecast_init_train=0.3,
-                 select_ensemble_methods='all', ensemble_init_train=0.3,
+                 select_forecasters='all', autosarimax_refit_interval=None, forecast_init_train=0.3,
+                 select_ensemblers='all', ensemble_init_train=0.3,
                  sort_by='MAPE',
                  export=True, errors='raise', verbose=False,
                  *args, **kwargs):
@@ -27,7 +27,7 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
     - verbose: bool, whether to print intermediate steps (default: False).
     - target:
     - covariates:
-    - models:
+    - forecasters:
     - init_splits:
     - verbose:
     
@@ -63,9 +63,9 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
         export_path = None
 
     # Create log file
-    # Outlook: Also store models' hyperparameters in log
+    # Outlook: Also store forecasters' hyperparameters in log
     if export and verbose:
-        # log_file_name = os.path.join(export_path, f'pipe_log_{start_pipe_formatted}.txt')
+        # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
         log_file_name = os.path.join(export_path, 'pipe_log.log')
 
         # Set up logger
@@ -118,11 +118,11 @@ def run_pipeline(df, forecasting_models, ensemble_methods, metrics,
             target=target, covariates=covariates, exclude=exclude,
             agg_method=agg_method, agg_freq=agg_freq,
             # Pipe 2 arguments
-            models=forecasting_models, select_models=select_individual_models,
+            forecasters=models['FORECASTERS'], select_forecasters=select_forecasters,
             forecast_init_train=forecast_init_train,
             autosarimax_refit_interval=autosarimax_refit_interval,
             # Pipe 3 arguments
-            methods=ensemble_methods, select_methods=select_ensemble_methods,
+            ensemblers=models['ENSEMBLERS'], select_ensemblers=select_ensemblers,
             ensemble_init_train=ensemble_init_train,
             # Pipe 4 arguments
             metrics=metrics,

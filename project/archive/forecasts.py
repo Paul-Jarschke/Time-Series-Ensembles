@@ -1,6 +1,7 @@
-from forecasting_models import models
 import pandas as pd
-from utils.helpers import transform_to_darts_format
+from forecasting_models import models
+
+from utils.helpers import transform_to_darts
 
 print(models)
 
@@ -50,7 +51,7 @@ fc_horizon = 1
 for model_name, model in models.items():
     # Fit the model and make one-step ahead predictions
     if model_name == "XGBoost":
-        y_train_darts = transform_to_darts_format(y_train)
+        y_train_darts = transform_to_darts(y_train)
         model.fit(y_train_darts)
         pred = model.predict(fc_horizon).values()
     else:
@@ -69,5 +70,5 @@ print(predictions)
 # - add XGBoost (with/without covariates to forecasting.py)
 # - Add SARIMA with covariates to forecasting.py
 # - Implement expanding window approach (either manually with loop or using historical_forecast respectively ExpandingWindowSplitter and update_prpedict in sktime)
-# - add Cubic Splines to forecasting models (maybe not)
+# - add Cubic Splines to forecasting forecasters (maybe not)
 
