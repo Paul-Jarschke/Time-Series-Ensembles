@@ -14,7 +14,7 @@ from utils.paths import *
 def run_pipeline(df, models, metrics,
                  date_col='infer', date_format=None, target='infer', covariates='infer', exclude=None,
                  agg_method=None, agg_freq=None,
-                 select_forecasters='all', autosarimax_refit_interval=None, forecast_init_train=0.3,
+                 select_forecasters='all', autosarimax_refit_interval=0.33, forecast_init_train=0.3,
                  select_ensemblers='all', ensemble_init_train=0.3,
                  sort_by='MAPE',
                  export=True, errors='raise', verbose=False,

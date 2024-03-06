@@ -95,7 +95,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
         # Loop over individual model in the current sub-dictionary (with/without covariates)
         for model_name, MODEL in approach_dict.items():
             # Only consider selected models in the current ensemble approach dictionary
-            if select_forecasters != 'all' and model_name not in select_forecasters:
+            if select_forecasters not in ['all', ['all']] and model_name not in select_forecasters:
                 continue
 
             # Define X_train_full depending on covtreatment_bool, i.e., depending on whether covariates are specified
@@ -117,8 +117,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
             # Depending on package_name select corresponding data transformer
 
             # Do not transform again if model source did not change
-            if ((last_package_name == package_name or last_package_name is not None) and
-                    last_covtreatment_bool == covtreatment_bool or last_covtreatment_bool is not None):
+            if last_package_name == package_name and last_covtreatment_bool == covtreatment_bool:
                 pass
             # Transform with provided TRANSFORMERS
             elif package_name in TRANSFORMERS.keys():
@@ -126,10 +125,9 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                 transformer = TRANSFORMERS[package_name]
                 # Transform
                 y_train_transformed, X_train_transformed = transformer(y_train_full, X_train_full)
-            # No transformation if package_name not in TRANSFORMERS
+            # No transformation possible if package_name not in TRANSFORMERS
             else:
-                y_train_transformed = y_train_full.copy()
-                X_train_transformed = X_train_full.copy()
+                raise RuntimeError(f'{package_name} is not yet supported')
 
             # Set up empty DataFrame for predictions and define index named 'Date'
             model_predictions = pd.DataFrame()
@@ -137,7 +135,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
 
             # Starting one-step ahead expanding window predictions for current model (fitting, updating, predicting)
             vprint(f'Now generating {H} one-step ahead expanding window predictions from model: '
-                   f'{model_name} ({package_name})'
+                   f'{model_name} ({package_name.replace('.lagged', '')})'
                    )
             # Method and data transformer is inferred from package_name
 
@@ -177,13 +175,25 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                     # - source this piece of code out
                     # - and make own .update_predict method for ARIMA (wrap in class)
 
-                    # Define at what frequency ARIMA model is being refitted
-                    autosarimax_refit_interval = 1 if (
-                            autosarimax_refit_interval is None) else autosarimax_refit_interval
-                    refit_freq = (H // (  # 33 % intervals => consider lowering to 20% or 10%
-                            1 / autosarimax_refit_interval) + 1)
+                    # Define at what interval ARIMA model is being refitted
+                    # autosarimax_refit_interval is between 0 and 1
+                    # Default: 0, thus: refitting each period
+                    # 1 would mean: no refitting at all
+                    # Example 0.33, means: only refitting at 33% and 66% of predictions made
+                    # + Fitting at the beginning
+                    # Fitting works with the AutoArima approach from Hyndman, RJ and Khandakar, Y (2008)
+                    if autosarimax_refit_interval in [0, None]:
+                        refit_freq = 1
+                    else:
+                        refit_freq = ceil(H / (1 / autosarimax_refit_interval))
 
-                    vprint('Auto-fitting model...')
+                    # Print information about refitting
+                    if refit_freq == 2:
+                        vprint(f'Auto-fitting model. Refitting every {refit_freq}nd period.')
+                    elif refit_freq == 1:
+                        vprint('Auto-fitting model. Refitting every period.')
+                    else:
+                        vprint(f'Auto-fitting model. Refitting every {refit_freq}th period.')
 
                     # sktime.lagged transformer removes the first period due to NaNs => positional indices change
                     lag_indicator = 1 if 'lagged' in package_name else 0
@@ -203,25 +213,26 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                         # Refit AutoArima model:
                         # at period 0 and every 'refit_freq'th period
                         if k % refit_freq == 0:
-                            # Initialize model with previous parameters (speed up fitting)
-                            sarima_fitted_params = model.get_fitted_params(deep=True)
-                            p, d, q = sarima_fitted_params['order']
-                            P, D, Q, sp = sarima_fitted_params['seasonal_order']
+                            # When refitting, update model with previous parameters (potentially speeds up fitting)
+                            if k != 0:
+                                sarima_fitted_params = model.get_fitted_params(deep=True)
+                                p, d, q = sarima_fitted_params['order']
+                                P, D, Q, sp = sarima_fitted_params['seasonal_order']
 
-                            updated_params = {
-                                'start_p': p,
-                                'd': d,
-                                'start_q': q,
-                                'start_P': P,
-                                'D': D,
-                                'start_Q': Q,
-                                'sp': sp,
-                                'maxiter': 15
-                            }
-                            model.set_params(**updated_params)
+                                updated_params = {
+                                    'start_p': p,
+                                    'd': d,
+                                    'start_q': q,
+                                    'start_P': P,
+                                    'D': D,
+                                    'start_Q': Q,
+                                    'sp': sp,
+                                    'maxiter': 15
+                                }
+                                model.set_params(**updated_params)
+                                # vprint('...automatic refitting...')
 
-                            # Refit model
-                            vprint('...automatic refitting...')
+                            # Fit model first time or refit model
                             model.fit(y=current_y_train_arima, X=current_X_train_arima)
 
                         # Update:

@@ -73,7 +73,7 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
             # thus: k = [0, ... , H-1]
 
             # if verbose: print current state to process
-            printed_model_name = f'{model_name}' + f'{package_name}'
+            printed_model_name = f'{model_name}' + f' ({package_name})'
             vprint(
                 f'\nNow generating {H_ensemble} one-step ahead expanding window predictions from ensemble model: '
                 f'\'{ensemble_approach.capitalize()} - {printed_model_name}\'')

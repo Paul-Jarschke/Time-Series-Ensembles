@@ -14,10 +14,12 @@ def ensemble_prediction_wrapper(past_individual_predictions, next_indiv_predicti
 
     # Meta forecasters
     if approach == "meta":
+        # Construct meta model
+        metamodel = model_function(**options)
         # Make metamodel prediction using a model function
         next_ensemble_prediction = get_metamodel_prediction(
             train_data=past_individual_predictions,
-            next_indiv_predictions=next_indiv_predictions, metamodel=model_function, options=options)
+            next_indiv_predictions=next_indiv_predictions, metamodel=metamodel, options=options)
 
     # Weighted 'forecasters'
     elif approach == "weighted":
