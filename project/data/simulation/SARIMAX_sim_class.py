@@ -1,8 +1,10 @@
 from datetime import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+
 
 # Define a custom class for SARIMAX simulation, extending functionality from statsmodels' SARIMAX class.
 class SARIMAX_Simulation(sm.tsa.SARIMAX):

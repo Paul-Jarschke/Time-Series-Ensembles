@@ -57,7 +57,7 @@ def ensemble_prediction_wrapper(past_individual_predictions, next_indiv_predicti
             train_data=past_individual_predictions,
             next_indiv_predictions=next_indiv_predictions, metamodel=metamodel, options=options)
 
-    # Weighted approach ('forecasters') for generating ensemble predictions
+    # Weighted approach (as 'ensembler' model) for generating ensemble predictions
     elif approach == "weighted":
         # Calculate weights via provided 'model', i.e., a weighting scheme
         # 'Model' must return a dictionary with items model_name and model_weight
