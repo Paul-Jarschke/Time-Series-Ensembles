@@ -102,6 +102,10 @@ def pipe2_individual_forecasts(target_covariates_tuple,
             X_train_full = covariates if covtreatment_bool else None
 
             # Extract model information from dictionary
+            if 'options' not in MODEL.keys():
+                MODEL['options'] = {}
+            if 'package' not in MODEL.keys():
+                raise RuntimeError(f'You need to provide the package for {model_name}.')
             model_function, package_name, options = MODEL['model'], MODEL['package'], MODEL['options']
 
             # Adjust model name depending on the approach (with or without covariates)
@@ -156,7 +160,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
             elif 'sktime' in package_name:
                 # Adjust sktime specific parameters
                 # in particular: Seasonal periodicity
-                if 'Naive' not in model_name:  # sNaive performs bad. Does not make sense to use this.
+                if 'Naive' not in model_name and 'sp'in model.get_params().keys():  # sNaive performs bad. Does not make sense to use this.
                     model.set_params(**{'sp': inferred_seasonal_freq})
 
                 # all sktime forecasters but ARIMA

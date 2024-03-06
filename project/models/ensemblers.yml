@@ -16,6 +16,22 @@ meta:
       package: sklearn
       options:
         kernel: linear
+    Ridge:
+      model: Ridge
+      package: sklearn
+      options:
+        alpha: 0.5
+    Linear Regression:
+      model: LinearRegression
+      package: sklearn
+    MLP:
+      model: MLPRegressor
+      package: sklearn
+      options:
+        hidden_layer_sizes: 100
+        activation: identity
+        solver: adam
+        alpha: 0.001
     RandomForest:
       model: RandomForestRegressor
       package: sklearn

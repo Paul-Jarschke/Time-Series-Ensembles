@@ -1,0 +1,42 @@
+=================================================================================
+[2024-03-06 09:43] Starting  Pipeline...
+
+=====================================================
+== Starting Step 1 in Pipeline: Data Preprocessing ==
+=====================================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+=======================================================
+== Starting Step 2 in Pipeline: Individual Forecasts ==
+=======================================================
+
+Splitting data (train/test ratio: 30/70)...
+Initial training set has 36 observations 
+and goes from 2004-01-01 to 2006-12-01
+There are 84 periods to be forecasted: 
+2007-01-01 to 2013-12-01
+
+Now generating 84 one-step ahead expanding window predictions from model: Prophet (sktime)
+cmd: where.exe tbb.dll
+cwd: None
+Adding TBB (C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\venv\Lib\site-packages\prophet\stan_model\cmdstan-2.33.1\stan\lib\stan_math\lib\tbb) to PATH

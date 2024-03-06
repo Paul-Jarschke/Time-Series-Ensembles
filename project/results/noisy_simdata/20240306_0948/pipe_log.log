@@ -1,0 +1,233 @@
+=================================================================================
+[2024-03-06 09:48] Starting  Pipeline...
+
+=====================================================
+== Starting Step 1 in Pipeline: Data Preprocessing ==
+=====================================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+=======================================================
+== Starting Step 2 in Pipeline: Individual Forecasts ==
+=======================================================
+
+Splitting data (train/test ratio: 30/70)...
+Initial training set has 36 observations 
+and goes from 2004-01-01 to 2006-12-01
+There are 84 periods to be forecasted: 
+2007-01-01 to 2013-12-01
+
+Now generating 84 one-step ahead expanding window predictions from model: Prophet (sktime)
+cmd: where.exe tbb.dll
+cwd: None
+Adding TBB (C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\venv\Lib\site-packages\prophet\stan_model\cmdstan-2.33.1\stan\lib\stan_math\lib\tbb) to PATH
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\n7ikydl7.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\l_37262r.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=84373', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\n7ikydl7.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\l_37262r.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modeljnky9v7q\\prophet_model-20240306094840.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\zxix_8v1.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\hyvofi9b.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=9707', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\zxix_8v1.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\hyvofi9b.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelhtyrrpvj\\prophet_model-20240306094841.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\ng3bepqy.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\vls5izjn.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=67209', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\ng3bepqy.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\vls5izjn.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelc5i_06ir\\prophet_model-20240306094843.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\h1spi0_v.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\td7keory.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=27539', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\h1spi0_v.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\td7keory.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelw8l5pm22\\prophet_model-20240306094844.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\xdcr1g8p.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\b604agqs.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=16101', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\xdcr1g8p.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\b604agqs.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modeljifl2ys0\\prophet_model-20240306094845.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\_flntvb1.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\yji0b1ab.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=48786', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\_flntvb1.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\yji0b1ab.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_model54tn1em4\\prophet_model-20240306094846.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\ueqs6dbp.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\z7cy_hch.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=25451', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\ueqs6dbp.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\z7cy_hch.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_model6fd18osk\\prophet_model-20240306094848.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\8scb2qb0.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\ipuz4m1c.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=26128', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\8scb2qb0.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\ipuz4m1c.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modella7orfvx\\prophet_model-20240306094849.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\if53gv_r.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\mwhrta6l.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=22585', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\if53gv_r.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\mwhrta6l.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelwawea7pd\\prophet_model-20240306094850.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\tv5ner0a.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\3a09qbyc.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=12496', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\tv5ner0a.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\3a09qbyc.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelbnig_v9_\\prophet_model-20240306094851.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\60yye6m5.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\olnc2dxx.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=52726', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\60yye6m5.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\olnc2dxx.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelke0xku2d\\prophet_model-20240306094852.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\ukycar3o.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\8yo8bzpu.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=25393', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\ukycar3o.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\8yo8bzpu.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelm96e123_\\prophet_model-20240306094853.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\44f5c0vq.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\1kaxbbny.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=16694', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\44f5c0vq.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\1kaxbbny.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modelgdn5t9ks\\prophet_model-20240306094854.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\0lfvjo2m.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\tiasfkfm.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=6802', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\0lfvjo2m.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\tiasfkfm.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_model2ndukbe3\\prophet_model-20240306094856.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\ul1of8i6.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\aqqqitlj.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=4448', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\ul1of8i6.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\aqqqitlj.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_model9bp0jga3\\prophet_model-20240306094857.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None
+TBB already found in load path
+Disabling weekly seasonality. Run prophet with weekly_seasonality=True to override this.
+Disabling daily seasonality. Run prophet with daily_seasonality=True to override this.
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\wh6qgq9v.json
+input tempfile: C:\Users\Work\AppData\Local\Temp\tmpbqsz6nvl\54ptqvq1.json
+idx 0
+running CmdStan, num_threads: None
+CmdStan args: ['C:\\Users\\Work\\OneDrive\\GAU\\3. Semester\\Statistisches Praktikum\\Git\\NEW_Ensemble_Techniques_TS_FC\\venv\\Lib\\site-packages\\prophet\\stan_model\\prophet_model.bin', 'random', 'seed=53938', 'data', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\wh6qgq9v.json', 'init=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\54ptqvq1.json', 'output', 'file=C:\\Users\\Work\\AppData\\Local\\Temp\\tmpbqsz6nvl\\prophet_modellpifl77g\\prophet_model-20240306094859.csv', 'method=optimize', 'algorithm=newton', 'iter=10000']
+Chain [1] start processing
+Chain [1] done processing
+cmd: where.exe tbb.dll
+cwd: None

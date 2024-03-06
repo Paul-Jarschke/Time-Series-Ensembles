@@ -65,6 +65,10 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
 
             # Extract model function, package name, and arguments from the models' dictionary
             # Thus, overwrite model dictionary with actual model
+            if 'options' not in MODEL.keys() and ensemble_approach == 'meta':
+                MODEL['options'] = {}
+            if 'package' not in MODEL.keys():
+                raise RuntimeError(f'You need to provide the package for {model_name}.')
             model_function, package_name, options = MODEL['model'], MODEL['package'], MODEL['options'],
 
             # Expanding window approach starts here
@@ -73,7 +77,7 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
             # thus: k = [0, ... , H-1]
 
             # if verbose: print current state to process
-            printed_model_name = f'{model_name}' + f' ({package_name})'
+            printed_model_name = f'{model_name}' + (f' ({package_name})' if package_name else '')
             vprint(
                 f'\nNow generating {H_ensemble} one-step ahead expanding window predictions from ensemble model: '
                 f'\'{ensemble_approach.capitalize()} - {printed_model_name}\'')

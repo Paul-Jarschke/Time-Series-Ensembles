@@ -1,0 +1,300 @@
+=================================================================================
+[2024-03-06 10:18] Starting  Pipeline...
+
+=====================================================
+== Starting Step 1 in Pipeline: Data Preprocessing ==
+=====================================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+=======================================================
+== Starting Step 2 in Pipeline: Individual Forecasts ==
+=======================================================
+
+Splitting data (train/test ratio: 30/70)...
+Initial training set has 36 observations 
+and goes from 2004-01-01 to 2006-12-01
+There are 84 periods to be forecasted: 
+2007-01-01 to 2013-12-01
+
+Now generating 84 one-step ahead expanding window predictions from model: Naive (sktime)
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: Naive (drift) (sktime)
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 28th period.
+AutoSARIMA forecast 1 / 84
+AutoSARIMA forecast 17 / 84
+AutoSARIMA forecast 34 / 84
+AutoSARIMA forecast 51 / 84
+AutoSARIMA forecast 68 / 84
+AutoSARIMA forecast 84 / 84
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: Exponential Smoothing (sktime)
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: STL (sktime)
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: XGBoost (darts)
+...finished!
+
+Now generating 84 one-step ahead expanding window predictions from model: XGBoost with covariates (darts)
+...finished!
+
+
+Individual forecasters' predictions finished!
+
+Insights into forecasters' predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2007-01  48.857243      48.800580   49.606623              49.016606   
+2007-02  48.254157      48.182315   48.515764              48.500499   
+2007-03  47.765006      47.681886   47.973535              48.001824   
+2007-04  46.394433      46.277432   46.969779              46.904911   
+2007-05  44.212976      44.043041   45.108821              45.025232   
+
+               STL    XGBoost  XGBoost with covariates  
+Date                                                    
+2007-01  40.574201  48.632446                49.624989  
+2007-02  41.374739  50.458118                49.453224  
+2007-03  45.653502  47.823650                48.497398  
+2007-04  41.569708  47.594688                48.059471  
+2007-05  49.855823  48.784794                45.706074  
+
+
+Exporting individual predictions as csv...
+...finished!
+
+[Time elapsed: 58s]
+
+
+=============================================
+== Step 3: Historical Ensemble Predictions ==
+=============================================
+
+Splitting forecast data (n = 84) for ensemble forecasts (train/test ratio: 30/70)...
+Initial training set has 25 observations and goes from 2007-01 to 2009-01
+There are 59 periods to be forecasted by the individual models 2009-02 to 2013-12
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Weighted - Simple'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Meta - Ridge (sklearn)'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Meta - Linear Regression (sklearn)'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Meta - MLP (sklearn)'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Now generating 59 one-step ahead expanding window predictions from ensemble model: 'Meta - RandomForest (sklearn)'
+Ensemble forecast 1 / 59
+Ensemble forecast 12 / 59
+Ensemble forecast 24 / 59
+Ensemble forecast 36 / 59
+Ensemble forecast 48 / 59
+Ensemble forecast 59 / 59
+...finished!
+
+Ensemble predictions finished!
+
+Insights into ensembles' predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2009-02                  61.113299                        60.814867   
+2009-03                  59.182571                        59.055344   
+2009-04                  58.799075                        58.823828   
+2009-05                  58.163131                        57.946170   
+2009-06                  59.402662                        59.596958   
+
+         Weighted Ensemble: Inverse Variance  \
+2009-02                            60.891558   
+2009-03                            58.930890   
+2009-04                            58.575512   
+2009-05                            57.788948   
+2009-06                            59.217292   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2009-02                                    63.054764           64.408891   
+2009-03                                    58.628813           58.701015   
+2009-04                                    58.522110           59.910576   
+2009-05                                    55.374381           57.259562   
+2009-06                                    59.381356           59.977680   
+
+         Meta Ensemble: Ridge  Meta Ensemble: Linear Regression  \
+2009-02             62.597588                         59.901068   
+2009-03             59.129386                         60.388606   
+2009-04             59.072710                         57.687579   
+2009-05             56.709381                         59.510199   
+2009-06             59.901035                         55.121393   
+
+         Meta Ensemble: MLP  Meta Ensemble: RandomForest  
+2009-02           65.804886                    60.107925  
+2009-03           78.347014                    59.769511  
+2009-04           75.462260                    59.280211  
+2009-05           73.679677                    58.991402  
+2009-06           77.540195                    58.561175  
+
+Merging...
+...finished!
+
+Exporting ensemble predictions as csv...
+Exporting full predictions as csv...
+...finished!
+
+[Time elapsed: 01m 20s]
+
+
+============================================
+== Step 4: Creating Metrics Ranking Table ==
+============================================
+
+Calculating MAE, RMSE, MAPE, sMAPE per model...
+Ranking forecasters ...
+...finished!
+
+Exporting metrics ranking as csv...
+...finished!
+
+Results:
+                                          Model        MAE       RMSE  \
+0               Weighted Ensemble: Inverse RMSE   1.984796   2.614644   
+1                     Weighted Ensemble: Simple   1.998712   2.640994   
+2           Weighted Ensemble: Inverse Variance   2.005879   2.642664   
+3                         Exponential Smoothing   2.073113   2.706564   
+4                                         Naive   2.090017   2.747925   
+5                                    AutoSARIMA   2.111371   2.730580   
+6                                 Naive (drift)   2.117502   2.748343   
+7                   Meta Ensemble: RandomForest   2.181056   2.782259   
+8                          Meta Ensemble: Ridge   2.202507   2.888313   
+9   Weighted Ensemble: Inverse Error Covariance   2.243608   2.997727   
+10                      XGBoost with covariates   2.297179   3.130366   
+11                                      XGBoost   2.238183   2.986848   
+12                           Meta Ensemble: SVR   2.275538   2.942122   
+13             Meta Ensemble: Linear Regression   2.421144   3.170619   
+14                                          STL   3.529755   4.620506   
+15                           Meta Ensemble: MLP  14.778628  16.861559   
+
+        MAPE      sMAPE  MAE Ranking  RMSE Ranking  MAPE Ranking  \
+0   0.027510   1.844813            1             1             1   
+1   0.027693   1.857083            2             2             2   
+2   0.027796   1.865093            3             3             3   
+3   0.028698   1.923401            4             4             4   
+4   0.028985   1.941180            5             6             5   
+5   0.029175   1.953598            6             5             6   
+6   0.029382   1.963672            7             7             7   
+7   0.030189   2.024136            8             8             8   
+8   0.030599   2.046141            9             9             9   
+9   0.031195   2.089228           11            12            10   
+10  0.031591   2.131706           13            13            11   
+11  0.031609   2.135754           10            11            12   
+12  0.031788   2.123269           12            10            13   
+13  0.034012   2.288446           14            14            14   
+14  0.049142   3.266421           15            15            15   
+15  0.209569  12.873251           16            16            16   
+
+    sMAPE Ranking  
+0               1  
+1               2  
+2               3  
+3               4  
+4               5  
+5               6  
+6               7  
+7               8  
+8               9  
+9              10  
+10             12  
+11             13  
+12             11  
+13             14  
+14             15  
+15             16  
+
+
+[2024-03-06 10:19] Finished Pipeline!
+[Total time elapsed: 01m 20s]
+=================================================================================
