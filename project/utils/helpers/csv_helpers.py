@@ -6,24 +6,24 @@ import pandas as pd
 from utils.helpers.console_outputs import vprint
 
 
-def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
+def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs): 
     """
-        Read a CSV file from the specified directory path and return it as a pandas DataFrame.
+    Read a CSV file from the specified directory path and return it as a pandas DataFrame.
 
-        Parameters:
-        - PATH (str): The directory path where the CSV file is located.
-        - file_name (str): The name of the CSV file.
-        - date_col (int, optional): The column index to be used as the index for the DataFrame. Default is first column.
-        - columns (list of int/str, optional): Subset of columns to select, denoted either \
-        by column labels or column indices stored in a list-like object.
-        - *args: Additional positional arguments to be passed to pandas.read_csv().
-        - **kwargs: Additional keyword arguments to be passed to pandas.read_csv().
+    Parameters:
+    - PATH (str):                           The directory path where the CSV file is located.
+    - file_name (str):                      The name of the CSV file.
+    - date_col (int, optional):             The index of the column to be used as the DataFrame index. Default is the first column.
+    - columns (list of int/str, optional):  Subset of columns to select, denoted either by column labels or indices stored in a list-like object.
 
-        Returns:
-        - df (pandas DataFrame): The DataFrame containing the data from the CSV file.
-        """
+    - *args:    Additional positional arguments to be passed to pandas.read_csv().
+    - **kwargs: Additional keyword arguments to be passed to pandas.read_csv().
 
-    # Remove '.csv' from file_name
+    Returns:
+    - df (pandas DataFrame): The DataFrame containing the data from the CSV file.
+    """
+
+    # Remove '.csv' from file_name if present
     if file_name.endswith('.csv'):
         file_name = file_name.replace('csv', '')
 
@@ -34,7 +34,7 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
     columns = None if columns == 'all' else columns
     df = pd.read_csv(FILE, index_col=date_col, usecols=columns, *args, **kwargs)
 
-    # Pass file name (without '.csv') as a flag to DataFrame
+    # Store the file name (without '.csv') as a flag in the DataFrame attributes
     df.attrs = {'file_name': file_name}
 
     return df
@@ -49,8 +49,9 @@ def csv_exporter(export_path,  *args, file_name=None):
         corresponding to the variable name of the DataFrame.
 
         Parameters:
-            export_path (str or os.PathLike): The directory path where the CSV files will be saved.
-            file_name (str with '.csv' ending, optional): Export file name. If not defined, infers it from object name.
+            export_path (str or os.PathLike):               The directory path where the CSV files will be saved.
+            file_name (str with '.csv' ending, optional):   Export file name. If not defined, infers it from object name.
+
             *args: Variable-length argument list of DataFrames to export.
 
         Notes:
@@ -63,14 +64,20 @@ def csv_exporter(export_path,  *args, file_name=None):
             csv_exporter("/path/to/export", df1, df2)
             # This will export df1 and df2 as CSV files to the "/path/to/export" directory.
         """
+    
+    # Accessing variables from the calling scope
     parent_objects = inspect.currentframe().f_back.f_locals
+
+    # Check if the 'verbose' variable is defined in the calling scope
     try:
         verbose = parent_objects['verbose']
     except KeyError:
         raise KeyError("'verbose' variable not found in the calling scope. Make sure it's defined.")
 
+    # Export each DataFrame to a CSV file
     if isinstance(export_path, (os.PathLike, str)):
         for df in args:
+            # Export with specified file_name or variable name if not provided
             if isinstance(file_name, str):
                 df.to_csv(os.path.join(export_path, f"{file_name}"), index=True)
                 vprint(f"Exporting DataFrame as csv...")

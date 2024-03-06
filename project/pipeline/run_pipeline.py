@@ -23,20 +23,35 @@ def run_pipeline(df, models, metrics,
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
     Args:
-    - df: pandas DataFrame or Series, input data containing targets and covariates. 
-    - verbose: bool, whether to print intermediate steps (default: False).
-    - target:
-    - covariates:
-    - forecasters:
-    - init_splits:
-    - verbose:
-    
+        df (pandas.DataFrame or pandas.Series):     Input data containing targets and covariates.
+        models (dict):                              Dictionary containing the forecasters and ensemblers models.
+        metrics (list):                             List of metrics for model ranking.
+        date_col (str):                             Name of the date column in the input data (default: 'infer').
+        date_format (str):                          Format of the date column if date_col is specified (default: None).
+        target (str):                               Name of the target column in the input data (default: 'infer').
+        covariates (str):                           Names of covariates columns in the input data (default: 'infer').
+        exclude (list):                             List of columns to exclude from the input data (default: None).
+        agg_method (str):                           Aggregation method for preprocessing (default: None).
+        agg_freq (str):                             Aggregation frequency for preprocessing (default: None).
+        select_forecasters (str or list):           Selection of forecasters to use (default: 'all').
+        autosarimax_refit_interval (float):         Refit interval for autosarimax (default: 0.33).
+        forecast_init_train (float):                Initial training ratio for individual forecasters (default: 0.3).
+        select_ensemblers (str or list):            Selection of ensemblers to use (default: 'all').
+        ensemble_init_train (float):                Initial training ratio for ensemblers (default: 0.3).
+        sort_by (str):                              Metric to sort by for model ranking (default: 'MAPE').
+        export (bool or os.PathLike):               Whether to export results or the export path if provided (default: True).
+        errors (str):                               How to handle errors (default: 'raise').
+        verbose (bool):                             Whether to print intermediate steps (default: False).
+
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+
     Returns:
-    - target:
-    - covariates:
-    - individual_predictions:
-    - full_predictions:
-    - metrics_ranking:
+        dict: Dictionary containing the following keys:
+            - 'target and covariates': Preprocessed target and covariates.
+            - 'individual_predictions': Individual predictions.
+            - 'full predictions': Full ensemble predictions.
+            - 'metrics ranking': Rankings based on specified metrics.
     """
 
     # Outlook: You could make this pipe more generic by looping over functions.
@@ -45,6 +60,7 @@ def run_pipeline(df, models, metrics,
     start_pipe = datetime.now()
     start_pipe_formatted = start_pipe.strftime("%Y%m%d_%H%M")
 
+    # Determine export path if exporting is enabled
     if export is True:
         if isinstance(export, os.PathLike):
             export_path = export
@@ -62,7 +78,7 @@ def run_pipeline(df, models, metrics,
     else:
         export_path = None
 
-    # Create log file
+    # Set up logging if both exporting and verbosity are enabled
     # Outlook: Also store forecasters' hyperparameters in log
     if export and verbose:
         # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
@@ -82,15 +98,12 @@ def run_pipeline(df, models, metrics,
         consoleHandler.setFormatter(logging.Formatter('\x1b[33;1m%(message)s\x1b[0m'))
         logger.addHandler(consoleHandler)
 
+    # Define pipeline processes
     processes = [
-        # Pipeline step 1: Perform data preprocessing
-        pipe1_data_preprocessing,
-        # Pipeline step 2: Compute individual predictions
-        pipe2_individual_forecasts,
-        # Pipeline step 3: Compute ensemble predictions
-        pipe3_ensemble_forecasts,
-        # Pipeline step 4: Ranking by metrics
-        pipe4_metrics_ranking
+        pipe1_data_preprocessing,   # Pipeline step 1: Perform data preprocessing
+        pipe2_individual_forecasts, # Pipeline step 2: Compute individual predictions
+        pipe3_ensemble_forecasts,   # Pipeline step 3: Compute ensemble predictions
+        pipe4_metrics_ranking       # Pipeline step 4: Ranking by metrics
     ]
 
     # Define expected outputs
@@ -104,27 +117,30 @@ def run_pipeline(df, models, metrics,
     # Set up empty output dictionary
     output_dict = {}
 
+    # Print pipeline start time
     vprint('================================================================================='
            f'\n[{start_pipe.strftime("%Y-%m-%d %H:%M")}] Starting  Pipeline...')
 
     # Feed pipeline with pandas DataFrame or Series
     pipe_input = df
 
+    # Iterate over pipeline processes
     for step, process in enumerate(processes):
+        # Execute each process
         pipe_output = process(
             pipe_input,
-            # Pipe 1 arguments
+            # Provide arguments for Pipe 1
             date_col=date_col, date_format=date_format,
             target=target, covariates=covariates, exclude=exclude,
             agg_method=agg_method, agg_freq=agg_freq,
-            # Pipe 2 arguments
+            # Provide arguments for Pipe 2
             forecasters=models['FORECASTERS'], select_forecasters=select_forecasters,
             forecast_init_train=forecast_init_train,
             autosarimax_refit_interval=autosarimax_refit_interval,
-            # Pipe 3 arguments
+            # Provide arguments for Pipe 3
             ensemblers=models['ENSEMBLERS'], select_ensemblers=select_ensemblers,
             ensemble_init_train=ensemble_init_train,
-            # Pipe 4 arguments
+            # Provide arguments for Pipe 4
             metrics=metrics,
             sort_by=sort_by,
             # Generic/shared arguments
@@ -132,10 +148,13 @@ def run_pipeline(df, models, metrics,
             errors=errors, verbose=verbose,
             *args, **kwargs
         )
+
         # Store results to output dictionary
         output_dict[expected_outputs[step]] = pipe_output
+        
         # Previous output is next input
         pipe_input = pipe_output
+        
         # Print time elapsed since start
         if step+1 != len(processes):
             vprint(f'[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')

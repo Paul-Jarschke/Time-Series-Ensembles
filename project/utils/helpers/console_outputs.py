@@ -10,8 +10,9 @@ def vprint(*args):
     - *args: Strings to be printed.
     """
     if inspect.currentframe().f_back.f_locals['verbose']:
-        # print(*args)
-        # logging.info('\033[0m' + arg)
+        ### print(*args)
+        ### logging.info('\033[0m' + arg)
+        # Log each argument using the logging module
         for arg in args:
             logging.info(arg)
 
@@ -26,20 +27,21 @@ def strfdelta(tdelta):
     Returns:
         str: A formatted string representing the time difference in the format 'HHh MMm SSs'.
     """
-    # Extract seconds
+    # Extract total seconds
     s = tdelta.seconds
-
-    # hours
+    # Calculate hours
     hours = s // 3600
     # remaining seconds
     s = s - (hours * 3600)
-    # minutes
+    # Calculate minutes
     minutes = s // 60
-    # remaining seconds
+    # Remaining seconds
     seconds = s - (minutes * 60)
 
-    # total time
+    # Format the timedelta into a string
     formatted_tdelta = '{:02}h {:02}m {:02}s'.format(int(hours), int(minutes), int(seconds))
+    
+    # Remove leading zeros for hours and minutes if they are zero
     formatted_tdelta = formatted_tdelta.replace('00h ', '').replace('00m ', '')
 
     return formatted_tdelta
