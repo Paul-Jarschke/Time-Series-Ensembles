@@ -158,7 +158,9 @@ def pipe2_individual_forecasts(
             # Handling transformation for specific packages and covariate models
             # For the prediction process some packages require transformed data
             if package_name == "sktime" and covtreatment_bool:
-                package_name = package_name + ".lagged"
+                # For using covariates in sktime, we must lag the data and remove one row.
+                # For this we implemented an extra transformer
+                package_name = package_name + ".covariates"
 
             # Determining whether/which transformation is needed based on package and covariate treatment
             # Do not transform again if model source did not change
@@ -187,7 +189,7 @@ def pipe2_individual_forecasts(
             # Generating one-step ahead expanding window predictions for the current model (fitting, updating, predicting)
             vprint(
                 f"Now generating {H} one-step ahead expanding window predictions from model: "
-                f'{model_name} ({package_name.replace(".lagged", "")})'
+                f'{model_name} ({package_name.split(".")[0]})'
             )
 
             # Handling different prediction methods based on the package used
@@ -270,11 +272,11 @@ def pipe2_individual_forecasts(
                         )
 
                     # Determine if lagged transformation affects positional indices
-                    # sktime.lagged transformer removes the first period due to NaNs => positional indices change
-                    lag_indicator = 1 if "lagged" in package_name else 0
+                    # sktime.covariates transformer removes the first period due to NaNs => positional indices change
+                    lag_indicator = 1 if "covariates" in package_name else 0
 
                     # We are at period t+k and forecast period t+k+1
-                    # Loop until until all H periods are forecasted
+                    # Loop until all H periods are forecasted
                     # thus: k = [0, ... , H-1]
                     # Iterate over forecast periods to refit and update the model
                     for k in range(H):

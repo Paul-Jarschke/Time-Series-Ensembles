@@ -7,6 +7,6 @@ print("Loading data transformers...")
 
 TRANSFORMERS = {
     "sktime": transform_to_sktime,
+    "sktime.covariates": transform_sktime_lagged_covariates,
     "darts": transform_to_darts,
-    "sktime.lagged": transform_sktime_lagged_covariates,
 }
