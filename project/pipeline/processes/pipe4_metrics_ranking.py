@@ -21,21 +21,27 @@ def pipe4_metrics_ranking(full_predictions, metrics,
     # Extract actual values
     Y_actual = full_predictions.pop('Target')
 
-    # Calculate metrics per (individual and ensemble) model
+    # Extract model names and store them in an empty dictionary, which later corresponds to the first column
+    # in the metric df
     model_names = full_predictions.columns
     metrics_dict = {'Model': model_names}
+
+    # Calculate metrics per (individual and ensemble) model
+    # Thus: loop over models
     for model_name in model_names:
 
         Y_predicted = full_predictions[model_name]  # Predicted values
 
-        # Calculate metrics
+        # Loop over metrics and corresponding function in METRICS dictionary
         for metric_name, metric_function in metrics.items():
             if metric_name not in metrics_dict:
                 metrics_dict[metric_name] = []
+            # Calculate performance metric
             model_metrics = metric_function(Y_predicted, Y_actual)
-            metrics_dict[metric_name].append(model_metrics)
+            # Save to metrics dictionary
+            metrics_dict[metric_name.upper()].append(model_metrics)
 
-    # Save as pandas DataFrame
+    # Save metrics dictionary as pandas DataFrame
     metrics_df = pd.DataFrame(metrics_dict)
 
     # Rank the forecasters based on metric columns
@@ -44,7 +50,7 @@ def pipe4_metrics_ranking(full_predictions, metrics,
         if metric_name == 'Model':  # No ranking for 'Model' column
             continue
         # Transform metric name to uppercase
-        metric_name = metric_name.upper()
+        metric_name = metric_name
         # Rank metric column (highest metric = lowest rank and vice versa)
         metrics_df[f'{metric_name} Ranking'] = [int(rank) for rank in metric_values.rank()]
 
