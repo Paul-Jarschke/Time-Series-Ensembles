@@ -1,0 +1,143 @@
+=================================================================================
+[2024-03-06 18:29] Starting  Pipeline...
+
+=====================================================
+== Starting Step 1 in Pipeline: Data Preprocessing ==
+=====================================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: 15T
+Data from goes from 2020-01-01 to 2020-04-14, resulting in 10000 observations.
+
+Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
+...finished!
+Data now has 74 observations.
+
+Selecting target and covariates...
+Target: bid_close
+Covariates: None
+
+Data Insight:
+
+            bid_close
+datetime             
+2020-01-02    1.11702
+2020-01-03    1.11599
+2020-01-06    1.11948
+2020-01-07    1.11530
+2020-01-08    1.11124
+[Time elapsed: 00s]
+
+
+=======================================================
+== Starting Step 2 in Pipeline: Individual Forecasts ==
+=======================================================
+
+Splitting data (train/test ratio: 30/70)...
+Initial training set has 22 observations 
+and goes from 2020-01-02 to 2020-01-31
+There are 52 periods to be forecasted: 
+2020-02-03 to 2020-04-14
+
+Now generating 52 one-step ahead expanding window predictions from model: Naive (sktime)
+...finished!
+
+Now generating 52 one-step ahead expanding window predictions from model: STL (sktime)
+...finished!
+
+
+Since no covariates are given, skipping covariate forecasters.
+
+Individual forecasters' predictions finished!
+
+Insights into forecasters' predictions:
+              Naive       STL
+Date                         
+2020-02-03  1.10885  1.099680
+2020-02-04  1.10618  1.103271
+2020-02-05  1.10440  1.105145
+2020-02-06  1.09994  1.104768
+2020-02-07  1.09802  1.105307
+
+
+Exporting individual predictions as csv...
+...finished!
+
+[Time elapsed: 03s]
+
+
+=============================================
+== Step 3: Historical Ensemble Predictions ==
+=============================================
+
+Splitting forecast data (n = 52) for ensemble forecasts (train/test ratio: 30/70)...
+Initial training set has 15 observations and goes from 2020-02-03 to 2020-02-21
+There are 37 periods to be forecasted by the individual models 2020-02-24 to 2020-04-14
+
+Now generating 37 one-step ahead expanding window predictions from ensemble model: 'Weighted - Simple'
+Ensemble forecast 1 / 37
+Ensemble forecast 8 / 37
+Ensemble forecast 15 / 37
+Ensemble forecast 23 / 37
+Ensemble forecast 30 / 37
+Ensemble forecast 37 / 37
+...finished!
+
+Now generating 37 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+Ensemble forecast 1 / 37
+Ensemble forecast 8 / 37
+Ensemble forecast 15 / 37
+Ensemble forecast 23 / 37
+Ensemble forecast 30 / 37
+Ensemble forecast 37 / 37
+...finished!
+
+Ensemble predictions finished!
+
+Insights into ensembles' predictions:
+            Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+2020-02-24                   1.081134                         1.081733
+2020-02-25                   1.082085                         1.082764
+2020-02-26                   1.085062                         1.085843
+2020-02-27                   1.085866                         1.086655
+2020-02-28                   1.096304                         1.097140
+
+Merging...
+...finished!
+
+Exporting ensemble predictions as csv...
+Exporting full predictions as csv...
+...finished!
+
+[Time elapsed: 03s]
+
+
+============================================
+== Step 4: Creating Metrics Ranking Table ==
+============================================
+
+Calculating MAE, RMSE, MAPE, sMAPE per model...
+Ranking forecasters ...
+...finished!
+
+Exporting metrics ranking as csv...
+...finished!
+
+Results:
+                             Model       MAE      RMSE      MAPE     sMAPE  \
+0                            Naive  0.006643  0.008753  0.006043  0.402667   
+1  Weighted Ensemble: Inverse RMSE  0.008979  0.011273  0.008167  0.544612   
+2        Weighted Ensemble: Simple  0.009945  0.012397  0.009049  0.603531   
+3                              STL  0.014148  0.017665  0.012884  0.859981   
+
+   MAE Ranking  RMSE Ranking  MAPE Ranking  sMAPE Ranking  
+0            1             1             1              1  
+1            2             2             2              2  
+2            3             3             3              3  
+3            4             4             4              4  
+
+
+[2024-03-06 18:29] Finished Pipeline!
+[Total time elapsed: 03s]
+=================================================================================
