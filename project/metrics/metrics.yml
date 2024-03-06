@@ -1,0 +1,26 @@
+# The following metrics can be chosen:
+# just uncomment and the metric will be implemented in the ranking table
+#
+# MASE: mean_absolute_scaled_error
+# MdASE: median_absolute_scaled_error
+# MSSE: mean_squared_scaled_error
+# MdSSE: median_squared_scaled_error
+MAE: mean_absolute_error
+# MSE: mean_squared_error
+RMSE: root_mean_squared_error
+# MdAE: median_absolute_error
+# MdSE: median_squared_error
+# GMAE: geometric_mean_absolute_error
+# GMSE: geometric_mean_squared_error
+MAPE: mean_absolute_percentage_error
+sMAPE: symmetric_mean_absolute_percentage_error
+# MdAPE: median_absolute_percentage_error
+# MSPE: mean_squared_percentage_error
+# MdSPE: median_squared_percentage_error
+# MRAE: mean_relative_absolute_error
+# MdRAE: median_relative_absolute_error
+# GMRAE: geometric_mean_relative_absolute_error
+# GMRSE: geometric_mean_relative_squared_error
+# MAS: mean_asymmetric_error
+# MLE: mean_linex_error
+# RL: relative_loss

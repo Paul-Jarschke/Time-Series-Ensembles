@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def rmse(predictions, targets):
+def root_mean_squared_error(targets, predictions):
     """
     Calculate the Root Mean Squared Error (RMSE) between predicted values and targets.
 
     Parameters:
-        predictions: Array, Series or DataFrame containing predicted values.
         targets: Array or Series containing target values.
+        predictions: Array, Series or DataFrame containing predicted values.
 
     Returns:
         RMSE: float, RMSE value.

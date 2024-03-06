@@ -1,33 +1,39 @@
-# Import FunctionFinder and METRICS_DIR
+# Import FunctionFinder and METRICS_DIR and external dependencies
+import os
+import yaml
 from utils.helpers import FunctionFinder
 from utils.paths import METRICS_DIR
+import sktime.performance_metrics.forecasting._functions# Import custom metrics
 
-# Import metrics from individual files
-from metrics.rmse import *
-from metrics.smape import *
-from metrics.mape import *
 
 # Print statement indicating loading of metric functions
 print('Loading metrics...')
 
-# Find implemented metrics
-loader = FunctionFinder()
-loader.find_functions(METRICS_DIR)  # Load functions from .py files in the current directory
+# Read in yml file
+with open(os.path.join(METRICS_DIR, "metrics.yml"), 'r') as f:
+    METRICS = yaml.safe_load(f)
 
-# If desired, exclude metrics (temporarily)
+
+# Find custom implemented metrics
+Finder = FunctionFinder()
+Finder.find_functions(METRICS_DIR)  # Load functions from .py files in the current directory
+
+
+# If desired, exclude metrics (temporarily) manually
 EXCLUDED_METRICS = []
 for element in EXCLUDED_METRICS:
-    loader.functions.pop(element)
+    METRICS.pop(element)
 
-# Set up metrics dictionary
-METRICS = loader.functions
+# Replace METRICS function name with actual constructor object
+sktime_functions = dir(sktime.performance_metrics.forecasting._functions)
+for metric_name, metric_function in METRICS.items():
+    if metric_function in sktime_functions:
+        METRICS[metric_name] = getattr(sktime.performance_metrics.forecasting._functions, metric_function)
+    else:
+        METRICS[metric_name] = Finder.functions[metric_function]
 
 # Note:
 # You can simply add new metrics as .py file, and they will be available to the pipeline
-
 # Generic format:
-# Metrics should take input arguments predictions, targets and return a single value in the end.
-
-# Outlook:
-# Implement metrics from sktime library
-
+# Input arguments must be y_actual and y_predicted (in this order)
+# Output must be a single value

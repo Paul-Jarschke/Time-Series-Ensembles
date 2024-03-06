@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def mape(predictions, targets):
+def mape(targets, predictions):
     """
     Calculates the Mean Absolute Percentage Error (MAPE) between predicted values and targets.
 
     Parameters:
-        predictions: Array, Series or DataFrame containing the predicted values.
         targets: Array or Series containing target values.
+        predictions: Array, Series or DataFrame containing the predicted values.
 
     Returns:
         MAPE: float, MAPE value.

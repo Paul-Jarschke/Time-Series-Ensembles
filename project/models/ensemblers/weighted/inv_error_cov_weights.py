@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def inv_error_cov_weights(predictions, verbose=True):
     """
     Computes weights based on the inverse of prediction error covariances.

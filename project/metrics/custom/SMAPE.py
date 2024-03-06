@@ -1,13 +1,13 @@
 import numpy as np
 
 
-def smape(predictions, targets):
+def symmetric_mean_absolute_percentage_error(targets, predictions):
     """
     Calculates the Symmetric Mean Absolute Percentage Error (SMAPE) between predicted values and targets.
 
     Parameters:
-        predictions: Array, Series, or DataFrame containing the predicted values.
         targets: Array or Series containing target values.
+        predictions: Array, Series, or DataFrame containing the predicted values.
 
     Returns:
         SMAPE: float, SMAPE value.

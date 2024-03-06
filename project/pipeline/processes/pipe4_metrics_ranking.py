@@ -19,7 +19,7 @@ def pipe4_metrics_ranking(full_predictions, metrics,
     vprint(f"Calculating {', '.join(metrics.keys())} per model...")
     
     # Extract actual values
-    Y_actual = full_predictions.pop('Target')
+    y_actual = full_predictions.pop('Target')
 
     # Extract model names and store them in an empty dictionary, which later corresponds to the first column
     # in the metric df
@@ -30,16 +30,16 @@ def pipe4_metrics_ranking(full_predictions, metrics,
     # Thus: loop over models
     for model_name in model_names:
 
-        Y_predicted = full_predictions[model_name]  # Predicted values
+        y_predicted = full_predictions[model_name]  # Predicted values
 
         # Loop over metrics and corresponding function in METRICS dictionary
         for metric_name, metric_function in metrics.items():
             if metric_name not in metrics_dict:
                 metrics_dict[metric_name] = []
             # Calculate performance metric
-            model_metrics = metric_function(Y_predicted, Y_actual)
+            model_metrics = metric_function(y_actual, y_predicted)
             # Save to metrics dictionary
-            metrics_dict[metric_name.upper()].append(model_metrics)
+            metrics_dict[metric_name].append(model_metrics)
 
     # Save metrics dictionary as pandas DataFrame
     metrics_df = pd.DataFrame(metrics_dict)
@@ -55,7 +55,7 @@ def pipe4_metrics_ranking(full_predictions, metrics,
         metrics_df[f'{metric_name} Ranking'] = [int(rank) for rank in metric_values.rank()]
 
     # Sort the DataFrame based on selected metric
-    metrics_ranking = metrics_df.sort_values(by=f'{sort_by.upper()} Ranking')
+    metrics_ranking = metrics_df.sort_values(by=f'{sort_by} Ranking')
 
     # Reset the index
     metrics_ranking.reset_index(drop=True, inplace=True)

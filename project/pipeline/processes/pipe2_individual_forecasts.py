@@ -135,7 +135,7 @@ def pipe2_individual_forecasts(target_covariates_tuple,
 
             # Starting one-step ahead expanding window predictions for current model (fitting, updating, predicting)
             vprint(f'Now generating {H} one-step ahead expanding window predictions from model: '
-                   f'{model_name} ({package_name.replace('.lagged', '')})'
+                   f'{model_name} ({package_name.replace(".lagged", "")})'
                    )
             # Method and data transformer is inferred from package_name
 

@@ -6,7 +6,7 @@ from utils.helpers.FunctionFinder import FunctionFinder
 from utils.paths import *
 
 
-def model_finder(package_name: str, model_function: str):
+def model_finder(model_function, package_name=''):
 
     # Define supported packages
     supported_packages = ['sktime', 'darts', 'sklearn']
