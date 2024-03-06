@@ -18,19 +18,58 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
                              ensemble_init_train=0.3,
                              export_path=None, verbose=False,
                              *args, **kwargs):
+    """
+    Perform ensemble forecasting using the provided individual predictions and ensemble methods.
+
+    Parameters:
+    -----------
+    individual_predictions : pandas.DataFrame
+        DataFrame containing individual predictions from various models. Each column represents a model's prediction,
+        indexed by time periods.
+
+    ensemblers : dict
+        Dictionary containing ensemble methods and their corresponding models for ensemble forecasting. The keys
+        represent the ensemble methods (e.g., 'weighted', 'meta') and the values are dictionaries where keys are model
+        names and values are dictionaries containing model information like 'model', 'package', and 'options'.
+
+    select_ensemblers : str or list, optional
+        Determines which ensemblers to use. Default is 'all', meaning all ensemblers will be used. If a list is provided,
+        only the ensemblers in the list will be utilized.
+
+    ensemble_init_train : float, optional
+        Proportion of the dataset used for initial training of the ensemble models. Default is 0.3.
+
+    export_path : str, optional
+        Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported. Default is None.
+
+    verbose : bool, optional
+        If True, prints detailed information about the ensemble forecasting process. Default is False.
+
+    Returns:
+    --------
+    full_predictions : pandas.DataFrame
+        DataFrame containing both individual and ensemble predictions merged based on the time periods.
+
+    Notes:
+    ------
+    This function performs ensemble forecasting using the provided individual predictions and ensemble methods.
+    It iterates over each ensemble approach and model within the ensemblers dictionary, generates ensemble predictions,
+    and merges them with the individual predictions. Finally, if an export path is provided, it exports the ensemble
+    predictions as a CSV file.
+
+    """
 
     vprint('\n============================================='
            '\n== Step 3: Historical Ensemble Predictions =='
            '\n=============================================\n')
 
-    # ensemblers is a dictionary of weighting schemes and metamodels (docstring follows)
-
     # Ensemble Train Split
+    # Determine size of the training set for ensemble forecasting
     n_predictions = len(individual_predictions)
     ens_init_trainsize = int(ensemble_init_train * n_predictions)
     # At this period ensemble training ends end ensemble forecast is produced for ens_init_trainsize + 1
 
-    # Ensemble forecasters' forecast horizon
+    # Calculate the forecast horizon for ensemble forecasters
     H_ensemble = n_predictions - ens_init_trainsize
 
     # Printing information about prediction process
@@ -41,10 +80,10 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
     vprint(f'There are {H_ensemble} periods to be forecasted by the individual models '
            f'{individual_predictions.index[ens_init_trainsize]} to {individual_predictions.index[-1]}')
 
-    # Create empty pandas data objects for results
-    ensemble_predictions = pd.DataFrame()  # Resulting DataFrame containing all ensemble models' predictions
+    # Create empty DataFrame for storing ensemble predictions
+    ensemble_predictions = pd.DataFrame() 
 
-    # Set percentage interval for printing forecast updates
+    # Define the percentage interval for printing forecast updates
     # (e.g., print 0.2 means printing at 0%, 20%, 40%, 60%, 80%, and 100%)
     # Include first and last prediction in console output
     printout_percentage_interval = 0.2
@@ -52,15 +91,15 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
                  H_ensemble * np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)]
     printed_k[0] = 1
 
-    # Loop over ensemble approach: weighted or meta
+    # Iterate over ensemble approaches (e.g., weighted, meta)
     for ensemble_approach, approach_dict in ensemblers.items():
-        # Loop over models in the approach: e.g., weighting scheme or metamodel
+        # Iterate over models in the approach (e.g., weighting scheme or metamodel)
         for model_name, MODEL in approach_dict.items():
-            # Only consider selected models in the current ensemble approach dictionary
+            # Consider only selected models in the current ensemble approach dictionary
             if select_ensemblers != 'all' and model_name not in select_ensemblers:
                 continue
 
-            # Define column name in resulting pandas DataFramae
+            # Define column name in resulting DataFrame
             ens_col_name = f'{ensemble_approach.capitalize()} Ensemble: {model_name}'
 
             # Extract model function, package name, and arguments from the models' dictionary
@@ -71,12 +110,12 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
                 raise RuntimeError(f'You need to provide the package for {model_name}.')
             model_function, package_name, options = MODEL['model'], MODEL['package'], MODEL['options'],
 
-            # Expanding window approach starts here
+            # Starting expanding window approach here
             # We are at period t+k and forecast period t+k+1
             # Loop until all H periods are forecasted
             # thus: k = [0, ... , H-1]
 
-            # if verbose: print current state to process
+            # If verbose, print current state of the process
             printed_model_name = f'{model_name}' + (f' ({package_name})' if package_name else '')
             vprint(
                 f'\nNow generating {H_ensemble} one-step ahead expanding window predictions from ensemble model: '
@@ -112,6 +151,7 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
             vprint('...finished!')
             ensemble_predictions[ens_col_name] = model_ens_predictions
 
+    # Merge with individual predictions
     vprint('\nEnsemble predictions finished!\n'
            '\nInsights into ensembles\' predictions:',
            ensemble_predictions.head())
@@ -119,7 +159,9 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
     # Merge with individual predictions
     vprint('\nMerging...')
     full_predictions = individual_predictions.merge(ensemble_predictions,
-                                                    left_index=True, right_index=True, how='inner')
+                                                    left_index=True,
+                                                    right_index=True,
+                                                    how='inner')
     vprint('...finished!\n')
 
     # If path is specified, export results as .csv

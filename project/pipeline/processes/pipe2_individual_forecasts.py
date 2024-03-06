@@ -16,35 +16,53 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                                autosarimax_refit_interval=0.33,
                                export_path=None, verbose=False,
                                *args, **kwargs):
+    
+    """
+    Generates individual forecasts for each model specified in the forecasters dictionary.
+
+    Args:
+        target_covariates_tuple (tuple):                Tuple containing target and covariates data.
+        forecasters (dict):                             Dictionary containing forecasters to be used for individual forecasts.
+        select_forecasters (str or list, optional):     Specify which forecasters to use. Defaults to 'all'.
+        forecast_init_train (float, optional):          Initial training set size as a fraction of total data. Defaults to 0.3.
+        autosarimax_refit_interval (float, optional):   Interval for refitting AutoSARIMA model. Defaults to 0.33.
+        export_path (str, optional):                    Path to export the results as CSV. Defaults to None.
+        verbose (bool, optional):                       Whether to print verbose output. Defaults to False.
+
+    Returns:
+        pd.DataFrame: DataFrame containing individual predictions.
+    """
 
     vprint("\n======================================================="
            "\n== Starting Step 2 in Pipeline: Individual Forecasts =="
            "\n=======================================================\n")
 
-    # Extract tuple elements
+    # Extracting target and covariates data from input tuple
     target = target_covariates_tuple[0]
     covariates = target_covariates_tuple[1]
 
-    # Calculate initial train size
+    # Calculating the initial training set size based on specified fraction
     init_trainsize = int(target.shape[0] * forecast_init_train)
 
-    # Define target training variables
+    # Defining target variable for training as the target data
     y_train_full = target
 
-    # Infer seasonal frequency
+    # Inferring the seasonal frequency of the target data
     inferred_seasonal_freq = SEASONAL_FREQ_MAPPING[target.index.freqstr] \
         if target.index.freqstr in SEASONAL_FREQ_MAPPING.keys() else None
 
+    # Issuing a warning if the available data is insufficient for seasonal forecasters
     if inferred_seasonal_freq > init_trainsize:
         warnings.warn('Too few observations provided for seasonal forecasters. '
                       'If you provide such forecasters, consider removing them!')
 
-    # Turn off warnings
+    # Turning off warnings (temporarily) for cleaner output
     warnings.filterwarnings('ignore')
 
-    # Calculate full forecast horizon
+    # Calculating full forecast horizon
     H = y_train_full.shape[0] - init_trainsize
 
+    # Providing detailed information about the data splitting process
     vprint(
          f"Splitting data (train/test ratio: "
          f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})..."
@@ -54,11 +72,11 @@ def pipe2_individual_forecasts(target_covariates_tuple,
          f"{target.index[init_trainsize].date()} to {target.index[-1].date()}\n"
     )
 
-    # Create a DataFrame to store all models' predictions
+    # Creating a DataFrame to store all models' predictions
     individual_predictions = pd.DataFrame()
     individual_predictions.index.name = 'Date'
 
-    # Initialize last model_source and covtreatment_bool objects
+    # Initializing variables for tracking the last model (model_source) source and covariate treatment (covtreatment_bool)
     last_model_source = None
     last_covtreatment_bool = None
 
@@ -66,63 +84,65 @@ def pipe2_individual_forecasts(target_covariates_tuple,
     y_train_transformed = None
     X_train_transformed = None
 
-    # Set percentage interval for printing forecast updates
+    # Setting percentage interval for printing forecast updates
     # (e.g., print 0.2 means printing at 0%, 20%, 40%, 60%, 80%, and 100%)
     # Include first and last prediction in console output
     printout_percentage_interval = 0.2
     printed_k = [ceil(x) for x in H * np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)]
     printed_k[0] = 1
 
-# Loop over model approach (with or without covariates)
+    # Looping over different modeling approaches (with or without covariates)
     for approach, approach_dict in forecasters.items():
 
-        # Define boolean object that indicates if it is a covariate model or not
+        # Determining if the current approach involves covariates
         covtreatment_bool = True if approach == 'with_covariates' else False
 
-        # Skip covariates forecasters when no covariates are specified
+        # Skipping covariates forecasters if no covariates are specified
         if covtreatment_bool and covariates is None:
             vprint(f"\nSince no covariates are given, skipping covariate forecasters.")
             continue
-        # Skip approach when no models are given.
+
+        # Skipping approach when no models are given
         if len(approach_dict) == 0:
             vprint(f"No models given for approach {approach}.")
             continue
 
-        # Initialize variable last_package_name and last_covtreatment_bool such that data is not transformed twice
+        # Initializing variable last_package_name and last_covtreatment_bool such that data is not transformed twice
         last_package_name = None
         last_covtreatment_bool = None
 
         # Loop over individual model in the current sub-dictionary (with/without covariates)
         for model_name, MODEL in approach_dict.items():
-            # Only consider selected models in the current ensemble approach dictionary
+            # Only considering selected models in the current ensemble approach dictionary
             if select_forecasters not in ['all', ['all']] and model_name not in select_forecasters:
                 continue
 
-            # Define X_train_full depending on covtreatment_bool, i.e., depending on whether covariates are specified
+            # Defining X_train_full depending on covtreatment_bool, i.e., depending on whether covariates are specified
             X_train_full = covariates if covtreatment_bool else None
 
-            # Extract model information from dictionary
+            # Extracting model information from the dictionary
             if 'options' not in MODEL.keys():
                 MODEL['options'] = {}
             if 'package' not in MODEL.keys():
                 raise RuntimeError(f'You need to provide the package for {model_name}.')
             model_function, package_name, options = MODEL['model'], MODEL['package'], MODEL['options']
 
-            # Adjust model name depending on the approach (with or without covariates)
+            # Adjusting model name depending on the approach (with/without covariates)
             model_name += (' with covariates' if covtreatment_bool else '')
 
-            # Construct model with corresponding arguments
+            # Constructing model with corresponding arguments
             model = model_function(**options)
 
+            # Handling transformation for specific packages and covariate models
             # For the prediction process some packages require transformed data
             if package_name == 'sktime' and covtreatment_bool:
                 package_name = package_name + '.lagged'
 
-            # Depending on package_name select corresponding data transformer
-
+            # Determining whether/which transformation is needed based on package and covariate treatment
             # Do not transform again if model source did not change
             if last_package_name == package_name and last_covtreatment_bool == covtreatment_bool:
                 pass
+
             # Transform with provided TRANSFORMERS
             elif package_name in TRANSFORMERS.keys():
                 # Select transformer
@@ -137,19 +157,21 @@ def pipe2_individual_forecasts(target_covariates_tuple,
             model_predictions = pd.DataFrame()
             model_predictions.index.name = 'Date'
 
-            # Starting one-step ahead expanding window predictions for current model (fitting, updating, predicting)
+            # Generating one-step ahead expanding window predictions for the current model (fitting, updating, predicting)
             vprint(f'Now generating {H} one-step ahead expanding window predictions from model: '
                    f'{model_name} ({package_name.replace(".lagged", "")})'
                    )
-            # Method and data transformer is inferred from package_name
-
+            
+            # Handling different prediction methods based on the package used
+            # Method and data transformer are inferred from package_name
             # darts forecasters use .historical_forecasts() method:
             if 'darts' in package_name:
                 model_predictions = model.historical_forecasts(
                     series=y_train_transformed, start=init_trainsize, stride=1,
                     forecast_horizon=1, past_covariates=X_train_transformed,
                     show_warnings=False).pd_dataframe()
-                # Transform back to periodIndex (nicer outputs)
+                
+                # Transforming back to PeriodIndex for better readability
                 period_freq = 'M' if target.index.freqstr == 'MS' else target.index.freqstr
                 model_predictions.set_index(
                     pd.PeriodIndex(
@@ -158,40 +180,44 @@ def pipe2_individual_forecasts(target_covariates_tuple,
 
             # sktime forecasters
             elif 'sktime' in package_name:
-                # Adjust sktime specific parameters
-                # in particular: Seasonal periodicity
-                if 'Naive' not in model_name and 'sp'in model.get_params().keys():  # sNaive performs bad. Does not make sense to use this.
+                # Adjust sktime specific parameters, in particular: Seasonal periodicity
+                if 'Naive' not in model_name and 'sp'in model.get_params().keys():          # sNaive performs bad. Does not make sense to use this.
                     model.set_params(**{'sp': inferred_seasonal_freq})
 
                 # all sktime forecasters but ARIMA
                 if 'ARIMA' not in model_name:
-                    # they use ExpandingWindowSplitter and .update_predict() method for historical forecasts
+                    # sktime uses ExpandingWindowSplitter and .update_predict() method for historical forecasts
                     cv = ExpandingWindowSplitter(fh=1, initial_window=init_trainsize, step_length=1)
                     model.fit(y_train_transformed[:init_trainsize])
                     model_predictions = model.update_predict(y_train_transformed, cv=cv)
 
-                # ARIMA
+                # Extra treatment for ARIMA model
                 else:
-                    # Extra treatment for ARIMA model
-                    # (Updating and Refitting each period with method above would take too much time here)
-                    # Outlook:
-                    # - Consider implementing UpdateRefitEvery() wrapper from sktime package (threw an error)
-                    # - source this piece of code out
-                    # - and make own .update_predict method for ARIMA (wrap in class)
+                    """
+                    Updating and Refitting each period with method above would take too much time here.
+                    Outlook:
+                    - Consider implementing UpdateRefitEvery() wrapper from sktime package (threw an error)
+                    - source this piece of code out
+                    - and make own .update_predict method for ARIMA (wrap in class)
 
-                    # Define at what interval ARIMA model is being refitted
-                    # autosarimax_refit_interval is between 0 and 1
-                    # Default: 0, thus: refitting each period
-                    # 1 would mean: no refitting at all
-                    # Example 0.33, means: only refitting at 33% and 66% of predictions made
-                    # + Fitting at the beginning
-                    # Fitting works with the AutoArima approach from Hyndman, RJ and Khandakar, Y (2008)
+                    Define at what interval ARIMA model is being refitted.
+                    autosarimax_refit_interval is between 0 and 1.
+                    Default: 0, thus: refitting each period.
+                    1 would mean: no refitting at all.
+                    Example 0.33, means: only refitting at 33% and 66% of predictions made.
+                    + Fitting at the beginning.
+                    Fitting works with the AutoArima approach from Hyndman, RJ and Khandakar, Y (2008).
+                    """
+
+                    # Determine the refit frequency for the ARIMA model based on autosarimax_refit_interval
+                    # If autosarimax_refit_interval is 0 or None, set refit_freq to 1, indicating refitting every period
                     if autosarimax_refit_interval in [0, None]:
                         refit_freq = 1
                     else:
+                        # Calculate the refit frequency based on the provided refitting interval
                         refit_freq = ceil(H / (1 / autosarimax_refit_interval))
 
-                    # Print information about refitting
+                    # Printing refitting information
                     if refit_freq == 2:
                         vprint(f'Auto-fitting model. Refitting every {refit_freq}nd period.')
                     elif refit_freq == 1:
@@ -199,26 +225,27 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                     else:
                         vprint(f'Auto-fitting model. Refitting every {refit_freq}th period.')
 
+                    # Determine if lagged transformation affects positional indices
                     # sktime.lagged transformer removes the first period due to NaNs => positional indices change
                     lag_indicator = 1 if 'lagged' in package_name else 0
 
                     # We are at period t+k and forecast period t+k+1
                     # Loop until until all H periods are forecasted
                     # thus: k = [0, ... , H-1]
+                    # Iterate over forecast periods to refit and update the model
                     for k in range(H):
+                        # Calculate the size of the current training set
                         current_trainsize = init_trainsize - lag_indicator + k
                         current_y_train_arima = y_train_transformed[:current_trainsize]
 
                         current_X_train_arima = X_train_transformed[:current_trainsize] \
                             if X_train_transformed is not None else None
 
-                        # Refit and Update AutoSARIMA(X) Model
-
-                        # Refit AutoArima model:
-                        # at period 0 and every 'refit_freq'th period
+                        # Refit or update AutoSARIMA(X) Model
                         if k % refit_freq == 0:
-                            # When refitting, update model with previous parameters (potentially speeds up fitting)
+                            # Refit the model at the start and every 'refit_freq' period thereafter(potentially speeds up fitting)
                             if k != 0:
+                                # Update model with previous parameters for efficiency
                                 sarima_fitted_params = model.get_fitted_params(deep=True)
                                 p, d, q = sarima_fitted_params['order']
                                 P, D, Q, sp = sarima_fitted_params['seasonal_order']
@@ -234,14 +261,14 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                                     'maxiter': 15
                                 }
                                 model.set_params(**updated_params)
-                                # vprint('...automatic refitting...')
+                                ### vprint('...automatic refitting...')
 
-                            # Fit model first time or refit model
+                            # Fit (first time) or refit the model
                             model.fit(y=current_y_train_arima, X=current_X_train_arima)
 
                         # Update:
                         else:
-                            # In all other periods just update parameters/coefficients
+                            # Update model parameters/coefficients in all other periods
                             model.update(y=current_y_train_arima, X=current_X_train_arima)
 
                         # Print forecast update
@@ -257,27 +284,30 @@ def pipe2_individual_forecasts(target_covariates_tuple,
                         prediction = model.predict(fh=1, X=X_pred_sarimax)
                         model_predictions = pd.concat([model_predictions, prediction], axis=0)
 
-            # After finishing historical forecasts per model: store predictions in a new column
+            # Store predictions in a new column after finishing historical forecasts per model
             vprint('...finished!\n')
             individual_predictions[model_name] = model_predictions
 
-            # Save model information to avoid double transforming when no change in model source
+            # Save model information to avoid redundant transformations when the model source hasn't changed
             last_covtreatment_bool = covtreatment_bool
             last_package_name = package_name
 
+    # Retunr information about end of process and get predictions
     vprint('\nIndividual forecasters\' predictions finished!\n'
            '\nInsights into forecasters\' predictions:',
            individual_predictions.head(), '\n'
            )
 
+    # Prepare target output and adjust its index frequency
     target_output = y_train_full[init_trainsize:]
     period_freq = 'M' if y_train_full.index.freqstr == 'MS' else y_train_full.index.freqstr
     target_output.index = pd.PeriodIndex(target_output.index, freq=period_freq)
     individual_predictions.insert(0, 'Target', value=target_output)
 
-    # If path is specified, export results as .csv
+    # Export results as .csv if a path is specified
     csv_exporter(export_path, individual_predictions)
 
+    # Return individual predictions
     return individual_predictions
 
 
