@@ -38,12 +38,15 @@ for model_type, models_dict in MODELS.items():
     # Loop over model approaches
     # for model_type == 'FORECASTERS': 'with_covariates' and 'without_covariates'
     # for model_type == 'ENSEMBLERS': 'weighted' and 'meta'
-    for approach, approach_dict in models_dict.items():
+    for approach_name, approach_dict in models_dict.items():
+        # Delete and skip approach when it is not properly defined/has no content
+        if approach_dict in [None, {}]:
+            continue
         # Loop over models in this approach
         for model_name, MODEL in approach_dict.items():
 
-            # Skip model, when its name is excluded by user
-            if model_name in EXCLUDED_MODELS:
+            # Delete model, when its name is excluded by user or when it is not properly defined/has no content
+            if model_name in EXCLUDED_MODELS or MODEL in [None, {}]:
                 continue
 
             # the model_functions of forecasting models and ensemble models are stored in a dictionary,
@@ -59,7 +62,7 @@ for model_type, models_dict in MODELS.items():
                 }
             # Currently model function is still stored as string => find the corresponding function/constructor
             MODEL['model'] = model_finder(package_name=MODEL['package'], model_function=MODEL['model'])
-            models_dict[approach][model_name] = MODEL
+            models_dict[approach_name][model_name] = MODEL
 
         MODELS[model_type] = models_dict
 

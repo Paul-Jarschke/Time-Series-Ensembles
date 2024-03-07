@@ -4,13 +4,6 @@ from utils.helpers import identify_date_column, target_covariate_split, aggregat
 from utils.mappings import FREQ_MAPPING
 
 
-### For debugging:
-### from paths import *
-### import os
-### FILE_PATH = os.path.join(SIMDATA_DIR, 'noisy_simdata.csv')
-### df = pd.read_csv(FILE_PATH)
-
-
 def pipe1_data_preprocessing(
         df, start=None, end=None,
         date_col='infer', date_format=None,
@@ -56,8 +49,10 @@ def pipe1_data_preprocessing(
 
     Returns:
     --------
-        tuple: A tuple containing the target and covariate DataFrames. Index is a pandas PeriodIndex containing dates,
-        respectively.
+        target : pd.DataFrame
+            DataFrame containing the preprocessed target variable.
+        covariates : pd.DataFrame
+            DataFrame containing the preprocessed covariates (if provided, otherwise: None).
         
     """
 
@@ -97,7 +92,7 @@ def pipe1_data_preprocessing(
         date_col = df.columns[date_col]
     # Identify position and name of date column if not provided and set as index
     elif date_col == 'infer':
-        vprint('Searching for time information...')
+        vprint('Searching time information...')
         date_col = identify_date_column(df, date_format=date_format)
         vprint(f'Dates found in \'{date_col}\' column!')
     elif isinstance(date_col, str):
@@ -112,7 +107,7 @@ def pipe1_data_preprocessing(
     # Transform index to DateTime Index
     df.index = pd.to_datetime(arg=df.index, format=date_format)
 
-    # Take subsetset of data
+    # Take subset of data
     if start is not None and end is not None:
         df = df.loc[start:end]  # Slice from start to end
     elif start is not None:
@@ -126,9 +121,12 @@ def pipe1_data_preprocessing(
     mapped_inferred_frequency = FREQ_MAPPING[inferred_freq] if (
             inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
 
+    # Transform index to PeriodIndex with given frequency
+    df.index = df.index.to_period()
+
     # Verbose print data information (frequency, start, end, number of observations)
     vprint(f'Inferred frequency: {mapped_inferred_frequency}')
-    vprint(f"Data from goes from {df.index[0].date()} to {df.index[-1].date()}, "
+    vprint(f"Data goes from {df.index[0]} to {df.index[-1]}, "
            f"resulting in {len(df)} observations.\n")
 
     # If desired, perform data aggregation
@@ -154,14 +152,7 @@ def pipe1_data_preprocessing(
     vprint("Covariates: " + (", ".join(covariates.columns) if covariates is not None else 'None'))
 
     # Provide data insight
-    vprint("\nData Insight:\n")
+    vprint("\nData Insights:")
     vprint(pd.concat([target, covariates], axis=1).head())
 
-    # Merge target and covariates to tuple
-    output_tuple = (target, covariates)
-
-    return output_tuple
-
-### For debugging:
-### y, X = pipe1_data_preprocessing(df=df, forecasters=forecasting_models, verbose=True)
-### print(y, X)
+    return target, covariates

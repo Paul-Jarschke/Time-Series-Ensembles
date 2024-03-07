@@ -3,6 +3,7 @@ from math import ceil
 
 import numpy as np
 import pandas as pd
+from pandas.tseries.frequencies import to_offset
 from sktime.split import ExpandingWindowSplitter
 
 from utils.helpers import vprint, csv_exporter
@@ -14,6 +15,7 @@ def pipe2_individual_forecasts(
         target_covariates_tuple,
         forecasters,
         forecast_init_train,
+        fh=None,
         select_forecasters="all",
         autosarimax_refit_interval=0.33,
         export_path=None,
@@ -26,11 +28,14 @@ def pipe2_individual_forecasts(
     -----------
         target_covariates_tuple : tuple
             Tuple containing (target, covariates) as pandas DataFrames. Index containing dates 
-            should be of pandas PeriodIndex format.
+            should be of pandas DateTimeIndex format.
         forecasters (dict)
             Dictionary containing forecasters' class names, package and options.
         forecast_init_train : float
             Initial forecasters' training set size as a fraction of preprocessed data.
+        fh : int, optional
+            When provided, pipeline not only performs historical evaluation of forecasters and ensemblers but also
+            provides out-of-sample future predictions along the whole provided forecast horizon.
         select_forecasters : str or list, optional
             Specify which forecaster classes to use (default: 'all').
         autosarimax_refit_interval : float, optional
@@ -49,7 +54,11 @@ def pipe2_individual_forecasts(
 
     Returns:
     --------
-        pd.DataFrame: DataFrame containing individual predictions per forecaster model (columns).
+        historical_predictions : pandas.DataFrame
+            DataFrame containing historical individual predictions per forecasting model.
+        future_predictions : pandas.DataFrame
+            DataFrame containing future individual predictions per forecasting model (if desired, otherwise:
+            None).
         
     Notes:
     ------
@@ -70,14 +79,15 @@ def pipe2_individual_forecasts(
     covariates = target_covariates_tuple[1]
 
     # Calculating the initial training set size based on specified fraction
-    init_trainsize = int(target.shape[0] * forecast_init_train)
+    init_trainsize = ceil(target.shape[0] * forecast_init_train)
 
     # Defining target variable for training as the target data
     y_train_full = target
 
     # Inferring the seasonal frequency of the target data
+    freq = target.index.freqstr
     inferred_seasonal_freq = (
-        SEASONAL_FREQ_MAPPING[target.index.freqstr]
+        SEASONAL_FREQ_MAPPING[freq]
         if target.index.freqstr in SEASONAL_FREQ_MAPPING.keys()
         else None
     )
@@ -97,51 +107,70 @@ def pipe2_individual_forecasts(
 
     # Providing detailed information about the data splitting process
     vprint(
-        f"Splitting data (train/test ratio: "
-        f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})..."
-        f"\nInitial training set has {init_trainsize} observations " f"and goes from {target.index[0].date()} to"
-        f" {target.index[init_trainsize - 1].date()}."
-        f"\nThere are {H} periods to be forecasted: " f"{target.index[init_trainsize].date()} to"
-        f" {target.index[-1].date()}\n",
+        f"Splitting data for training of forecasters (train/test ratio: "
+        f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
+        f"Initial training set has {init_trainsize} observations " f"and goes from {target.index[0]} to"
+        f" {target.index[init_trainsize - 1]}.",
+        f"\nIn an historical expanding window approach, there are {H} periods to be forecasted by the individual "
+        f"models: "
+        f"{target.index[init_trainsize]} to {target.index[-1]}",
     )
 
-    # Creating a DataFrame to store all models' predictions
-    individual_predictions = pd.DataFrame()
-    individual_predictions.index.name = "Date"
+    # If out-of-sample prediction is desired, verbose print information about periods to be forecasted
+    if fh is None:
+        pass
+    else:
+        last_period = target.index[-1]
+        offset_next = to_offset(freq)
+        offset_end = to_offset(str(fh) + freq)
 
-    # Initializing variables for tracking the last model (model_source) source and covariate treatment (covtreatment_bool)
-    last_model_source = None
-    last_covtreatment_bool = None
+        if fh == 1:
+            vprint(f"Out-of-sample predictions are generated for next period: "
+                   f"{(last_period + offset_next)}")
+        else:
+            offset1 = to_offset(target.index.freq)
+            vprint(
+                f"Out-of-sample-predictions are generated for the next {fh} periods: "
+                f"{(last_period + offset_next)} "
+                f"to {(last_period + offset_end)}")
+
+    # Creating a DataFrame to store all models' predictions
+    historical_predictions = pd.DataFrame()
+    historical_predictions.index.name = "Date"
+    if fh is None:
+        future_predictions = None
+    else:
+        future_predictions = pd.DataFrame()
+        future_predictions.index.name = "Date"
 
     # Initialize transformed datasets
     y_train_transformed = None
     X_train_transformed = None
 
     # Setting percentage interval for printing forecast updates
-    # (e.g., print 0.2 means printing at 0%, 20%, 40%, 60%, 80%, and 100%)
+    # (e.g., print 0.25 means printing at 0%, 25%, 50%, 75%, and 100%)
     # Include first and last prediction in console output
-    printout_percentage_interval = 0.2
+    printout_percentage_interval = 0.25
     printed_k = [
         ceil(x)
-        for x in H
-                 * np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)
+        for x in H * np.arange(0, 1, printout_percentage_interval)
     ]
     printed_k[0] = 1
 
     # Looping over different modeling approaches (with or without covariates)
-    for approach, approach_dict in forecasters.items():
+    for individual_approach, approach_dict in forecasters.items():
 
         # Determining if the current approach involves covariates
-        covtreatment_bool = True if approach == "with_covariates" else False
+        covtreatment_bool = True if individual_approach == "with_covariates" else False
 
         # Skipping covariates forecasters if no covariates are specified
         if covtreatment_bool and covariates is None:
-            vprint(f"\nSince no covariates are given, skipping covariate forecasters.")
+            vprint(f"\nSkipping covariate forecasters since no covariates are given.")
             continue
 
         # Skipping approach when no models are given
-        if len(approach_dict) == 0:
-            vprint(f"No models given for approach {approach}.")
+        if approach_dict in [None, {}]:
+            vprint(f"Skipping {individual_approach} since no models are provided.")
             continue
 
         # Initializing variable last_package_name and last_covtreatment_bool such that data is not transformed twice
@@ -149,11 +178,15 @@ def pipe2_individual_forecasts(
         last_covtreatment_bool = None
 
         # Loop over individual model in the current sub-dictionary (with/without covariates)
-        for model_name, MODEL in approach_dict.items():
+        for forecaster_name, MODEL in approach_dict.items():
+            # Skipping approach when model is not properly defined
+            if MODEL in [None, {}]:
+                vprint(f"Skipping {forecaster_name} since it is not properly by user.")
+                continue
             # Only considering selected models in the current ensemble approach dictionary
             if (
                     select_forecasters not in ["all", ["all"]]
-                    and model_name not in select_forecasters
+                    and forecaster_name not in select_forecasters
             ):
                 continue
 
@@ -164,7 +197,7 @@ def pipe2_individual_forecasts(
             if "options" not in MODEL.keys():
                 MODEL["options"] = {}
             if "package" not in MODEL.keys():
-                raise RuntimeError(f"You need to provide the package for {model_name}.")
+                raise RuntimeError(f"You need to provide the package for {forecaster_name}.")
             model_function, package_name, options = (
                 MODEL["model"],
                 MODEL["package"],
@@ -172,7 +205,7 @@ def pipe2_individual_forecasts(
             )
 
             # Adjusting model name depending on the approach (with/without covariates)
-            model_name += " with covariates" if covtreatment_bool else ""
+            forecaster_name += " with covariates" if covtreatment_bool else ""
 
             # Constructing model with corresponding arguments
             model = model_function(**options)
@@ -196,34 +229,50 @@ def pipe2_individual_forecasts(
             elif package_name in TRANSFORMERS.keys():
                 # Select transformer
                 transformer = TRANSFORMERS[package_name]
-                # Transform
+                # Transform for historical predictions
                 y_train_transformed, X_train_transformed = transformer(
                     y_train_full, X_train_full
                 )
+                # Transform for future predictions
+                if fh is not None:
+                    target_transformed, covariates_transformed = transformer(
+                        target, covariates
+                    )
+                # Replace covariates_transformed with None if it is not a covariate model
+                if not covtreatment_bool:
+                    covariates_transformed = None
             # No transformation possible if package_name not in TRANSFORMERS
             else:
                 raise RuntimeError(f"{package_name} is not yet supported")
 
             # Set up empty DataFrame for predictions and define index named 'Date'
-            model_predictions = pd.DataFrame()
-            model_predictions.index.name = "Date"
+            historical_predictions_model = pd.DataFrame()
+            historical_predictions_model.index.name = "Date"
 
-            # Generating one-step ahead expanding window predictions for the current model (fitting, updating, predicting)
+            # Set up empty DataFrame for predictions and define index named 'Date'
+            if fh is None:
+                future_predictions_model = None
+            else:
+                future_predictions_model = pd.DataFrame()
+                future_predictions_model.index.name = "Date"
+
+            # Generating one-step ahead expanding window predictions for the current model
+            # (fitting, updating, predicting)
             vprint(
-                f"Now generating {H} one-step ahead expanding window predictions from model: "
-                f'{model_name} ({package_name.split(".")[0]})'
+                f"\nNow generating {H} one-step ahead historical expanding window predictions from model: "
+                f'{forecaster_name} ({package_name.split(".")[0]})'
             )
 
             # Handling different prediction methods based on the package used
             # Method and data transformer are inferred from package_name
             # darts forecasters use .historical_forecasts() method:
             if "darts" in package_name:
-                model_predictions = model.historical_forecasts(
+                historical_predictions_model = model.historical_forecasts(
                     series=y_train_transformed,
                     start=init_trainsize,
                     stride=1,
                     forecast_horizon=1,
-                    past_covariates=X_train_transformed,
+                    past_covariates=X_train_transformed,  # Provide covariates
                     show_warnings=False,
                 ).pd_dataframe()
 
@@ -231,29 +280,53 @@ def pipe2_individual_forecasts(
                 period_freq = (
                     "M" if target.index.freqstr == "MS" else target.index.freqstr
                 )
-                model_predictions.set_index(
+                historical_predictions_model.set_index(
                     pd.PeriodIndex(
-                        pd.to_datetime(model_predictions.index), freq=period_freq
+                        pd.to_datetime(historical_predictions_model.index), freq=period_freq
                     ),
                     inplace=True,
                 )
+
+                # out-of-sample predictions:
+                if fh is not None:
+                    vprint(f"Now performing corresponding out-of-sample predictions...")
+                    model.fit(series=target_transformed, past_covariates=covariates_transformed)
+                    future_predictions_model = model.predict(
+                        n=fh,
+                        series=target_transformed,
+                        past_covariates=covariates_transformed,  # Provide covariates
+                        verbose=verbose,
+                        show_warnings=False,
+                    ).pd_dataframe()
+
+                    future_predictions_model.set_index(
+                    pd.PeriodIndex(
+                        pd.to_datetime(future_predictions_model.index), freq=period_freq
+                    ),
+                        inplace=True,
+                    )
+
 
             # sktime forecasters
             elif "sktime" in package_name:
                 # Adjust sktime specific parameters, in particular: Seasonal periodicity
                 if (
-                        "Naive" not in model_name and "sp" in model.get_params().keys()
+                        "Naive" not in forecaster_name and "sp" in model.get_params().keys()
                 ):  # sNaive performs bad. Does not make sense to use this.
                     model.set_params(**{"sp": inferred_seasonal_freq})
 
                 # all sktime forecasters but ARIMA
-                if "ARIMA" not in model_name:
+                if "ARIMA" not in forecaster_name:
                     # sktime uses ExpandingWindowSplitter and .update_predict() method for historical forecasts
                     cv = ExpandingWindowSplitter(
                         fh=1, initial_window=init_trainsize, step_length=1
                     )
                     model.fit(y_train_transformed[:init_trainsize])
-                    model_predictions = model.update_predict(y_train_transformed, cv=cv)
+                    historical_predictions_model = model.update_predict(
+                        y=y_train_transformed,
+                        X=X_train_transformed,
+                        cv=cv
+                    )
 
                 # Extra treatment for ARIMA model
                 else:
@@ -314,7 +387,8 @@ def pipe2_individual_forecasts(
 
                         # Refit or update AutoSARIMA(X) Model
                         if k % refit_freq == 0:
-                            # Refit the model at the start and every 'refit_freq' period thereafter(potentially speeds up fitting)
+                            # Refit the model at the start and every 'refit_freq' period thereafter
+                            # (potentially speeds up fitting)
                             if k != 0:
                                 # Update model with previous parameters for efficiency
                                 sarima_fitted_params = model.get_fitted_params(
@@ -348,7 +422,7 @@ def pipe2_individual_forecasts(
 
                         # Print forecast update
                         if k + 1 in printed_k:
-                            vprint(f"{model_name} forecast {k + 1} / {H}")
+                            vprint(f"...forecast {k + 1} / {H}")
 
                         # Predict:
                         # Select last known X as predictor if using a covariate model
@@ -359,49 +433,58 @@ def pipe2_individual_forecasts(
                             if covtreatment_bool
                             else None
                         )
-                        # Perform prediction
+                        # Perform historical one step ahead prediction
                         prediction = model.predict(fh=1, X=X_pred_sarimax)
-                        model_predictions = pd.concat(
-                            [model_predictions, prediction], axis=0
+                        historical_predictions_model = pd.concat(
+                            [historical_predictions_model, prediction], axis=0
                         )
 
-            # Store predictions in a new column after finishing historical forecasts per model
-            vprint("...finished!\n")
-            individual_predictions[model_name] = model_predictions
+                # out-of-sample predictions for sktime model:
+                if fh is not None:
+                    # Perform predictions
+                    vprint(f"Performing out-of-sample predictions...")
+                    model.fit(fh=list(range(1, fh+1)), y=target_transformed, X=covariates_transformed)
+                    future_predictions_model = model.predict(X=X_train_transformed)
+
+            # Now finished historical (and future) forecasts per model
+            vprint("...finished!")
+
+            # Store historical predictions in a new column
+            historical_predictions[forecaster_name] = historical_predictions_model
+
+            # Store future predictions in a new column
+            if fh is not None:
+                future_predictions[forecaster_name] = future_predictions_model
 
             # Save model information to avoid redundant transformations when the model source hasn't changed
             last_covtreatment_bool = covtreatment_bool
             last_package_name = package_name
 
-    # Retunr information about end of process and get predictions
-    vprint(
-        "\nIndividual forecasters' predictions finished!\n"
-        "\nInsights into forecasters' predictions:",
-        individual_predictions.head(),
-        "\n",
+    vprint("\nFinished predictions of individual forecasters!")
+
+    # Return information about end of process and get predictions
+    vprint("\nInsights into forecasters' historical predictions:",
+           historical_predictions.head()
     )
 
-    # Prepare target output and adjust its index frequency
+    if fh is not None:
+        vprint(
+            "\nInsights into forecasters' future predictions:",
+            future_predictions.head()
+        )
+
+    # Prepare target output, adjust its index frequency and transform to PeriodIndex
     target_output = y_train_full[init_trainsize:]
     period_freq = (
         "M" if y_train_full.index.freqstr == "MS" else y_train_full.index.freqstr
     )
     target_output.index = pd.PeriodIndex(target_output.index, freq=period_freq)
-    individual_predictions.insert(0, "Target", value=target_output)
+    historical_predictions.insert(0, "Target", value=target_output)
 
-    # Export results as .csv if a path is specified
-    csv_exporter(export_path, individual_predictions)
+    # # Export results as .csv if a path is specified
+    # csv_exporter(export_path, historical_predictions)
+
+    # Note: Consider working with DateTimeIndex frequencies again
 
     # Return individual predictions
-    return individual_predictions
-
-# For debugging:
-# from forecasters.forecasting import FC_MODELS
-# from pipe1_data_preprocessing import pipe1_data_preprocessing
-# from paths import *
-# import os
-#
-# FILE_PATH = os.path.join(SIMDATA_DIR, 'noisy_simdata.csv')
-# df = pd.read_csv(FILE_PATH)
-# target, covariates = pipe1_data_preprocessing(df, verbose=True)
-# indiv_fc = pipe2_individual_forecasts(target=target, covariates=covariates, forecasters=FC_MODELS, verbose=True)
+    return historical_predictions, future_predictions

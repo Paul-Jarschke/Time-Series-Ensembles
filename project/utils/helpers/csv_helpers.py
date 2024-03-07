@@ -40,7 +40,7 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
     return df
 
 
-def csv_exporter(export_path,  *args, file_name=None):
+def csv_exporter(export_path,  *args, file_names=None):
     """
         Export pandas DataFrames to CSV files.
 
@@ -49,8 +49,9 @@ def csv_exporter(export_path,  *args, file_name=None):
         corresponding to the variable name of the DataFrame.
 
         Parameters:
-            export_path (str or os.PathLike):               The directory path where the CSV files will be saved.
-            file_name (str with '.csv' ending, optional):   Export file name. If not defined, infers it from object name.
+            export_path (str or os.PathLike):           The directory path where the CSV files will be saved.
+            file_names (str or list of str, optional):  Export file name with '.csv' ending. If not defined,
+                                                        infers it from object name.
 
             *args: Variable-length argument list of DataFrames to export.
 
@@ -62,7 +63,8 @@ def csv_exporter(export_path,  *args, file_name=None):
 
         Example:
             csv_exporter("/path/to/export", df1, df2)
-            # This will export df1 and df2 as CSV files to the "/path/to/export" directory.
+            his will export df1 and df2 as CSV files called "df1.csv" and "df2.csv" to the "/path/to/export"
+            directory.
         """
     
     # Accessing variables from the calling scope
@@ -76,13 +78,34 @@ def csv_exporter(export_path,  *args, file_name=None):
 
     # Export each DataFrame to a CSV file
     if isinstance(export_path, (os.PathLike, str)):
-        for df in args:
-            # Export with specified file_name or variable name if not provided
-            if isinstance(file_name, str):
-                df.to_csv(os.path.join(export_path, f"{file_name}"), index=True)
-                vprint(f"Exporting DataFrame as csv...")
-            for par_obj_name, par_obj in parent_objects.items():
-                if par_obj is df:
-                    df.to_csv(os.path.join(export_path, f"{par_obj_name}.csv"), index=True)
-                    vprint(f"Exporting {par_obj_name.replace('_', ' ')} to csv file...")
-        vprint("...finished!\n")
+        # Loop over dataframes
+        for i, df in enumerate(args):
+            if isinstance(df, (pd.DataFrame, pd.Series)): # Don't export NoneTypes
+
+                # Create file_name string from input
+                file_name = file_names
+
+                # Special handling for lists and NoneTypes
+                # Extract file name from list
+                if isinstance(file_names, list):
+                    file_name = file_names[i]
+                # Infer file name from object name
+                elif file_names is None:
+                    for par_obj_name, par_obj in parent_objects.items():
+                        if par_obj is df:
+                            file_name = par_obj_name
+                            vprint(f"\nExporting {file_name} as csv to {export_path}...")
+
+                # Export df with extracted string file_name
+                if isinstance(file_name, str):
+                    df.to_csv(os.path.join(export_path, f"{file_name}.csv"), index=True)
+                # Export with specified file_name
+                else:
+                    raise ValueError('Can not export DataFrame. Please provide filename!')
+
+        # Print export statements
+        if isinstance(file_names, str):
+            vprint(f"\nExporting {file_names} as csv to {export_path}...")
+        elif isinstance(file_names, list):
+            vprint(f"\nExporting {' and '.join(file_names).replace('_', ' ')} as csv to {export_path}...")
+        vprint("...finished!")

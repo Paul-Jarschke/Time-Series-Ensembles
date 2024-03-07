@@ -4,7 +4,7 @@ from utils.predictions.get_weighted_predictions import get_weighted_predictions
 
 def ensemble_prediction_wrapper(
     past_individual_predictions,
-    next_indiv_predictions,
+    next_individual_predictions,
     approach,
     model_function,
     options,
@@ -17,7 +17,7 @@ def ensemble_prediction_wrapper(
 
     Args:
     - past_individual_predictions (DataFrame):  DataFrame containing individual predictions for past periods.
-    - next_indiv_predictions (DataFrame):       DataFrame containing individual predictions for the next period.
+    - next_individual_predictions (DataFrame):       DataFrame containing individual predictions for the next period.
     - approach (str):                           Approach for generating ensemble predictions. Should be one of 'meta' or 'weighted'.
     - model_function (callable):                Function to create either a meta model or a weighting scheme.
     - options (dict):                           Options to be passed to the model_function.
@@ -35,7 +35,7 @@ def ensemble_prediction_wrapper(
       and corresponding weights (values).
 
     - For the 'meta' approach:
-      - The 'model_function' should create a meta model using 'options'.
+      - The 'model_function' is model class that should create a meta model using 'options'.
       - The function 'get_metamodel_prediction' is used to make predictions using the meta model.
 
     - For the 'weighted' approach:
@@ -60,7 +60,7 @@ def ensemble_prediction_wrapper(
         # Make metamodel prediction using a model function
         next_ensemble_prediction = get_metamodel_prediction(
             train_data=past_individual_predictions,
-            next_indiv_predictions=next_indiv_predictions,
+            next_indiv_predictions=next_individual_predictions,
             metamodel=metamodel,
             options=options,
         )
@@ -82,7 +82,7 @@ def ensemble_prediction_wrapper(
 
         # Perform ensemble prediction for the next period given weights
         next_ensemble_prediction = get_weighted_predictions(
-            next_indiv_predictions, weights=weights
+            next_individual_predictions, weights=weights
         )
     else:
         raise ValueError("Method must be one of 'weighted' or 'meta'.")

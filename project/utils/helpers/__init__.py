@@ -8,6 +8,7 @@ from utils.helpers.console_outputs import *
 from utils.helpers.csv_helpers import *
 from utils.helpers.data_preparation import *
 from utils.helpers.model_finder import model_finder
+from utils.helpers.display_ranking_table import display_ranking_table
 
 # Print statement indicating loading of helper functions
 print("Loading helper functions...")

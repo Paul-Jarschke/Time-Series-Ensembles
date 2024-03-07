@@ -76,13 +76,21 @@ def model_finder(model_function, package_name=""):
         # Use the FunctionFinder to find the model function in this project's library
         Finder = FunctionFinder()
         Finder.find_functions(directory=MODELS_DIR)
-        model_function = Finder.functions[model_function]
-
+        try:
+            model_function = Finder.functions[model_function]
+        except:
+            # Raise ValueError if model function is from none of these packages:
+            raise ValueError(
+                f"Model {model_function} not found locally or in supported packages: "
+                f'{", ".join(str(e) for e in supported_packages)}'
+                f'\nCheck your defined models.'
+            )
     # Raise ValueError if model is from none of these packages:
     else:
         raise ValueError(
             f"Model {model_function} not found locally or in supported packages: "
             f'{", ".join(str(e) for e in supported_packages)}'
+            f'\nCheck your defined models.'
         )
 
     return model_function

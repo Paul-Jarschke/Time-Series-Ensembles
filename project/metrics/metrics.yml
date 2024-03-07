@@ -5,7 +5,7 @@
 # MdASE: median_absolute_scaled_error
 # MSSE: mean_squared_scaled_error
 # MdSSE: median_squared_scaled_error
-MAE: mean_absolute_error
+# MAE: mean_absolute_error
 # MSE: mean_squared_error
 RMSE: root_mean_squared_error
 # MdAE: median_absolute_error

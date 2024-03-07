@@ -12,6 +12,7 @@ from utils.paths import *
 
 # noinspection PyTypeChecker
 def run_pipeline(df, models, metrics,
+                 fh=None,
                  start=None, end=None,
                  date_col='infer', date_format=None,
                  target='infer', covariates='infer', exclude=None,
@@ -36,6 +37,9 @@ def run_pipeline(df, models, metrics,
         metrics : dict
             List of performance measures for model ranking in historical predictions.
             Can be imported from the 'metrics' module of the project. Edit '.yml' files to add/remove metrics.
+        fh : int, optional
+            When provided, pipeline not only performs historical evaluation of forecasters and ensemblers but also
+            provides out-of-sample future predictions along the whole provided forecast horizon.
         start : str, optional
             Filter data to start from date string. Expects ISO DateTimeIndex format "YYYY-MMMM-DDD" (default: None).
         end : str, optional
@@ -87,7 +91,7 @@ def run_pipeline(df, models, metrics,
     --------
     dict: Dictionary containing the following keys as pandas Series or DataFrames:
         - 'target and covariates': Tuple of preprocessed target and covariates.
-        - 'individual_predictions': Individual forecasters' predictions.
+        - 'historical_individual_predictions': Individual forecasters' predictions.
         - 'full predictions': Full ensemble predictions.
         - 'metrics ranking': Rankings based on specified metrics.
     """
@@ -95,6 +99,10 @@ def run_pipeline(df, models, metrics,
     # Save starting time
     start_pipe = datetime.now()
     start_pipe_formatted = start_pipe.strftime("%Y%m%d_%H%M")
+
+    # Correct confusing user inputs
+    if fh == 0:
+        fh = None
 
     # Determine export path if exporting is enabled
     if export is True:
@@ -145,7 +153,7 @@ def run_pipeline(df, models, metrics,
     # Define expected outputs
     expected_outputs = [
         'target and covariates',
-        'individual_predictions',
+        'historical_individual_predictions',
         'full predictions',
         'metrics ranking'
     ]
@@ -164,6 +172,7 @@ def run_pipeline(df, models, metrics,
     for step, process in enumerate(processes):
         # Execute each process
         pipe_output = process(
+            # Provide required input (DataFrame or result from previous pipeline step)
             pipe_input,
             # Provide arguments for Pipe 1
             start=start, end=end,
@@ -181,6 +190,7 @@ def run_pipeline(df, models, metrics,
             metrics=metrics,
             sort_by=sort_by,
             # Generic/shared arguments
+            fh=fh,
             export_path=export_path,
             errors=errors, verbose=verbose,
             *args, **kwargs
@@ -194,11 +204,11 @@ def run_pipeline(df, models, metrics,
         
         # Print time elapsed since start
         if step+1 != len(processes):
-            vprint(f'[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
+            vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
 
     # Reporting total time elapsed
     end_pipe = datetime.now()
-    vprint(f'\n\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline!\n'
+    vprint(f'\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline!\n'
            f'[Total time elapsed: {strfdelta(end_pipe - start_pipe)}]'
            '\n================================================================================='
            )

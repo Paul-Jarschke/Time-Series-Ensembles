@@ -40,11 +40,15 @@ def get_metamodel_prediction(
         # Train Meta-Model
         metamodel.fit(predictions, target)
 
-        # Also remove target from the covariates (= predictions of individual forecasters) employed in the
-        # Ensemble forecast for the next period
-        next_indiv_predictions = next_indiv_predictions.copy().drop(columns=["Target"])
+        # If target column is still present in the dataframe of the covariates (= historical predictions of individual
+        # forecasters) remove it
+        # This for now only concerns when next_indiv_predictions is from the historical predictions but not form the
+        # future predictions
+        if "Target" in next_indiv_predictions.columns:
+            next_indiv_predictions = next_indiv_predictions.copy().drop(columns=["Target"])
 
-        # Make ensemble predictions for next given period
+        # Make ensemble predictions for next given period (horizon is automatically taken from the number of rows in
+        # next_indiv_predictions)
         ensemble_prediction = metamodel.predict(next_indiv_predictions)
 
         # Ensure that output is a pandas Series
