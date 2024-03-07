@@ -1,5 +1,5 @@
 =================================================================================
-[2024-03-06 19:18] Starting  Pipeline...
+[2024-03-06 20:35] Starting  Pipeline...
 
 =====================================================
 == Starting Step 1 in Pipeline: Data Preprocessing ==
@@ -91,7 +91,7 @@ Date
 Exporting individual predictions as csv...
 ...finished!
 
-[Time elapsed: 14s]
+[Time elapsed: 01m 17s]
 
 
 =============================================
@@ -215,11 +215,11 @@ Insights into ensembles' predictions:
 2020-02-28              1.090071                          1.100768   
 
             Meta Ensemble: MLP  Meta Ensemble: RandomForest  
-2020-02-24            1.384296                     1.082423  
-2020-02-25            1.235168                     1.083799  
-2020-02-26            1.407868                     1.087130  
-2020-02-27            1.203127                     1.087557  
-2020-02-28            1.440708                     1.096670  
+2020-02-24            1.146973                     1.082774  
+2020-02-25            1.392504                     1.083668  
+2020-02-26            1.067745                     1.087359  
+2020-02-27            1.360404                     1.087214  
+2020-02-28            1.446144                     1.096287  
 
 Merging...
 ...finished!
@@ -228,7 +228,7 @@ Exporting ensemble predictions as csv...
 Exporting full predictions as csv...
 ...finished!
 
-[Time elapsed: 20s]
+[Time elapsed: 01m 39s]
 
 
 ============================================
@@ -252,13 +252,13 @@ Results:
 5                                       XGBoost  0.007547  0.009868  0.006833   
 6               Weighted Ensemble: Inverse RMSE  0.007669  0.009893  0.006972   
 7           Weighted Ensemble: Inverse Variance  0.007773  0.009915  0.007063   
-8                     Weighted Ensemble: Simple  0.008050  0.010284  0.007317   
-9                   Meta Ensemble: RandomForest  0.008126  0.009865  0.007375   
+8                   Meta Ensemble: RandomForest  0.008040  0.009964  0.007296   
+9                     Weighted Ensemble: Simple  0.008050  0.010284  0.007317   
 10                                   AutoSARIMA  0.010249  0.013546  0.009347   
 11                                          STL  0.014148  0.017665  0.012884   
 12                         Meta Ensemble: Ridge  0.014475  0.018307  0.013096   
 13                           Meta Ensemble: SVR  0.015275  0.018415  0.013895   
-14                           Meta Ensemble: MLP  0.242192  0.264513  0.219881   
+14                           Meta Ensemble: MLP  0.241076  0.262871  0.218923   
 
         sMAPE  MAE Ranking  RMSE Ranking  MAPE Ranking  sMAPE Ranking  
 0    0.379191            1             1             1              1  
@@ -266,61 +266,18 @@ Results:
 2    0.403417            3             3             3              3  
 3    0.408527            4             5             4              4  
 4    0.413911            5             4             5              5  
-5    0.456078            6             7             6              6  
-6    0.464799            7             8             7              7  
-7    0.470917            8             9             8              8  
-8    0.487915            9            10             9              9  
-9    0.491458           10             6            10             10  
+5    0.456078            6             6             6              6  
+6    0.464799            7             7             7              7  
+7    0.470917            8             8             8              8  
+8    0.486241            9             9             9              9  
+9    0.487915           10            10            10             10  
 10   0.623553           11            11            11             11  
 11   0.859981           12            12            12             12  
 12   0.875092           13            13            13             13  
 13   0.925268           14            14            14             14  
-14  13.488019           15            15            15             15  
+14  13.434860           15            15            15             15  
 
 
-[2024-03-06 19:19] Finished Pipeline!
-[Total time elapsed: 20s]
+[2024-03-06 20:37] Finished Pipeline!
+[Total time elapsed: 01m 39s]
 =================================================================================
-=================================================================================
-[2024-03-06 19:22] Starting  Pipeline...
-
-=====================================================
-== Starting Step 1 in Pipeline: Data Preprocessing ==
-=====================================================
-
-Searching for time information...
-Dates found in 'index' column!
-Inferred frequency: 15T
-Data from goes from 2020-01-01 to 2024-02-06, resulting in 143713 observations.
-
-Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
-...finished!
-Data now has 1069 observations.
-
-Selecting target and covariates...
-Target: bid_close
-Covariates: None
-
-Data Insight:
-
-            bid_close
-datetime             
-2020-01-02       1.12
-2020-01-03       1.12
-2020-01-06       1.12
-2020-01-07       1.12
-2020-01-08       1.11
-[Time elapsed: 00s]
-
-
-=======================================================
-== Starting Step 2 in Pipeline: Individual Forecasts ==
-=======================================================
-
-Splitting data (train/test ratio: 30/70)...
-Initial training set has 320 observations 
-and goes from 2020-01-02 to 2021-03-24
-There are 749 periods to be forecasted: 
-2021-03-25 to 2024-02-06
-
-Now generating 749 one-step ahead expanding window predictions from model: Naive (sktime)
