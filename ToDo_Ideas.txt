@@ -9,18 +9,8 @@ ensemble:
 
 pipe1 and run_pipe:
 - add option to provide target and covariates as individual elements, not as full dataframe 'df'
-- add option for filtering data in arguments
 
 pipe2_individual_forecasts():
-- docstring, comments
 - check if SARIMAX loop takes updated params (trace = True)
 - make more generic for all models that have fit and predict method; consider removing historical forecast method etc => as in arima
-- use ceil() instead of int() to ensure including the desired proportion into the train set
 - Allowing refit interval for each model; Implement UpdateRefitEvery from sktime
-
-pipe3_ensemble_forecasts():
-- comment, docstring 
-- use ceil() instead of int() to ensure including the desired proportion into the train set
-
-pipe4_metrics_ranking():
-- comment, docstring
