@@ -121,12 +121,9 @@ def pipe1_data_preprocessing(
     mapped_inferred_frequency = FREQ_MAPPING[inferred_freq] if (
             inferred_freq in FREQ_MAPPING.keys()) else inferred_freq
 
-    # Transform index to PeriodIndex with given frequency
-    df.index = df.index.to_period()
-
     # Verbose print data information (frequency, start, end, number of observations)
     vprint(f'Inferred frequency: {mapped_inferred_frequency}')
-    vprint(f"Data goes from {df.index[0]} to {df.index[-1]}, "
+    vprint(f"Data goes from {df.index.to_period()[0]} to {df.index.to_period()[-1]}, "
            f"resulting in {len(df)} observations.\n")
 
     # If desired, perform data aggregation
@@ -143,7 +140,12 @@ def pipe1_data_preprocessing(
     elif (agg_method is not None) ^ (agg_freq is not None):
         raise ValueError('Arguments \'agg_method\' and \'agg_freq\' must always be specified together.')
 
-    # Split DataFrame into target and covariates (if covariates exist)
+    # Transform index to PeriodIndex with given frequency (must happen after aggregation, since aggregation of
+    # business day data is depreciated when it is PeriodIndex)
+    # sktime needs PeriodIndex for its models, otherwise it throws an error
+    df.index = df.index.to_period()
+
+        # Split DataFrame into target and covariates (if covariates exist)
     vprint('Selecting target' + (' and covariates' if covariates is not None else '') + '...')
     target, covariates = target_covariate_split(df, target=target, covariates=covariates, exclude=exclude)
 

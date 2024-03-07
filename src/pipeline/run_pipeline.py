@@ -125,20 +125,21 @@ def run_pipeline(df, models, metrics,
 
     # Set up logging if both exporting and verbosity are enabled
     # Outlook: Also store forecasters' hyperparameters in log
-    if export and verbose:
+    # Set up logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # Set up log file logger
+    if export:
         # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
         log_file_name = os.path.join(export_path, 'pipe_log.log')
-
-        # Set up logger
-        logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
-
         # Output file
         fileHandler = logging.FileHandler(log_file_name)
         fileHandler.setFormatter(logging.Formatter('%(message)s'))
         logger.addHandler(fileHandler)
 
-        # Console output
+    # Set up console output/print logger
+    if verbose:
         consoleHandler = logging.StreamHandler(sys.stdout)
         consoleHandler.setFormatter(logging.Formatter('\x1b[33;1m%(message)s\x1b[0m'))
         logger.addHandler(consoleHandler)

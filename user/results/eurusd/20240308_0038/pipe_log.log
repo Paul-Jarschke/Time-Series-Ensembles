@@ -1,0 +1,319 @@
+=================================================================================
+[2024-03-08 00:38] Starting  Pipeline...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: 15T
+Data goes from 2020-01-01 00:00 to 2020-03-31 23:45, resulting in 8736 observations.
+
+Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
+...finished!
+Data now has 64 observations.
+
+Selecting target and covariates...
+Target: bid_close
+Covariates: None
+
+Data Insights:
+            bid_close
+datetime             
+2020-01-02    1.11702
+2020-01-03    1.11599
+2020-01-06    1.11948
+2020-01-07    1.11530
+2020-01-08    1.11124
+
+[Time elapsed: 00s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 20 observations and goes from 2020-01-02 to 2020-01-29.
+
+In an historical expanding window approach, there are 44 periods to be forecasted by the individual models: 2020-01-30 to 2020-03-31
+Out-of-sample predictions are generated for next period: 2020-04-01
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Naive (drift) (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 15th period.
+...forecast 1 / 44
+...forecast 11 / 44
+...forecast 22 / 44
+...forecast 33 / 44
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Exponential Smoothing (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+              Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                    
+2020-01-30  1.10132       1.100494     1.09728               1.101324   
+2020-01-31  1.10282       1.102110     1.09973               1.102813   
+2020-02-03  1.10885       1.108461     1.10833               1.108820   
+2020-02-04  1.10618       1.105687     1.10646               1.106193   
+2020-02-05  1.10440       1.103851     1.10357               1.104409   
+
+                 STL   XGBoost  
+Date                            
+2020-01-30  1.099366  1.102249  
+2020-01-31  1.096396  1.104599  
+2020-02-03  1.099680  1.108045  
+2020-02-04  1.103271  1.107951  
+2020-02-05  1.105145  1.104865  
+
+Insights into forecasters' future predictions:
+              Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                    
+2020-04-01  1.10253         1.1023    1.102132                1.10253   
+
+                 STL  XGBoost  
+Date                           
+2020-04-01  1.116646  1.10182  
+
+[Time elapsed: 32s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 44) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 11 observations and goes from 2020-01-30 to 2020-02-13
+
+In an historical expanding window approach, there are 33 periods to be forecasted by the ensemble models: 2020-02-14 to 2020-03-31
+Out-of-sample predictions are generated for next period: 2020-03-31 00:00:00
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Ridge (sklearn)'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Linear Regression (sklearn)'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Meta - MLP (sklearn)'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 33 one-step ahead historical expanding window predictions from ensemble model: 'Meta - RandomForest (sklearn)'
+...Forecast 1 / 33
+...Forecast 9 / 33
+...Forecast 17 / 33
+...Forecast 25 / 33
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+            Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2020-02-14                   1.086850                         1.085691   
+2020-02-17                   1.082922                         1.082988   
+2020-02-18                   1.084465                         1.083910   
+2020-02-19                   1.078742                         1.078503   
+2020-02-20                   1.079630                         1.079851   
+
+            Weighted Ensemble: Inverse Variance  \
+2020-02-14                             1.088744   
+2020-02-17                             1.083398   
+2020-02-18                             1.085005   
+2020-02-19                             1.079341   
+2020-02-20                             1.079748   
+
+            Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2020-02-14                                     1.084969            1.096465   
+2020-02-17                                     1.092013            1.096460   
+2020-02-18                                     1.088703            1.096225   
+2020-02-19                                     1.081854            1.094095   
+2020-02-20                                     1.083498            1.094095   
+
+            Meta Ensemble: Ridge  Meta Ensemble: Linear Regression  \
+2020-02-14              1.097154                          1.072431   
+2020-02-17              1.096023                          1.079284   
+2020-02-18              1.095051                          1.081693   
+2020-02-19              1.093841                          1.075596   
+2020-02-20              1.092956                          1.078201   
+
+            Meta Ensemble: MLP  Meta Ensemble: RandomForest  
+2020-02-14            1.154477                     1.089562  
+2020-02-17            1.372811                     1.086206  
+2020-02-18            0.983604                     1.084700  
+2020-02-19            1.184395                     1.081256  
+2020-02-20            1.330569                     1.081046  
+
+Insights into ensemblers' future predictions:
+            Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+Date                                                                     
+2020-04-01                    1.10466                         1.103734   
+
+            Weighted Ensemble: Inverse Variance  \
+Date                                              
+2020-04-01                             1.103949   
+
+            Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+Date                                                                          
+2020-04-01                                     1.100225             1.10262   
+
+            Meta Ensemble: Ridge  Meta Ensemble: Linear Regression  \
+Date                                                                 
+2020-04-01              1.100181                          1.101054   
+
+            Meta Ensemble: MLP  Meta Ensemble: RandomForest  
+Date                                                         
+2020-04-01            1.441317                     1.102319  
+
+Merging...
+...finished!
+
+
+Exporting historical predictions and future predictions as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\user\results\eurusd\20240308_0038...
+...finished!
+
+[Time elapsed: 40s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating RMSE, MAPE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                          Model      RMSE      MAPE  \
+0                                         Naive  0.008799  0.005859   
+1                         Exponential Smoothing  0.008810  0.005871   
+2   Weighted Ensemble: Inverse Error Covariance  0.008911  0.005984   
+3                                 Naive (drift)  0.008943  0.006103   
+4               Weighted Ensemble: Inverse RMSE  0.009430  0.006535   
+5           Weighted Ensemble: Inverse Variance  0.009524  0.006694   
+6                                    AutoSARIMA  0.009726  0.006721   
+7                     Weighted Ensemble: Simple  0.009709  0.006823   
+8              Meta Ensemble: Linear Regression  0.009574  0.006846   
+9                                       XGBoost  0.010706  0.007271   
+10                  Meta Ensemble: RandomForest  0.010378  0.007350   
+11                                          STL  0.016776  0.011271   
+12                           Meta Ensemble: SVR  0.018559  0.013948   
+13                         Meta Ensemble: Ridge  0.019063  0.014357   
+14                           Meta Ensemble: MLP  0.246915  0.201978   
+
+        sMAPE  RMSE Ranking  MAPE Ranking  sMAPE Ranking  
+0    0.390421             1             1              1  
+1    0.391224             2             2              2  
+2    0.398411             3             3              3  
+3    0.406742             4             4              4  
+4    0.435654             5             5              5  
+5    0.446353             6             6              6  
+6    0.447989             9             7              7  
+7    0.454990             8             8              8  
+8    0.456111             7             9              9  
+9    0.484983            11            10             10  
+10   0.489651            10            11             11  
+11   0.753179            12            12             12  
+12   0.929209            13            13             13  
+13   0.959029            14            14             14  
+14  12.460616            15            15             15  
+
+The 'Naive' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2020-04-01    1.10253
+Freq: B, Name: Naive, dtype: float64
+
+Exporting metrics_ranking as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\user\results\eurusd\20240308_0038...
+...finished!
+
+[2024-03-08 00:39] Finished Pipeline!
+[Total time elapsed: 40s]
+=================================================================================
