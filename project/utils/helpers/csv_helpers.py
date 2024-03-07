@@ -84,5 +84,5 @@ def csv_exporter(export_path,  *args, file_name=None):
             for par_obj_name, par_obj in parent_objects.items():
                 if par_obj is df:
                     df.to_csv(os.path.join(export_path, f"{par_obj_name}.csv"), index=True)
-                    vprint(f"Exporting {par_obj_name.replace('_', ' ')} as csv...")
+                    vprint(f"Exporting {par_obj_name.replace('_', ' ')} to csv file...")
         vprint("...finished!\n")

@@ -11,36 +11,58 @@ from utils.transformers import TRANSFORMERS
 
 
 def pipe2_individual_forecasts(
-    target_covariates_tuple,
-    forecasters,
-    select_forecasters="all",
-    forecast_init_train=0.3,
-    autosarimax_refit_interval=0.33,
-    export_path=None,
-    verbose=False,
-    *args,
-    **kwargs,
-):
+        target_covariates_tuple,
+        forecasters,
+        forecast_init_train,
+        select_forecasters="all",
+        autosarimax_refit_interval=0.33,
+        export_path=None,
+        verbose=False,
+        *args, **kwargs):
     """
-    Generates individual forecasts for each model specified in the forecasters dictionary.
+    Generates individual forecasts for each model specified in the forecasters' dictionary.
 
-    Args:
-        target_covariates_tuple (tuple):                Tuple containing target and covariates data.
-        forecasters (dict):                             Dictionary containing forecasters to be used for individual forecasts.
-        select_forecasters (str or list, optional):     Specify which forecasters to use. Defaults to 'all'.
-        forecast_init_train (float, optional):          Initial training set size as a fraction of total data. Defaults to 0.3.
-        autosarimax_refit_interval (float, optional):   Interval for refitting AutoSARIMA model. Defaults to 0.33.
-        export_path (str, optional):                    Path to export the results as CSV. Defaults to None.
-        verbose (bool, optional):                       Whether to print verbose output. Defaults to False.
+    Parameters:
+    -----------
+        target_covariates_tuple : tuple
+            Tuple containing (target, covariates) as pandas DataFrames. Index containing dates 
+            should be of pandas PeriodIndex format.
+        forecasters (dict)
+            Dictionary containing forecasters' class names, package and options.
+        forecast_init_train : float
+            Initial forecasters' training set size as a fraction of preprocessed data.
+        select_forecasters : str or list, optional
+            Specify which forecaster classes to use (default: 'all').
+        autosarimax_refit_interval : float, optional
+            Refit interval for AutoSARIMA model (default: 0.33, corresponds to fitting at 0%, 33%, and 66% of ensemblers
+            training set).
+        export_path : os.PathLike, optional
+            Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported
+            (default: None).
+        verbose : bool, optional
+            If True, prints detailed information about the individual forecasting process and stores results in log file
+            (default: False).
+        *args:
+            Additional positional arguments.
+        **kwargs:
+            Additional keyword arguments.
 
     Returns:
-        pd.DataFrame: DataFrame containing individual predictions.
+    --------
+        pd.DataFrame: DataFrame containing individual predictions per forecaster model (columns).
+        
+    Notes:
+    ------
+    This function performs forecasting using the provided individual forecasting models.
+    It iterates over each approach and model in the models dictionary and generates historical one-step-ahead
+    predictions. Finally, if an export path is provided, it exports the ensemble predictions as a CSV file.
     """
 
+    # Verbose print to indicate that individual forecasters start historical forecasts
     vprint(
-        "\n======================================================="
-        "\n== Starting Step 2 in Pipeline: Individual Forecasts =="
-        "\n=======================================================\n"
+        "\n====================================================="
+        "\n== Pipeline Step 2: Individual Models\' Predictions =="
+        "\n=====================================================\n"
     )
 
     # Extracting target and covariates data from input tuple
@@ -77,10 +99,10 @@ def pipe2_individual_forecasts(
     vprint(
         f"Splitting data (train/test ratio: "
         f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})..."
-        f"\nInitial training set has {init_trainsize} observations ",
-        f"and goes from {target.index[0].date()} to {target.index[init_trainsize - 1].date()}"
-        f"\nThere are {H} periods to be forecasted: ",
-        f"{target.index[init_trainsize].date()} to {target.index[-1].date()}\n",
+        f"\nInitial training set has {init_trainsize} observations " f"and goes from {target.index[0].date()} to"
+        f" {target.index[init_trainsize - 1].date()}."
+        f"\nThere are {H} periods to be forecasted: " f"{target.index[init_trainsize].date()} to"
+        f" {target.index[-1].date()}\n",
     )
 
     # Creating a DataFrame to store all models' predictions
@@ -102,7 +124,7 @@ def pipe2_individual_forecasts(
     printed_k = [
         ceil(x)
         for x in H
-        * np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)
+                 * np.arange(0, 1 + printout_percentage_interval, printout_percentage_interval)
     ]
     printed_k[0] = 1
 
@@ -130,8 +152,8 @@ def pipe2_individual_forecasts(
         for model_name, MODEL in approach_dict.items():
             # Only considering selected models in the current ensemble approach dictionary
             if (
-                select_forecasters not in ["all", ["all"]]
-                and model_name not in select_forecasters
+                    select_forecasters not in ["all", ["all"]]
+                    and model_name not in select_forecasters
             ):
                 continue
 
@@ -165,8 +187,8 @@ def pipe2_individual_forecasts(
             # Determining whether/which transformation is needed based on package and covariate treatment
             # Do not transform again if model source did not change
             if (
-                last_package_name == package_name
-                and last_covtreatment_bool == covtreatment_bool
+                    last_package_name == package_name
+                    and last_covtreatment_bool == covtreatment_bool
             ):
                 pass
 
@@ -220,7 +242,7 @@ def pipe2_individual_forecasts(
             elif "sktime" in package_name:
                 # Adjust sktime specific parameters, in particular: Seasonal periodicity
                 if (
-                    "Naive" not in model_name and "sp" in model.get_params().keys()
+                        "Naive" not in model_name and "sp" in model.get_params().keys()
                 ):  # sNaive performs bad. Does not make sense to use this.
                     model.set_params(**{"sp": inferred_seasonal_freq})
 
@@ -332,7 +354,7 @@ def pipe2_individual_forecasts(
                         # Select last known X as predictor if using a covariate model
                         X_pred_sarimax = (
                             X_train_transformed[
-                                current_trainsize : current_trainsize + 1
+                            current_trainsize: current_trainsize + 1
                             ]
                             if covtreatment_bool
                             else None
@@ -372,7 +394,6 @@ def pipe2_individual_forecasts(
 
     # Return individual predictions
     return individual_predictions
-
 
 # For debugging:
 # from forecasters.forecasting import FC_MODELS

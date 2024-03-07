@@ -1,0 +1,46 @@
+=================================================================================
+[2024-03-07 02:26] Starting  Pipeline...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+====================================================
+== Pipeline Step 3: Individual Models Predictions ==
+====================================================
+
+Splitting data (train/test ratio: 10/90)...
+Initial training set has 12 observations 
+and goes from 2004-01-01 to 2004-12-01
+There are 108 periods to be forecasted: 
+2005-01-01 to 2013-12-01
+
+Now generating 108 one-step ahead expanding window predictions from model: Naive (sktime)
+...finished!
+
+Now generating 108 one-step ahead expanding window predictions from model: Naive (drift) (sktime)
+...finished!
+
+Now generating 108 one-step ahead expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 36th period.

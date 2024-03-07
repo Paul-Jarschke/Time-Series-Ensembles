@@ -1,0 +1,167 @@
+=================================================================================
+[2024-03-07 02:53] Starting  Pipeline...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+====================================================
+== Pipeline Step 3: Individual Models Predictions ==
+====================================================
+
+Splitting data (train/test ratio: 20/80)...
+Initial training set has 24 observations 
+and goes from 2004-01-01 to 2005-12-01
+There are 96 periods to be forecasted: 
+2006-01-01 to 2013-12-01
+
+Now generating 96 one-step ahead expanding window predictions from model: Naive (sktime)
+=================================================================================
+[2024-03-07 02:53] Starting  Pipeline...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching for time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data from goes from 2004-01-01 to 2013-12-01, resulting in 120 observations.
+
+Selecting target and covariates...
+Target: y
+Covariates: x1, x2, x3
+
+Data Insight:
+
+                    y          x1         x2          x3
+Date                                                    
+2004-01-01  50.840469  427.595799  55.337904  900.325291
+2004-02-01  52.871538  434.062163  54.959155  900.775888
+2004-03-01  53.769316  453.264284  56.470633  899.510058
+2004-04-01  57.672973  459.367523  56.704233  903.524834
+2004-05-01  57.182051  462.354356  61.557907  905.071762
+[Time elapsed: 00s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data (train/test ratio: 20/80)...
+Initial training set has 24 observations and goes from 2004-01-01 to 2005-12-01.
+There are 96 periods to be forecasted: 2006-01-01 to 2013-12-01
+
+Now generating 96 one-step ahead expanding window predictions from model: Naive (sktime)
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: Naive (drift) (sktime)
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 32th period.
+AutoSARIMA forecast 1 / 96
+AutoSARIMA forecast 20 / 96
+AutoSARIMA forecast 39 / 96
+AutoSARIMA forecast 58 / 96
+AutoSARIMA forecast 77 / 96
+AutoSARIMA forecast 96 / 96
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: Exponential Smoothing (sktime)
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: STL (sktime)
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: XGBoost (darts)
+...finished!
+
+Now generating 96 one-step ahead expanding window predictions from model: XGBoost with covariates (darts)
+...finished!
+
+
+Individual forecasters' predictions finished!
+
+Insights into forecasters' predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2006-01  51.813804      51.856122   51.813804              51.665098   
+2006-02  44.973909      44.729469   44.973909              46.171059   
+2006-03  45.010114      44.776899   45.010114              45.150272   
+2006-04  47.779780      47.662061   47.779780              47.337586   
+2006-05  43.121392      42.835500   43.121392              43.982710   
+
+               STL    XGBoost  XGBoost with covariates  
+Date                                                    
+2006-01  53.982077  53.406013                51.060802  
+2006-02  48.533959  46.484928                47.164600  
+2006-03  48.665163  45.078720                47.698875  
+2006-04  47.567749  47.190353                47.838005  
+2006-05  50.286885  43.596886                46.453705  
+
+
+Exporting individual predictions to csv file...
+...finished!
+
+[Time elapsed: 59s]
+
+
+====================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+====================================================
+
+Splitting forecast data (n = 96) for ensemble forecasts (train/test ratio: 20/80)...
+Initial training set has 19 observations and goes from 2006-01 to 2007-07
+There are 77 periods to be forecasted by the individual models 2007-08 to 2013-12
+
+Now generating 77 one-step ahead expanding window predictions from ensemble model: 'Weighted - Simple'
+Ensemble forecast 1 / 77
+Ensemble forecast 16 / 77
+Ensemble forecast 31 / 77
+Ensemble forecast 47 / 77
+Ensemble forecast 62 / 77
+Ensemble forecast 77 / 77
+...finished!
+
+Now generating 77 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+Ensemble forecast 1 / 77
+Ensemble forecast 16 / 77
+Ensemble forecast 31 / 77
+Ensemble forecast 47 / 77
+Ensemble forecast 62 / 77
+Ensemble forecast 77 / 77
+...finished!
+
+Now generating 77 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+Ensemble forecast 1 / 77
+Ensemble forecast 16 / 77
+Ensemble forecast 31 / 77
+Ensemble forecast 47 / 77
+Ensemble forecast 62 / 77
+Ensemble forecast 77 / 77
+...finished!
+
+Now generating 77 one-step ahead expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+Ensemble forecast 1 / 77

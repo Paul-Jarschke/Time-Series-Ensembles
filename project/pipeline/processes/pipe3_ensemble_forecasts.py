@@ -13,37 +13,37 @@ from utils.predictions.ensemble_predictions_wrapper import ensemble_prediction_w
 # individual_predictions = individual_predictions.drop(columns=['Theta']) # remove me later!
 
 
-def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
-                             select_ensemblers='all',
-                             ensemble_init_train=0.3,
-                             export_path=None, verbose=False,
-                             *args, **kwargs):
+def pipe3_ensemble_forecasts(
+        individual_predictions, ensemblers,
+        ensemble_init_train,
+        select_ensemblers='all',
+        export_path=None, verbose=False,
+        *args, **kwargs):
     """
-    Perform ensemble forecasting using the provided individual predictions and ensemble methods.
+    Perform ensemble forecasts using the provided individual predictions and ensemble approaches.
 
     Parameters:
     -----------
     individual_predictions : pandas.DataFrame
-        DataFrame containing individual predictions from various models. Each column represents a model's prediction,
-        indexed by time periods.
-
+        DataFrame containing predictions from various individual forecaster models.
+        Each column represents a model's prediction. Index containing dates should be of pandas PeriodIndex format.
     ensemblers : dict
         Dictionary containing ensemble methods and their corresponding models for ensemble forecasting. The keys
         represent the ensemble methods (e.g., 'weighted', 'meta') and the values are dictionaries where keys are model
         names and values are dictionaries containing model information like 'model', 'package', and 'options'.
-
+    ensemble_init_train : float
+        Initial ensemblers' training set size as a fraction of individual forecasters' predictions.
     select_ensemblers : str or list, optional
-        Determines which ensemblers to use. Default is 'all', meaning all ensemblers will be used. If a list is provided,
-        only the ensemblers in the list will be utilized.
-
-    ensemble_init_train : float, optional
-        Proportion of the dataset used for initial training of the ensemble models. Default is 0.3.
-
-    export_path : str, optional
-        Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported. Default is None.
-
+        Specify which ensemblers to use (default: 'all').
+    export_path : os.PathLike, optional
+        Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported (default: None).
     verbose : bool, optional
-        If True, prints detailed information about the ensemble forecasting process. Default is False.
+        If True, prints detailed information about the individual forecasting process and stores results in log file
+        (default: False).
+    *args:
+            Additional positional arguments.
+    **kwargs:
+        Additional keyword arguments.
 
     Returns:
     --------
@@ -53,15 +53,15 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
     Notes:
     ------
     This function performs ensemble forecasting using the provided individual predictions and ensemble methods.
-    It iterates over each ensemble approach and model within the ensemblers dictionary, generates ensemble predictions,
-    and merges them with the individual predictions. Finally, if an export path is provided, it exports the ensemble
-    predictions as a CSV file.
-
+    It iterates over each ensemble approach and model within the ensemblers dictionary, generates historical 
+    one-step-ahead predictions using the individual predictions as covariates. Finally, it merges them with the 
+    individual predictions. If export path is provided, it exports these predictions as CSV file.
     """
 
-    vprint('\n============================================='
-           '\n== Step 3: Historical Ensemble Predictions =='
-           '\n=============================================\n')
+    # Verbose print to indicate that the historical ensemble predictions start
+    vprint('\n===================================================='
+           '\n== Pipeline Step 3: Ensemble Models\' Predictions =='
+           '\n====================================================\n')
 
     # Ensemble Train Split
     # Determine size of the training set for ensemble forecasting
@@ -76,12 +76,12 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
     vprint(f'Splitting forecast data (n = {n_predictions}) for ensemble forecasts (train/test ratio: '
            f'{int(ensemble_init_train * 100)}/{int(100 - ensemble_init_train * 100)})...')
     vprint(f'Initial training set has {ens_init_trainsize} observations and goes from '
-           f'{individual_predictions.index[0]} to {individual_predictions.index[ens_init_trainsize-1]}')
+           f'{individual_predictions.index[0]} to {individual_predictions.index[ens_init_trainsize - 1]}')
     vprint(f'There are {H_ensemble} periods to be forecasted by the individual models '
            f'{individual_predictions.index[ens_init_trainsize]} to {individual_predictions.index[-1]}')
 
     # Create empty DataFrame for storing ensemble predictions
-    ensemble_predictions = pd.DataFrame() 
+    ensemble_predictions = pd.DataFrame()
 
     # Define the percentage interval for printing forecast updates
     # (e.g., print 0.2 means printing at 0%, 20%, 40%, 60%, 80%, and 100%)
@@ -134,7 +134,7 @@ def pipe3_ensemble_forecasts(individual_predictions, ensemblers,
                 past_individual_predictions = individual_predictions.iloc[0:current_trainsize, :]
 
                 next_individual_predictions = individual_predictions.iloc[current_trainsize:
-                                                                          current_trainsize+1, :]
+                                                                          current_trainsize + 1, :]
 
                 # Depending on ensemble approach 'weighted' or 'meta' the ensemble_prediction_wrapper
                 # selects the appropriate approach and creates a forecast
