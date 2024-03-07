@@ -9,7 +9,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 # Data directory and subdirectories
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SIMDATA_DIR = os.path.join(DATA_DIR, "simulation")
-TESTDATA_DIR = os.path.join(DATA_DIR, "testing")
+TESTDATA_DIR = os.path.join(DATA_DIR, "test_data")
 
 # User directory and subdirectories
 USER_DIR = os.path.join(ROOT_DIR, "user")
