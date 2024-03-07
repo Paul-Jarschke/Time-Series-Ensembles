@@ -1,7 +1,9 @@
 # Import modules
 import os
+
 import numpy as np
 import pandas as pd
+
 from SARIMAX_sim_class import SARIMAX_Simulation
 
 # Set number of periods

@@ -1,9 +1,15 @@
-print('Loading Univariate darts forecasters...')
+print("Loading Univariate darts forecasters...")
 
 
 # External Modules
 import pandas as pd
-from darts.models import XGBModel, NaiveDrift, NaiveMovingAverage, AutoARIMA, RandomForest
+from darts.models import (
+    XGBModel,
+    NaiveDrift,
+    NaiveMovingAverage,
+    AutoARIMA,
+    RandomForest,
+)
 
 # Naive forecasters
 model_naive = NaiveMovingAverage(input_chunk_length=1)
@@ -37,7 +43,7 @@ def hfc_models(models, target_series):
 
         # Extract Model name
         model_name = type(model).__name__
-        print(f'Training {model_name}:')
+        print(f"Training {model_name}:")
 
         # Generate historical forecasts using the model
         historical_fc = model.historical_forecasts(
@@ -45,7 +51,7 @@ def hfc_models(models, target_series):
             start=0.3,
             forecast_horizon=1,
             verbose=True,
-            show_warnings=False
+            show_warnings=False,
         )
 
         # Transform darts' TimeSeries to list of values
@@ -53,7 +59,7 @@ def hfc_models(models, target_series):
 
         # Remove last element of historical forecast, since there is no target value for comparison
         prediction_values.pop()
-        
+
         # Using the model's name as the column label
         predictions[model_name] = prediction_values
 

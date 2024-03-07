@@ -1,4 +1,5 @@
 """Compositors that control stream and refitting behaviour of update."""
+
 # copyright: sktime developers, BSD-3-Clause License (see LICENSE file)
 
 __author__ = ["fkiraly"]
@@ -64,11 +65,9 @@ class UpdateRefitsEvery(_DelegatedForecaster):
 
         self._set_delegated_tags(self.forecaster_)
         self.set_tags(**{"fit_is_empty": False})
-        
-        
-        #Leon:
+
+        # Leon:
         self.cutoff.index = self.cutoff.index.to_timestamp()
-        
 
     def _fit(self, y, X, fh):
         """Fit forecaster to training data.

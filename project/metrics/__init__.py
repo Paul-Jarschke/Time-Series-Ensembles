@@ -1,10 +1,11 @@
 # Import FunctionFinder and METRICS_DIR and external dependencies
 import os
+
+import sktime.performance_metrics.forecasting._functions  # Import custom metrics
 import yaml
+
 from utils.helpers import FunctionFinder
 from utils.paths import METRICS_DIR
-import sktime.performance_metrics.forecasting._functions# Import custom metrics
-
 
 # Print statement indicating loading of metric functions
 print('Loading metrics...')

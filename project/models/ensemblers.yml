@@ -11,30 +11,30 @@ weighted:
   Inverse Variance: inv_variance_weights
   Inverse Error Covariance: inv_error_cov_weights
 meta:
-    SVR:
-      model: SVR
-      package: sklearn
-      options:
-        kernel: linear
-    Ridge:
-      model: Ridge
-      package: sklearn
-      options:
-        alpha: 0.5
-    Linear Regression:
-      model: LinearRegression
-      package: sklearn
-    MLP:
-      model: MLPRegressor
-      package: sklearn
-      options:
-        hidden_layer_sizes: 100
-        activation: identity
-        solver: adam
-        alpha: 0.001
-    RandomForest:
-      model: RandomForestRegressor
-      package: sklearn
-      options:
-        n_estimators: 100
-        random_state: null
+  SVR:
+    model: SVR
+    package: sklearn
+    options:
+      kernel: linear
+  Ridge:
+    model: Ridge
+    package: sklearn
+    options:
+      alpha: 0.5
+  Linear Regression:
+    model: LinearRegression
+    package: sklearn
+  MLP:
+    model: MLPRegressor
+    package: sklearn
+    options:
+      hidden_layer_sizes: 100
+      activation: identity
+      solver: adam
+      alpha: 0.001
+  RandomForest:
+    model: RandomForestRegressor
+    package: sklearn
+    options:
+      n_estimators: 100
+      random_state: null

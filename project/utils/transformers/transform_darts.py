@@ -20,7 +20,7 @@ def transform_to_darts(*args):
         if pandas_object is None:
             darts_object = pandas_object
             pass
-    # Check if the pandas object is a pandas object
+        # Check if the pandas object is a pandas object
         elif isinstance(pandas_object, (pd.Series, pd.DataFrame)):
             # Create a copy of the input pandas object to avoid changing the index globally
             darts_object = pandas_object.copy()

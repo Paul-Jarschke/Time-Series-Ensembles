@@ -12,53 +12,97 @@ from utils.paths import *
 
 # noinspection PyTypeChecker
 def run_pipeline(df, models, metrics,
-                 date_col='infer', date_format=None, target='infer', covariates='infer', exclude=None,
+                 fh=None,
+                 start=None, end=None,
+                 date_col='infer', date_format=None,
+                 target='infer', covariates='infer', exclude=None,
                  agg_method=None, agg_freq=None,
-                 select_forecasters='all', autosarimax_refit_interval=0.33, forecast_init_train=0.3,
-                 select_ensemblers='all', ensemble_init_train=0.3,
+                 select_forecasters='all', forecast_init_train=0.3,
+                 autosarimax_refit_interval=0.33,
+                 select_ensemblers='all', ensemble_init_train=0.25,
                  sort_by='MAPE',
                  export=True, errors='raise', verbose=False,
                  *args, **kwargs):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
-    Args:
-        df (pandas.DataFrame or pandas.Series):     Input data containing targets and covariates.
-        models (dict):                              Dictionary containing the forecasters and ensemblers models.
-        metrics (list):                             List of metrics for model ranking.
-        date_col (str):                             Name of the date column in the input data (default: 'infer').
-        date_format (str):                          Format of the date column if date_col is specified (default: None).
-        target (str):                               Name of the target column in the input data (default: 'infer').
-        covariates (str):                           Names of covariates columns in the input data (default: 'infer').
-        exclude (list):                             List of columns to exclude from the input data (default: None).
-        agg_method (str):                           Aggregation method for preprocessing (default: None).
-        agg_freq (str):                             Aggregation frequency for preprocessing (default: None).
-        select_forecasters (str or list):           Selection of forecasters to use (default: 'all').
-        autosarimax_refit_interval (float):         Refit interval for autosarimax (default: 0.33).
-        forecast_init_train (float):                Initial training ratio for individual forecasters (default: 0.3).
-        select_ensemblers (str or list):            Selection of ensemblers to use (default: 'all').
-        ensemble_init_train (float):                Initial training ratio for ensemblers (default: 0.3).
-        sort_by (str):                              Metric to sort by for model ranking (default: 'MAPE').
-        export (bool or os.PathLike):               Whether to export results or the export path if provided (default: True).
-        errors (str):                               How to handle errors (default: 'raise').
-        verbose (bool):                             Whether to print intermediate steps (default: False).
-
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments.
+    Parameters:
+    -----------
+        df : pandas.DataFrame or pandas.Series:
+            Input DataFrame containing date, targets (and optionally covariates).
+        models : dict
+            Dictionary containing the forecasters and ensemblers models (approach, names, class names, package name,
+            and options). This can be imported from the 'models' module of the project.
+            Edit the '.yml' file to add/remove models.ch
+        metrics : dict
+            List of performance measures for model ranking in historical predictions.
+            Can be imported from the 'metrics' module of the project. Edit '.yml' files to add/remove metrics.
+        fh : int, optional
+            When provided, pipeline not only performs historical evaluation of forecasters and ensemblers but also
+            provides out-of-sample future predictions along the whole provided forecast horizon.
+        start : str, optional
+            Filter data to start from date string. Expects ISO DateTimeIndex format "YYYY-MMMM-DDD" (default: None).
+        end : str, optional
+            Filter data to end on date string. Expects ISO DateTimeIndex format "YYYY-MMMM-DDD" (default: None).
+        date_col : str or int, optional
+            Name or index of the date column in the input data (default: 'infer', searches for ISO formatted column).
+        date_format : str, optional
+            Custom format of the date column if date_col is specified (default: None, expects ISO format YYYY-MM-DD).
+        target : str, int, optional
+            Name or positional index of the target column in the input data
+            (default: 'infer', takes first column after the date was set).
+        covariates : str, int, or list, optional
+            Names of covariates columns in the input data (default: 'infer', takes all columns after date and target
+            are inferred.).
+        exclude : str, int, or list, optional
+            List of columns (string or positional index) to exclude from the input data (default: None).
+        agg_method : str, optional
+            Aggregation method for preprocessing.
+            One of the pandas methods 'first', 'last', 'min', 'max', and 'mean' (default: None).
+        agg_freq : str, optional
+            DateTimeIndex aggregation frequency for preprocessing (default: None).
+        select_forecasters : str or list, optional
+            Specify which forecaster classes to use (default: 'all').
+        forecast_init_train : float, optional
+            Initial forecasters' training set size as a fraction of preprocessed data (default: 0.3, results in a
+            30%/80% train-test split of the data).
+        autosarimax_refit_interval : float, optional
+            Refit interval for AutoSARIMA model (default: 0.33, corresponds to fitting at 0%, 33%, and 66% of ensemblers
+            training set).
+        select_ensemblers : str or list, optional
+            Specify which ensemblers to use (default: 'all').
+        ensemble_init_train : float, optional
+            Initial ensemblers' training set size as a fraction of individual forecasters' predictions (default: 0.25,
+            results in a 25%/75% train-test split of the data).
+        sort_by : str, optional
+            Performance measure to sort by for model ranking (default: 'MAPE').
+        export : bool or os.PathLike, optional
+            If True but no path provided, exports to current working directory (default: True).
+        errors : str, optional
+            How to handle errors (default: 'raise').
+        verbose : bool, optional
+            If True, prints progress, intermediate results and steps console and log file (default: False).
+        *args:
+            Additional positional arguments.
+        **kwargs:
+            Additional keyword arguments.
 
     Returns:
-        dict: Dictionary containing the following keys:
-            - 'target and covariates': Preprocessed target and covariates.
-            - 'individual_predictions': Individual predictions.
-            - 'full predictions': Full ensemble predictions.
-            - 'metrics ranking': Rankings based on specified metrics.
+    --------
+    dict: Dictionary containing the following keys as pandas Series or DataFrames:
+        - 'target and covariates': Tuple of preprocessed target and covariates.
+        - 'historical_individual_predictions': Individual forecasters' predictions.
+        - 'full predictions': Full ensemble predictions.
+        - 'metrics ranking': Rankings based on specified metrics.
     """
-
-    # Outlook: You could make this pipe more generic by looping over functions.
 
     # Save starting time
     start_pipe = datetime.now()
     start_pipe_formatted = start_pipe.strftime("%Y%m%d_%H%M")
+
+    # Correct confusing user inputs
+    if fh == 0:
+        fh = None
 
     # Determine export path if exporting is enabled
     if export is True:
@@ -109,7 +153,7 @@ def run_pipeline(df, models, metrics,
     # Define expected outputs
     expected_outputs = [
         'target and covariates',
-        'individual_predictions',
+        'historical_individual_predictions',
         'full predictions',
         'metrics ranking'
     ]
@@ -128,8 +172,10 @@ def run_pipeline(df, models, metrics,
     for step, process in enumerate(processes):
         # Execute each process
         pipe_output = process(
+            # Provide required input (DataFrame or result from previous pipeline step)
             pipe_input,
             # Provide arguments for Pipe 1
+            start=start, end=end,
             date_col=date_col, date_format=date_format,
             target=target, covariates=covariates, exclude=exclude,
             agg_method=agg_method, agg_freq=agg_freq,
@@ -144,6 +190,7 @@ def run_pipeline(df, models, metrics,
             metrics=metrics,
             sort_by=sort_by,
             # Generic/shared arguments
+            fh=fh,
             export_path=export_path,
             errors=errors, verbose=verbose,
             *args, **kwargs
@@ -157,11 +204,11 @@ def run_pipeline(df, models, metrics,
         
         # Print time elapsed since start
         if step+1 != len(processes):
-            vprint(f'[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
+            vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
 
     # Reporting total time elapsed
     end_pipe = datetime.now()
-    vprint(f'\n\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline!\n'
+    vprint(f'\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline!\n'
            f'[Total time elapsed: {strfdelta(end_pipe - start_pipe)}]'
            '\n================================================================================='
            )

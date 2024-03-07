@@ -9,7 +9,7 @@ def vprint(*args):
     Parameters:
     - *args: Strings to be printed.
     """
-    if inspect.currentframe().f_back.f_locals['verbose']:
+    if inspect.currentframe().f_back.f_locals["verbose"]:
         ### print(*args)
         ### logging.info('\033[0m' + arg)
         # Log each argument using the logging module
@@ -39,9 +39,11 @@ def strfdelta(tdelta):
     seconds = s - (minutes * 60)
 
     # Format the timedelta into a string
-    formatted_tdelta = '{:02}h {:02}m {:02}s'.format(int(hours), int(minutes), int(seconds))
-    
+    formatted_tdelta = "{:02}h {:02}m {:02}s".format(
+        int(hours), int(minutes), int(seconds)
+    )
+
     # Remove leading zeros for hours and minutes if they are zero
-    formatted_tdelta = formatted_tdelta.replace('00h ', '').replace('00m ', '')
+    formatted_tdelta = formatted_tdelta.replace("00h ", "").replace("00m ", "")
 
     return formatted_tdelta

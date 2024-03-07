@@ -9,7 +9,7 @@ def equal_weights(predictions):
         weights (dict): Dictionary containing model names as keys and equal weights as items.
     """
     # Remove target
-    predictions = predictions.drop(columns=['Target'])
+    predictions = predictions.drop(columns=["Target"])
 
     # Get number of forecasters
     n_models = len(predictions.columns)

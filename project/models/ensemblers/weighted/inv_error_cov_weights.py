@@ -17,7 +17,7 @@ def inv_error_cov_weights(predictions, verbose=True):
     """
     predictions = predictions.copy()
     # Extract target
-    target = predictions.pop('Target')
+    target = predictions.pop("Target")
 
     # Compute errors for each model
     errors = predictions.apply(lambda x: target - x)
@@ -39,6 +39,8 @@ def inv_error_cov_weights(predictions, verbose=True):
     model_names = predictions.columns  # Extract model names
 
     # Compute model weights
-    weights = {model: row_sum / total_sum for model, row_sum in zip(model_names, row_sums)}
+    weights = {
+        model: row_sum / total_sum for model, row_sum in zip(model_names, row_sums)
+    }
 
     return weights
