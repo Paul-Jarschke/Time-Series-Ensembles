@@ -1,0 +1,268 @@
+=================================================================================
+[2024-03-07 12:37] Starting  Pipeline...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: 15T
+Data goes from 2020-01-01 00:00 to 2020-03-31 23:45, resulting in 8736 observations.
+
+Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
+...finished!
+Data now has 64 observations.
+
+Selecting target and covariates...
+Target: bid_close
+Covariates: None
+
+Data Insights:
+            bid_close
+datetime             
+2020-01-02    1.11702
+2020-01-03    1.11599
+2020-01-06    1.11948
+2020-01-07    1.11530
+2020-01-08    1.11124
+
+[Time elapsed: 00s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 20 observations and goes from 2020-01-02 to 2020-01-29.
+
+In an historical expanding window approach, there are 44 periods to be forecasted by the individual models: 2020-01-30 to 2020-03-31
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Naive (sktime)
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Naive (drift) (sktime)
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 15th period.
+...forecast 1 / 44
+...forecast 11 / 44
+...forecast 22 / 44
+...forecast 33 / 44
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: Exponential Smoothing (sktime)
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: STL (sktime)
+...finished!
+
+Now generating 44 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+              Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                    
+2020-01-30  1.10132       1.100494     1.09728               1.101324   
+2020-01-31  1.10282       1.102110     1.09973               1.102813   
+2020-02-03  1.10885       1.108461     1.10833               1.108820   
+2020-02-04  1.10618       1.105687     1.10646               1.106193   
+2020-02-05  1.10440       1.103851     1.10357               1.104409   
+
+                 STL   XGBoost  
+Date                            
+2020-01-30  1.099366  1.102249  
+2020-01-31  1.096396  1.104599  
+2020-02-03  1.099680  1.108045  
+2020-02-04  1.103271  1.107951  
+2020-02-05  1.105145  1.104865  
+
+[Time elapsed: 14s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 44) for training of ensemblers (train/test ratio: 30/70)...
+Initial training set has 14 observations and goes from 2020-01-30 to 2020-02-18
+
+In an historical expanding window approach, there are 30 periods to be forecasted by the ensemble models: 2020-02-19 to 2020-03-31
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Ridge (sklearn)'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Linear Regression (sklearn)'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Meta - MLP (sklearn)'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Now generating 30 one-step ahead historical expanding window predictions from ensemble model: 'Meta - RandomForest (sklearn)'
+...Forecast 1 / 30
+...Forecast 8 / 30
+...Forecast 15 / 30
+...Forecast 23 / 30
+...finished!
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+            Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2020-02-19                   1.078742                         1.078503   
+2020-02-20                   1.079630                         1.079851   
+2020-02-21                   1.078509                         1.078394   
+2020-02-24                   1.082453                         1.082707   
+2020-02-25                   1.083550                         1.083805   
+
+            Weighted Ensemble: Inverse Variance  \
+2020-02-19                             1.079341   
+2020-02-20                             1.079748   
+2020-02-21                             1.078591   
+2020-02-24                             1.082523   
+2020-02-25                             1.083643   
+
+            Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2020-02-19                                     1.081854            1.094095   
+2020-02-20                                     1.083498            1.094095   
+2020-02-21                                     1.079768            1.093780   
+2020-02-24                                     1.086864            1.093780   
+2020-02-25                                     1.090099            1.093780   
+
+            Meta Ensemble: Ridge  Meta Ensemble: Linear Regression  \
+2020-02-19              1.093841                          1.075596   
+2020-02-20              1.092956                          1.078201   
+2020-02-21              1.092014                          1.075129   
+2020-02-24              1.091580                          1.080045   
+2020-02-25              1.091216                          1.083968   
+
+            Meta Ensemble: MLP  Meta Ensemble: RandomForest  
+2020-02-19            1.238681                     1.081186  
+2020-02-20            1.393630                     1.081267  
+2020-02-21            1.342109                     1.080048  
+2020-02-24            1.189605                     1.081207  
+2020-02-25            1.408941                     1.083712  
+
+Merging...
+...finished!
+
+
+Exporting historical predictions and future predictions as csv to C:\Users\Paul\Desktop\Repositories\Time-Series-Ensembles\project\results\eurusd\20240307_1237...
+...finished!
+
+[Time elapsed: 19s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating RMSE, MAPE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                          Model      RMSE      MAPE  \
+0   Weighted Ensemble: Inverse Error Covariance  0.009057  0.006006   
+1                                         Naive  0.009195  0.006299   
+2                         Exponential Smoothing  0.009207  0.006312   
+3                                 Naive (drift)  0.009358  0.006562   
+4              Meta Ensemble: Linear Regression  0.009773  0.006968   
+5               Weighted Ensemble: Inverse RMSE  0.009850  0.006978   
+6                                       XGBoost  0.010464  0.007015   
+7                                    AutoSARIMA  0.010122  0.007032   
+8           Weighted Ensemble: Inverse Variance  0.009898  0.007039   
+9                     Weighted Ensemble: Simple  0.010126  0.007241   
+10                  Meta Ensemble: RandomForest  0.010679  0.007707   
+11                                          STL  0.017578  0.012183   
+12                           Meta Ensemble: SVR  0.018940  0.014044   
+13                         Meta Ensemble: Ridge  0.019510  0.014523   
+14                           Meta Ensemble: MLP  0.224505  0.172919   
+
+        sMAPE  RMSE Ranking  MAPE Ranking  sMAPE Ranking  
+0    0.399980             1             1              1  
+1    0.419720             2             2              2  
+2    0.420562             3             3              3  
+3    0.437355             4             4              4  
+4    0.464072             5             5              5  
+5    0.465245             6             6              6  
+6    0.468272            10             7              7  
+7    0.468696             8             8              8  
+8    0.469364             7             9              9  
+9    0.482869             9            10             10  
+10   0.513419            11            11             11  
+11   0.814139            12            12             12  
+12   0.935965            13            13             13  
+13   0.970649            14            14             14  
+14  10.683078            15            15             15  
+
+The 'Weighted Ensemble: Inverse Error Covariance' is identified as the best model based on the MAPE value of its the historical predictions.
+
+Exporting metrics_ranking as csv to C:\Users\Paul\Desktop\Repositories\Time-Series-Ensembles\project\results\eurusd\20240307_1237...
+...finished!
+
+[2024-03-07 12:38] Finished Pipeline!
+[Total time elapsed: 19s]
+=================================================================================
