@@ -6,6 +6,11 @@ print("Loading paths...")
 # Package root directory
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
+# Paper directory
+PAPER_DIR = os.path.join(ROOT_DIR, "paper")
+ANALYSIS_DIR = os.path.join(PAPER_DIR, "analysis")
+PAPERDATA_DIR = os.path.join(PAPER_DIR, "current_data")
+
 # Data directory and subdirectories
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SIMDATA_DIR = os.path.join(DATA_DIR, "simulation")
