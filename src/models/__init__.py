@@ -8,10 +8,10 @@ stdout = sys.stdout
 print("Loading models...")
 
 # Open forecasters' specification from yaml files
-with open(os.path.join(USER_DIR, "forecasters.yml"), 'r') as f:
+with open(os.path.join(INPUT_DIR, "forecasters.yml"), 'r') as f:
     forecasters = yaml.safe_load(f)
 
-with open(os.path.join(USER_DIR, "ensemblers.yml"), 'r') as f:
+with open(os.path.join(INPUT_DIR, "ensemblers.yml"), 'r') as f:
     ensemblers = yaml.safe_load(f)
 
 # If desired, exclude forecasters or ensemblers (temporarily) by their name

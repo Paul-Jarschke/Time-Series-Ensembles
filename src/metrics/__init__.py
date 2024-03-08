@@ -5,13 +5,13 @@ import sktime.performance_metrics.forecasting._functions  # Import custom metric
 import yaml
 
 from src.utils.helpers.FunctionFinder import FunctionFinder
-from src.utils.paths import USER_DIR, METRICS_DIR
+from src.utils.paths import INPUT_DIR, METRICS_DIR
 
 # Print statement indicating loading of metric functions
 print('Loading metrics...')
 
 # Read in yml file
-with open(os.path.join(USER_DIR, "metrics.yml"), 'r') as f:
+with open(os.path.join(INPUT_DIR, "metrics.yml"), 'r') as f:
     METRICS = yaml.safe_load(f)
 
 

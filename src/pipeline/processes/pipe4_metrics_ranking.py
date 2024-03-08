@@ -96,7 +96,8 @@ def pipe4_metrics_ranking(
     metrics_ranking = metrics_df.sort_values(by=f'{sort_by} Ranking')
 
     # Reset index
-    metrics_ranking.reset_index(drop=True, inplace=True)
+    # metrics_ranking.reset_index(drop=True, inplace=True)
+    metrics_ranking.set_index('Model', inplace=True)
 
     # Verbose print to indicate completion of ranking
     vprint('...finished!')
@@ -106,7 +107,7 @@ def pipe4_metrics_ranking(
            metrics_ranking)
 
     # If future predictions are to be made, make a recommendation as to which model to choose based on metric ranking
-    best_model = metrics_ranking.iloc[0, 0]
+    best_model = metrics_ranking.index[0]
     vprint(f'\nThe \'{best_model}\' is identified as the best model based on the {sort_by} value of its the historical '
            f'predictions.')
     # Show the corresponding future predictions

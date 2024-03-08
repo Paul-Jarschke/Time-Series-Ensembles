@@ -11,5 +11,5 @@ def display_ranking_table(metrics_ranking):
         return val
     formatted_metrics = metrics_ranking.applymap(format_numeric)
 
-    display(formatted_metrics.style.hide())
+    display(formatted_metrics.style)
     pd.reset_option('display.float_format')

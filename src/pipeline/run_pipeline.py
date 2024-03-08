@@ -113,7 +113,7 @@ def run_pipeline(df, models, metrics,
             # If df is imported by internal function csv_reader, export path can be inferred from file_name in attrs.
             if 'file_name' in df.attrs:
                 file_name = df.attrs['file_name'].replace('.csv', '')
-                export_path = os.path.join(EXPORT_DIR, file_name, start_pipe_formatted)
+                export_path = os.path.join(OUTPUT_DIR, file_name, start_pipe_formatted)
             else:
                 raise ValueError("Provide valid path for 'export' or set 'export = False'")
 

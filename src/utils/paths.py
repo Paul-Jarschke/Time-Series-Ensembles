@@ -9,7 +9,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 # Paper directory
 PAPER_DIR = os.path.join(ROOT_DIR, "paper")
 ANALYSIS_DIR = os.path.join(PAPER_DIR, "analysis")
-PAPERDATA_DIR = os.path.join(PAPER_DIR, "current_data")
+PAPERDATA_DIR = os.path.join(PAPER_DIR, "analyzed_data")
 PLOT_DIR = os.path.join(ANALYSIS_DIR, "plots")
 TABLE_DIR = os.path.join(ANALYSIS_DIR, "tables")
 
@@ -20,7 +20,8 @@ TESTDATA_DIR = os.path.join(DATA_DIR, "test_data")
 
 # User directory and subdirectories
 USER_DIR = os.path.join(ROOT_DIR, "user")
-EXPORT_DIR = os.path.join(USER_DIR, "results")
+INPUT_DIR = os.path.join(USER_DIR, "inputs")
+OUTPUT_DIR = os.path.join(USER_DIR, "outputs")
 
 # Source code directory and subdirectories
 SRC_DIR = os.path.join(ROOT_DIR, "src")

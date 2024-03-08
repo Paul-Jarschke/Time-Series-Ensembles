@@ -1,5 +1,5 @@
 =================================================================================
-[2024-03-07 11:32] Starting  Pipeline...
+[2024-03-08 09:43] Starting  Pipeline...
 
 =========================================
 == Pipeline Step 1: Data Preprocessing ==
@@ -94,7 +94,7 @@ Date
 Date                           
 2016-01  91.278306  84.968803  
 
-[Time elapsed: 02m 46s]
+[Time elapsed: 03m 17s]
 
 
 ===================================================
@@ -179,7 +179,7 @@ Now generating 75 one-step ahead historical expanding window predictions from en
 Performing out-of-sample predictions...
 ...finished!
 
-Now generating 75 one-step ahead historical expanding window predictions from ensemble model: 'Meta - RandomForest (sklearn)'
+Now generating 75 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Random Forest (sklearn)'
 ...Forecast 1 / 75
 ...Forecast 19 / 75
 ...Forecast 38 / 75
@@ -219,12 +219,12 @@ Insights into ensemblers' historical predictions:
 2010-01             61.030074                         60.690040   
 2010-02             60.939069                         59.575960   
 
-         Meta Ensemble: MLP  Meta Ensemble: RandomForest  
-2009-10           76.921426                    59.714563  
-2009-11           61.588751                    60.158205  
-2009-12           76.113341                    60.261278  
-2010-01           75.172796                    61.325414  
-2010-02           77.343945                    59.924012  
+         Meta Ensemble: MLP  Meta Ensemble: Random Forest  
+2009-10           61.395601                     59.612707  
+2009-11           70.765357                     60.138725  
+2009-12           81.021246                     60.017426  
+2010-01           62.355397                     61.191397  
+2010-02           64.867125                     59.802752  
 
 Insights into ensemblers' future predictions:
          Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
@@ -243,18 +243,18 @@ Date
 Date                                                              
 2016-01             85.169797                         85.626185   
 
-         Meta Ensemble: MLP  Meta Ensemble: RandomForest  
-Date                                                      
-2016-01          103.187702                    84.354358  
+         Meta Ensemble: MLP  Meta Ensemble: Random Forest  
+Date                                                       
+2016-01           89.167957                      84.24575  
 
 Merging...
 ...finished!
 
 
-Exporting historical predictions and future predictions as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\project\results\noisy_simdata\20240307_1132...
+Exporting historical predictions and future predictions as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\user\outputs\noisy_simdata\20240308_0943...
 ...finished!
 
-[Time elapsed: 03m 26s]
+[Time elapsed: 03m 59s]
 
 
 ==============================================================
@@ -266,49 +266,69 @@ Ranking models ...
 ...finished!
 
 Results:
-                                          Model       RMSE      MAPE  \
-0               Weighted Ensemble: Inverse RMSE   2.811203  0.028420   
-1           Weighted Ensemble: Inverse Variance   2.828961  0.028457   
-2                     Weighted Ensemble: Simple   2.849349  0.028489   
-3                         Exponential Smoothing   2.837649  0.029072   
-4                                         Naive   2.883142  0.029242   
-5                                 Naive (drift)   2.882004  0.029617   
-6                          Meta Ensemble: Ridge   2.937377  0.029939   
-7                            Meta Ensemble: SVR   3.079198  0.030364   
-8                                    AutoSARIMA   2.883281  0.030442   
-9              Meta Ensemble: Linear Regression   3.046754  0.031136   
-10                  Meta Ensemble: RandomForest   3.275245  0.031402   
-11                                      XGBoost   3.342290  0.032360   
-12  Weighted Ensemble: Inverse Error Covariance   3.539178  0.034571   
-13                                          STL   4.901734  0.050245   
-14                           Meta Ensemble: MLP  16.500338  0.200884   
+                                                  RMSE      MAPE      sMAPE  \
+Model                                                                         
+Weighted Ensemble: Inverse RMSE               2.811203  0.028420   1.905886   
+Weighted Ensemble: Inverse Variance           2.828961  0.028457   1.908820   
+Weighted Ensemble: Simple                     2.849349  0.028489   1.910962   
+Exponential Smoothing                         2.837649  0.029072   1.948458   
+Naive                                         2.883142  0.029242   1.957764   
+Naive (drift)                                 2.882004  0.029617   1.978757   
+Meta Ensemble: Ridge                          2.937377  0.029939   2.008962   
+Meta Ensemble: SVR                            3.079198  0.030364   2.046130   
+AutoSARIMA                                    2.883281  0.030442   2.037102   
+Meta Ensemble: Linear Regression              3.046754  0.031136   2.083072   
+XGBoost                                       3.342290  0.032360   2.187298   
+Meta Ensemble: Random Forest                  3.351071  0.032381   2.181280   
+Weighted Ensemble: Inverse Error Covariance   3.539178  0.034571   2.346372   
+STL                                           4.901734  0.050245   3.360780   
+Meta Ensemble: MLP                           14.989380  0.169655  10.505539   
 
-        sMAPE  RMSE Ranking  MAPE Ranking  sMAPE Ranking  
-0    1.905886             1             1              1  
-1    1.908820             2             2              2  
-2    1.910962             4             3              3  
-3    1.948458             3             4              4  
-4    1.957764             6             5              5  
-5    1.978757             5             6              6  
-6    2.008962             8             7              7  
-7    2.046130            10             8              9  
-8    2.037102             7             9              8  
-9    2.083072             9            10             10  
-10   2.115527            11            11             11  
-11   2.187298            12            12             12  
-12   2.346372            13            13             13  
-13   3.360780            14            14             14  
-14  12.417443            15            15             15  
+                                             RMSE Ranking  MAPE Ranking  \
+Model                                                                     
+Weighted Ensemble: Inverse RMSE                         1             1   
+Weighted Ensemble: Inverse Variance                     2             2   
+Weighted Ensemble: Simple                               4             3   
+Exponential Smoothing                                   3             4   
+Naive                                                   6             5   
+Naive (drift)                                           5             6   
+Meta Ensemble: Ridge                                    8             7   
+Meta Ensemble: SVR                                     10             8   
+AutoSARIMA                                              7             9   
+Meta Ensemble: Linear Regression                        9            10   
+XGBoost                                                11            11   
+Meta Ensemble: Random Forest                           12            12   
+Weighted Ensemble: Inverse Error Covariance            13            13   
+STL                                                    14            14   
+Meta Ensemble: MLP                                     15            15   
 
-The 'Weighted Ensemble: Inverse RMSE' is identified as the best model based on the MAPE value of its the historical predictions
+                                             sMAPE Ranking  
+Model                                                       
+Weighted Ensemble: Inverse RMSE                          1  
+Weighted Ensemble: Inverse Variance                      2  
+Weighted Ensemble: Simple                                3  
+Exponential Smoothing                                    4  
+Naive                                                    5  
+Naive (drift)                                            6  
+Meta Ensemble: Ridge                                     7  
+Meta Ensemble: SVR                                       9  
+AutoSARIMA                                               8  
+Meta Ensemble: Linear Regression                        10  
+XGBoost                                                 12  
+Meta Ensemble: Random Forest                            11  
+Weighted Ensemble: Inverse Error Covariance             13  
+STL                                                     14  
+Meta Ensemble: MLP                                      15  
+
+The 'Weighted Ensemble: Inverse RMSE' is identified as the best model based on the MAPE value of its the historical predictions.
 Thus, it is recommended to work with the future predictions coming from this model:
 Date
 2016-01    85.616501
 Freq: M, Name: Weighted Ensemble: Inverse RMSE, dtype: float64
 
-Exporting metrics_ranking as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\project\results\noisy_simdata\20240307_1132...
+Exporting metrics_ranking as csv to C:\Users\Work\OneDrive\GAU\3. Semester\Statistisches Praktikum\Git\NEW_Ensemble_Techniques_TS_FC\user\outputs\noisy_simdata\20240308_0943...
 ...finished!
 
-[2024-03-07 11:35] Finished Pipeline!
-[Total time elapsed: 03m 26s]
+[2024-03-08 09:47] Finished Pipeline!
+[Total time elapsed: 03m 59s]
 =================================================================================

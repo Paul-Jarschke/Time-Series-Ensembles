@@ -5,7 +5,7 @@ from src.utils.paths import *
 
 # Pull the results for the different complexity datasets to a specified directory (or current working directory) for
 # a given timestamp (if no timestamp specified, use latest)
-def pull_results(source_dir=EXPORT_DIR, target_dir=PAPERDATA_DIR, timestamp=None, file_prefix="noisy_simdata_compl"):
+def pull_results(source_dir=OUTPUT_DIR, target_dir=PAPERDATA_DIR, timestamp=None, file_prefix="noisy_simdata_compl"):
     # Browse source_dir for folder names starting with "file_name"
     relevant_folders = sorted([item for item in os.listdir(source_dir) if
                                os.path.isdir(os.path.join(source_dir, item)) and item.startswith(file_prefix)])
@@ -34,7 +34,7 @@ def pull_results(source_dir=EXPORT_DIR, target_dir=PAPERDATA_DIR, timestamp=None
             # Move the file to the target directory with the modified name
             source_file_path = os.path.join(current_folder, old_filename)
             target_file_path = os.path.join(target_dir, new_filename)
-            shutil.move(source_file_path, target_file_path)
+            shutil.copy(source_file_path, target_file_path)
 
     print("Finished pulling files!")
 

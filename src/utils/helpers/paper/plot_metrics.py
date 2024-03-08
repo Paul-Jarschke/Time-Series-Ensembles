@@ -90,12 +90,12 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
         marker='D', linestyle='-', label=data_labels, color='black', linewidth=3)
     if n_weighted > 0:
         cmap = plt.get_cmap("RdPu")
-        cmap = truncate_colormap(cmap, n_weighted, 0.5, 0.8)
+        cmap = truncate_colormap(cmap, n_weighted, 0.3, 0.8)
         models_data[meta_model_names].copy().plot(
             marker='s', linestyle='-', label=data_labels, ax=plt.gca(), colormap=cmap, alpha=0.95)
     if n_meta > 0:
         cmap = plt.get_cmap("YlGn")
-        cmap = truncate_colormap(cmap, n_meta, 0.5, 0.8)
+        cmap = truncate_colormap(cmap, n_meta, 0.3, 0.8)
         models_data[weighted_model_names].copy().plot(
             marker='o', linestyle='-', label=data_labels, ax=plt.gca(), colormap=cmap, alpha=0.95)
 
