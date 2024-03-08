@@ -70,11 +70,13 @@ def csv_exporter(export_path,  *args, file_names=None):
     # Accessing variables from the calling scope
     parent_objects = inspect.currentframe().f_back.f_locals
 
-    # Check if the 'verbose' variable is defined in the calling scope
+    # Infer verbose from the calling scope. If this raises KeyError (not found), set it to False
+        # Check if the 'verbose' variable is defined in the calling scope
     try:
         verbose = parent_objects['verbose']
     except KeyError:
-        raise KeyError("'verbose' variable not found in the calling scope. Make sure it's defined.")
+        verbose = False
+        # raise KeyError("'verbose' variable not found in the calling scope. Make sure it's defined.")
 
     # Export each DataFrame to a CSV file
     if isinstance(export_path, (os.PathLike, str)):

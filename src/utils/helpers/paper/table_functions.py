@@ -13,3 +13,10 @@ def display_ranking_table(metrics_ranking):
 
     display(formatted_metrics.style)
     pd.reset_option('display.float_format')
+
+def latex_exporter(df, caption=None):
+    latex_output = df.style.to_latex(
+        hrules=True,
+        caption=caption
+    )
+    return latex_output
