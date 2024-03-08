@@ -32,7 +32,7 @@ meta:
       activation: identity
       solver: adam
       alpha: 0.001
-  RandomForest:
+  Random Forest:
     model: RandomForestRegressor
     package: sklearn
     options:

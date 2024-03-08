@@ -10,6 +10,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 PAPER_DIR = os.path.join(ROOT_DIR, "paper")
 ANALYSIS_DIR = os.path.join(PAPER_DIR, "analysis")
 PAPERDATA_DIR = os.path.join(PAPER_DIR, "current_data")
+PLOT_DIR = os.path.join(ANALYSIS_DIR, "plots")
 
 # Data directory and subdirectories
 DATA_DIR = os.path.join(ROOT_DIR, "data")
