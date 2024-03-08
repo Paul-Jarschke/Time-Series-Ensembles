@@ -1,0 +1,25 @@
+\begin{table}
+\caption{Ranking Forecasters and Ensemblers by Predictive Performance - Data Complexity: 1}
+\begin{tabular}{lrrrrrrr}
+\toprule
+ & Unnamed: 0 & RMSE & MAPE & sMAPE & RMSE Ranking & MAPE Ranking & sMAPE Ranking \\
+Model &  &  &  &  &  &  &  \\
+\midrule
+Weighted Ensemble: Inverse Error Covariance & 0 & 0.009057 & 0.006006 & 0.399980 & 1 & 1 & 1 \\
+Naive & 1 & 0.009195 & 0.006299 & 0.419720 & 2 & 2 & 2 \\
+Exponential Smoothing & 2 & 0.009207 & 0.006312 & 0.420562 & 3 & 3 & 3 \\
+Naive (drift) & 3 & 0.009358 & 0.006562 & 0.437355 & 4 & 4 & 4 \\
+Meta Ensemble: Linear Regression & 4 & 0.009773 & 0.006968 & 0.464072 & 5 & 5 & 5 \\
+Weighted Ensemble: Inverse RMSE & 5 & 0.009850 & 0.006978 & 0.465245 & 6 & 6 & 6 \\
+XGBoost & 6 & 0.010464 & 0.007015 & 0.468272 & 10 & 7 & 7 \\
+AutoSARIMA & 7 & 0.010122 & 0.007032 & 0.468696 & 8 & 8 & 8 \\
+Weighted Ensemble: Inverse Variance & 8 & 0.009898 & 0.007039 & 0.469364 & 7 & 9 & 9 \\
+Weighted Ensemble: Simple & 9 & 0.010126 & 0.007241 & 0.482869 & 9 & 10 & 10 \\
+Meta Ensemble: RandomForest & 10 & 0.010679 & 0.007707 & 0.513419 & 11 & 11 & 11 \\
+STL & 11 & 0.017578 & 0.012183 & 0.814139 & 12 & 12 & 12 \\
+Meta Ensemble: SVR & 12 & 0.018940 & 0.014044 & 0.935965 & 13 & 13 & 13 \\
+Meta Ensemble: Ridge & 13 & 0.019510 & 0.014523 & 0.970649 & 14 & 14 & 14 \\
+Meta Ensemble: MLP & 14 & 0.224505 & 0.172919 & 10.683078 & 15 & 15 & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
