@@ -253,7 +253,6 @@ class SimulatedSeries(pd.Series):
         self.seed = seed
         self.series = series
         self.months = super().index
-        self.month_strings = [str(month) for month in self.months]
         self.seasonal_order = seasonal_order
         self.order = order
 
@@ -263,7 +262,7 @@ class SimulatedSeries(pd.Series):
         self.n_exog = 0 if self.exog is None else self.exog.shape[1]
 
     # Plot method for visualizing the simulated series/overwrite pandas plotting method
-    def plot(self, title=None, export_name=None, *args, **kwargs):
+    def plot(self, title=None, export_name=None, custom_ax=None, *args, **kwargs):
         """
         Plot method for visualizing the simulated series.
 
@@ -271,22 +270,20 @@ class SimulatedSeries(pd.Series):
             export_name:
             title (str, optional): Plot title. Defaults to "Simulation".
             title (str, optional): When given, adding a custom superior title.
+            custom_ax (pyplot axis object, optional): An axis to plot to. Defaults to None.
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
 
         """
+
+        plotted_series = self.series
+        plotted_series = pd.Series(plotted_series, index=[str(month) for month in self.months])
+
         plot_title = "ARIMA"  # Initialize title
 
         seasonal_label = (
             f"${self.seasonal_order[:3]}_{{{self.seasonal_order[3]}}}$"
         )
-
-        # Generate the plot
-        plt.figure(figsize=(6, 5))
-        plt.gcf().set_size_inches(6, 5)
-
-        if title:
-            plt.suptitle(title, size=16, y=0.98)
 
         # Adjust plot title based on model components
         plot_title += f"{'X' if self.n_exog > 0 else ''}{self.order}"
@@ -305,18 +302,49 @@ class SimulatedSeries(pd.Series):
                         plot_title + f" with Covariate Influence"
                 )
 
-        plt.title(f"{plot_title}", size=14)
+        # Replace axis if specified
+        if custom_ax:
+            ax = custom_ax
+            if title in ['Exogenous 1', 'Exogenous 2', 'Exogenous 3']:
+                plot_title = None
+            else:
+                plot_title = title
+        else:
+            fig, ax = plt.subplots()
+            fig.set_size_inches(6, 5)
+            if title:
+                if "\n" in title:
+                    ax.get_figure().suptitle(title, size=16, y=1.025)
+                else:
+                    ax.get_figure().suptitle(title, size=16, y=0.98)
+
+        ax.set_title(plot_title, size=14)
+
+        plotted_series.plot(ax=ax, *args, **kwargs)
 
         freq = 12
         xticks_positions = np.arange(0, len(self.series), freq * 2)
-        plt.xticks(ticks=xticks_positions, rotation=45)
-        plt.xlabel("Time")
-        plt.ylabel("Value")
-        plt.plot(
-            self.month_strings, self.series, label="Simulated Data", *args, **kwargs
-        )
+        xticks_labels = self.months[xticks_positions]
+        ax.set_xticks(xticks_positions, xticks_labels, rotation=45)
+        # ax.set_xlabel("Time", fontsize=12)
+
+        if not ax:
+            ax.set_ylabel("Value", fontsize=14)
+        elif title in ["Exogenous 1", "Weak Seasonal ARIMA"]:
+            ax.set_ylabel("Value", fontsize=14)
+
+        if not ax:
+            ax.set_xlabel("Time", fontsize=14)
+        elif title in ["Strong Seasonal ARIMA\nwith Covariate Influence",  "Exogenous 2"]:
+            ax.set_xlabel("Time", fontsize=14)
+
+        # self.month_strings = [str(month) for month in self.months]
+
+
 
         if export_name:
             plt.savefig(export_name, dpi=300)
 
-        return plt.show()
+        # When no axis provided show and close plot.
+        if not ax:
+            return plt.show()
