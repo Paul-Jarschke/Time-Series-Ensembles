@@ -45,9 +45,8 @@ class SarimaxSimulation(sm.tsa.SARIMAX):
     def __init__(self, order, n_simulations=None, start=None, end=None, trend=False,
                  seasonal_order=None, trend_value=None, ar_coefs=None, ma_coefs=None, sar_coefs=None, sma_coefs=None,
                  shock_sigma2=None, bounded=False, lower_bound=None, upper_bound=None, exog=None, exog_coefs=None,
+                 trend_choice="c",
                  *args, **kwargs):
-
-
 
         # Input validation
         if not (n_simulations or (start and end)):
@@ -86,7 +85,7 @@ class SarimaxSimulation(sm.tsa.SARIMAX):
 
         # Determine trend choice
         if trend:
-            trend_choice = "c"
+            trend_choice = trend_choice
             if trend_value is None:
                 raise ValueError("You must provide trend value when trend is True.")
         else:
@@ -177,14 +176,14 @@ class SarimaxSimulation(sm.tsa.SARIMAX):
 
         """
         # Calculate seed value for reproducibility
-        seed = (
-                987
-                + seed
-                + int(np.sum(self.params))
-                + int(np.sum(self.seasonal_order))
-                + int(np.sum(self.order))
-                + int(self.trend_binary)
-        )
+        # seed = (
+        #         987
+        #         + seed
+        #         + int(np.sum(self.params))
+        #         + int(np.sum(self.seasonal_order))
+        #         + int(np.sum(self.order))
+        #         + int(self.trend_binary)
+        # )
         np.random.seed(seed)
         self.seed = seed
 
@@ -210,9 +209,6 @@ class SarimaxSimulation(sm.tsa.SARIMAX):
             series = ((series - min(series)) / (max(series) - min(series))) * (
                     b - a
             ) + a
-
-        # Create pandas Series object from simulated ndarray series with appropriate index
-
 
         # Add all attributes from parent class to series
 
@@ -260,55 +256,67 @@ class SimulatedSeries(pd.Series):
         self.month_strings = [str(month) for month in self.months]
         self.seasonal_order = seasonal_order
         self.order = order
-        self.seasonal_label = (
-            f"${self.seasonal_order[:3]}_{{{self.seasonal_order[3]}}}$"
-        )
 
-        self.plot_title = "ARIMA"
         self.exog = exog
         self.trend = trend
         # Determine the number of exogenous variables
         self.n_exog = 0 if self.exog is None else self.exog.shape[1]
 
     # Plot method for visualizing the simulated series/overwrite pandas plotting method
-    def plot(self, title="Simulation", *args, **kwargs):
+    def plot(self, title=None, export_name=None, *args, **kwargs):
         """
         Plot method for visualizing the simulated series.
 
         Args:
+            export_name:
             title (str, optional): Plot title. Defaults to "Simulation".
+            title (str, optional): When given, adding a custom superior title.
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
 
         """
+        plot_title = "ARIMA"  # Initialize title
 
-        # Adjust plot title based on model components
-        self.plot_title += f"{'X' if self.n_exog > 0 else ''}{self.order}"
-        if not all(x == 0 for x in self.seasonal_order[:3]):
-            self.plot_title = f"S{self.plot_title}{self.seasonal_label}"
-
-        if self.trend:
-            self.plot_title = self.plot_title + " with trend"
-            if self.n_exog > 0:
-                self.plot_title = (
-                        self.plot_title + f" and {self.n_exog} exogenous variables"
-                )
-        elif self.n_exog > 0:
-            self.plot_title = (
-                    self.plot_title + f" with {self.n_exog} exogenous variables"
-            )
+        seasonal_label = (
+            f"${self.seasonal_order[:3]}_{{{self.seasonal_order[3]}}}$"
+        )
 
         # Generate the plot
         plt.figure(figsize=(6, 5))
-        plt.suptitle(title, size=16, y=0.98)
-        plt.title(f"{self.plot_title}", size=14)
+        plt.gcf().set_size_inches(6, 5)
+
+        if title:
+            plt.suptitle(title, size=16, y=0.98)
+
+        # Adjust plot title based on model components
+        plot_title += f"{'X' if self.n_exog > 0 else ''}{self.order}"
+        if not all(x == 0 for x in self.seasonal_order[:3]):
+            plot_title = f"S{plot_title}{seasonal_label}"
+
+        if not title:
+            if self.trend:
+                plot_title = plot_title + " with Trend"
+                if self.n_exog > 0:
+                    plot_title = (
+                            plot_title + f" and Covariate Influence"
+                    )
+            elif self.n_exog > 0:
+                plot_title = (
+                        plot_title + f" with Covariate Influence"
+                )
+
+        plt.title(f"{plot_title}", size=14)
+
         freq = 12
         xticks_positions = np.arange(0, len(self.series), freq * 2)
         plt.xticks(ticks=xticks_positions, rotation=45)
         plt.xlabel("Time")
-        plt.ylabel("Price")
+        plt.ylabel("Value")
         plt.plot(
             self.month_strings, self.series, label="Simulated Data", *args, **kwargs
         )
-        plt.show()
-        self.plot_title = "ARIMA"  # Reset title
+
+        if export_name:
+            plt.savefig(export_name, dpi=300)
+
+        return plt.show()

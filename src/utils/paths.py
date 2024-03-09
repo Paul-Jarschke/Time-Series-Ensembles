@@ -15,7 +15,7 @@ TABLE_DIR = os.path.join(ANALYSIS_DIR, "tables")
 
 # Data directory and subdirectories
 DATA_DIR = os.path.join(ROOT_DIR, "data")
-SIMDATA_DIR = os.path.join(DATA_DIR, "simulation")
+SIMDATA_DIR = os.path.join(DATA_DIR, "simulated")
 TESTDATA_DIR = os.path.join(DATA_DIR, "test_data")
 
 # User directory and subdirectories
