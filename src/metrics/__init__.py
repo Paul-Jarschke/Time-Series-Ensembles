@@ -5,7 +5,17 @@ import sktime.performance_metrics.forecasting._functions  # Import custom metric
 import yaml
 
 from src.utils.helpers.FunctionFinder import FunctionFinder
-from src.utils.paths import INPUT_DIR, METRICS_DIR
+from src.utils.paths import *
+
+INPUT_DIR = None
+
+for dirpath, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+        if file.endswith("metrics.yml"):
+            INPUT_DIR = os.path.join(dirpath)
+
+if not INPUT_DIR:
+    raise RuntimeError(f"Could not find 'metrics.yml' file in current directory or subdirectories.")
 
 # Print statement indicating loading of metric functions
 print('Loading metrics...')
@@ -38,3 +48,5 @@ for metric_name, metric_function in METRICS.items():
 # Generic format:
 # Input arguments must be y_actual and y_predicted (in this order)
 # Output must be a single value
+
+print(f"\nSuccessfully loaded metrics: {', '.join(METRICS.keys())}")

@@ -63,46 +63,50 @@ def pipe1_data_preprocessing(
 
     # Transform positional indices of target, covariate, and exclude to labels and perform input validation
 
-    # Target
-    initial_column_names = df.columns
-    if isinstance(target, int):
-        target = initial_column_names[target]
-    elif not isinstance(target, str):
-        raise ValueError('Target must be provided as str or positional int.')
-
-    # Covariates
-    if isinstance(covariates, int):
-        covariates = initial_column_names[covariates]
-    elif isinstance(covariates, list):
-        covariates = [element if isinstance(element, str) else initial_column_names[element] for element in covariates]
-    elif not isinstance(covariates, str) and covariates is not None:
-        raise ValueError('If not None, covariates must be provided as str, positional int or list of str/int.')
-
-    # Excluded columns
-    if isinstance(exclude, int):
-        covariates = initial_column_names[exclude]
-    elif isinstance(exclude, list):
-        exclude = [element if isinstance(element, str) else initial_column_names[element] for element in exclude]
-    elif not isinstance(exclude, str) and exclude is not None:
-        raise ValueError('If not None, excluded columns must be provided as str, positional int or list of str/int.')
-
-    # Identify position and name of date column if not provided
-    # Transform positional index to column label
-    if isinstance(date_col, int):
-        date_col = df.columns[date_col]
-    # Identify position and name of date column if not provided and set as index
-    elif date_col == 'infer':
-        vprint('Searching time information...')
-        date_col = identify_date_column(df, date_format=date_format)
-        vprint(f'Dates found in \'{date_col}\' column!')
-    elif isinstance(date_col, str):
+    # When data is provided as Series, it is assumed that covariates are None and time is already in index
+    if isinstance(df, pd.Series):
         pass
     else:
-        raise ValueError('date_col must be either \'infer\' or of type str or positional int.')
+        # Target
+        initial_column_names = df.columns
+        if isinstance(target, int):
+            target = initial_column_names[target]
+        elif not isinstance(target, str):
+            raise ValueError('Target must be provided as str or positional int.')
 
-    # Set given/inferred date_col as the index column if it is not yet in the index
-    if date_col != 'index':
-        df.set_index(date_col, inplace=True)
+        # Covariates
+        if isinstance(covariates, int):
+            covariates = initial_column_names[covariates]
+        elif isinstance(covariates, list):
+            covariates = [element if isinstance(element, str) else initial_column_names[element] for element in covariates]
+        elif not isinstance(covariates, str) and covariates is not None:
+            raise ValueError('If not None, covariates must be provided as str, positional int or list of str/int.')
+
+        # Excluded columns
+        if isinstance(exclude, int):
+            covariates = initial_column_names[exclude]
+        elif isinstance(exclude, list):
+            exclude = [element if isinstance(element, str) else initial_column_names[element] for element in exclude]
+        elif not isinstance(exclude, str) and exclude is not None:
+            raise ValueError('If not None, excluded columns must be provided as str, positional int or list of str/int.')
+
+        # Identify position and name of date column if not provided
+        # Transform positional index to column label
+        if isinstance(date_col, int):
+            date_col = df.columns[date_col]
+        # Identify position and name of date column if not provided and set as index
+        elif date_col == 'infer':
+            vprint('Searching time information...')
+            date_col = identify_date_column(df, date_format=date_format)
+            vprint(f'Dates found in \'{date_col}\' column!')
+        elif isinstance(date_col, str):
+            pass
+        else:
+            raise ValueError('date_col must be either \'infer\' or of type str or positional int.')
+
+        # Set given/inferred date_col as the index column if it is not yet in the index
+        if date_col != 'index':
+            df = df.set_index(date_col)
 
     # Transform index to DateTime Index
     df.index = pd.to_datetime(arg=df.index, format=date_format)

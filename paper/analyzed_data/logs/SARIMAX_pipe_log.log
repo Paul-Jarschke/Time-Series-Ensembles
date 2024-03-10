@@ -1,0 +1,620 @@
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: SARIMAX
+Covariates: x1, x2, x3
+
+Data Insights:
+           SARIMAX          x1         x2          x3
+Date                                                 
+2004-01  63.359514  323.949027  40.000000  933.107000
+2004-02  62.756503  308.988281  49.263525  934.755444
+2004-03  58.479650  302.057244  46.104072  932.751264
+2004-04  56.888113  293.210459  47.277415  930.060213
+2004-05  56.145492  299.166454  44.259856  930.273192
+
+[Time elapsed: 55s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive        STL    XGBoost
+Date                                    
+2010-01  48.313254  49.831533  45.596222
+2010-02  49.046896  49.402094  45.476078
+2010-03  46.196081  45.191216  43.880276
+2010-04  47.743744  46.595300  46.005119
+2010-05  46.389321  49.016185  45.911194
+
+Insights into forecasters' future predictions:
+             Naive        STL    XGBoost
+Date                                    
+2024-01  78.144651  81.860428  76.515747
+
+[Time elapsed: 01m 50s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+2013-07                  74.293814                        74.319220
+2013-08                  71.079281                        71.143924
+2013-09                  71.568315                        71.557278
+2013-10                  66.154133                        66.462973
+2013-11                  66.607043                        66.935970
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+Date                                                               
+2024-01                  78.840275                        78.676461
+
+Merging...
+...finished!
+
+
+[Time elapsed: 01m 51s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                     MAPE      RMSE     sMAPE  MAPE Ranking  \
+Model                                                                         
+Naive                            0.028448  2.736189  1.893638             1   
+Weighted Ensemble: Inverse RMSE  0.030337  2.868220  2.024877             2   
+Weighted Ensemble: Simple        0.030960  2.923127  2.067260             3   
+XGBoost                          0.036741  3.554502  2.471411             4   
+STL                              0.044035  4.202281  2.928100             5   
+
+                                 RMSE Ranking  sMAPE Ranking  
+Model                                                         
+Naive                                       1              1  
+Weighted Ensemble: Inverse RMSE             2              2  
+Weighted Ensemble: Simple                   3              3  
+XGBoost                                     4              4  
+STL                                         5              5  
+
+The 'Naive' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    78.144651
+Freq: M, Name: Naive, dtype: float64
+
+[2024-03-10 08:31] Finished Pipeline  for SARIMAX!
+[Total time elapsed: 01m 51s]
+=================================================================================
+
+=================================================================================
+[2024-03-10 08:29] Starting  Pipeline  for StrongSARIMA...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: StrongSARIMA
+Covariates: None
+
+Data Insights:
+         StrongSARIMA
+Date                 
+2004-01     64.726819
+2004-02     65.665491
+2004-03     59.977914
+2004-04     58.470525
+2004-05     56.619631
+
+[Time elapsed: 01m 51s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive        STL    XGBoost
+Date                                    
+2010-01  53.238002  55.413315  51.004799
+2010-02  54.048640  58.804369  52.822178
+2010-03  54.967022  55.794707  54.910160
+2010-04  56.805565  54.515936  56.141392
+2010-05  56.141273  53.172350  56.550434
+
+Insights into forecasters' future predictions:
+             Naive        STL    XGBoost
+Date                                    
+2024-01  80.149937  83.320569  81.758759
+
+[Time elapsed: 02m 56s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+2013-07                  67.599541                        67.513150
+2013-08                  65.959446                        65.969446
+2013-09                  66.154195                        66.386764
+2013-10                  62.213692                        62.214238
+2013-11                  60.535259                        60.383773
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+Date                                                               
+2024-01                  81.743089                        81.443957
+
+Merging...
+...finished!
+
+
+[Time elapsed: 02m 57s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                     MAPE      RMSE     sMAPE  MAPE Ranking  \
+Model                                                                         
+Naive                            0.022841  2.014759  1.522180             1   
+Weighted Ensemble: Inverse RMSE  0.024011  2.212179  1.603206             2   
+Weighted Ensemble: Simple        0.024975  2.336430  1.667521             3   
+XGBoost                          0.026451  2.500118  1.771815             4   
+STL                              0.043690  3.856003  2.909221             5   
+
+                                 RMSE Ranking  sMAPE Ranking  
+Model                                                         
+Naive                                       1              1  
+Weighted Ensemble: Inverse RMSE             2              2  
+Weighted Ensemble: Simple                   3              3  
+XGBoost                                     4              4  
+STL                                         5              5  
+
+The 'Naive' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    80.149937
+Freq: M, Name: Naive, dtype: float64
+
+[2024-03-10 08:32] Finished Pipeline  for StrongSARIMA!
+[Total time elapsed: 02m 57s]
+=================================================================================
+
+=================================================================================
+[2024-03-10 08:29] Starting  Pipeline  for TrendSeasRW...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: TrendSeasRW
+Covariates: None
+
+Data Insights:
+         TrendSeasRW
+Date                
+2004-01    69.091832
+2004-02    68.281398
+2004-03    59.419663
+2004-04    60.921257
+2004-05    57.008218
+
+[Time elapsed: 02m 57s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive        STL    XGBoost
+Date                                    
+2010-01  55.335626  55.354353  52.346306
+2010-02  54.648712  60.088353  49.883060
+2010-03  55.429574  53.127261  53.310276
+2010-04  57.888055  51.757218  51.985195
+2010-05  53.278633  50.102725  52.860527
+
+Insights into forecasters' future predictions:
+            Naive        STL    XGBoost
+Date                                   
+2024-01  81.82247  83.627385  82.093315
+
+[Time elapsed: 04m 27s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+2013-07                  66.126336                        66.241870
+2013-08                  62.600376                        62.689007
+2013-09                  63.662362                        63.247588
+2013-10                  59.478524                        59.743657
+2013-11                  61.174106                        61.191512
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+Date                                                               
+2024-01                  82.514391                        82.481374
+
+Merging...
+...finished!
+
+
+[Time elapsed: 04m 28s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                     MAPE      RMSE     sMAPE  MAPE Ranking  \
+Model                                                                         
+Weighted Ensemble: Inverse RMSE  0.037806  3.321315  2.522171             1   
+Weighted Ensemble: Simple        0.037876  3.335940  2.527184             2   
+Naive                            0.040938  3.502125  2.724533             3   
+XGBoost                          0.044369  4.102619  2.976202             4   
+STL                              0.049250  4.413122  3.273544             5   
+
+                                 RMSE Ranking  sMAPE Ranking  
+Model                                                         
+Weighted Ensemble: Inverse RMSE             1              1  
+Weighted Ensemble: Simple                   2              2  
+Naive                                       3              3  
+XGBoost                                     4              4  
+STL                                         5              5  
+
+The 'Weighted Ensemble: Inverse RMSE' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    82.481374
+Freq: M, Name: Weighted Ensemble: Inverse RMSE, dtype: float64
+
+[2024-03-10 08:34] Finished Pipeline  for TrendSeasRW!
+[Total time elapsed: 04m 28s]
+=================================================================================
+
+=================================================================================
+[2024-03-10 08:29] Starting  Pipeline  for WeakSARIMA...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: WeakSARIMA
+Covariates: None
+
+Data Insights:
+         WeakSARIMA
+Date               
+2004-01   67.834583
+2004-02   67.990248
+2004-03   60.532925
+2004-04   60.827498
+2004-05   57.793300
+
+[Time elapsed: 04m 28s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive        STL    XGBoost
+Date                                    
+2010-01  54.125598  54.909797  53.260006
+2010-02  54.391598  59.503070  49.700474
+2010-03  55.414677  54.191112  53.145664
+2010-04  57.505825  52.546657  56.468643
+2010-05  54.400890  50.757380  49.862255
+
+Insights into forecasters' future predictions:
+           Naive        STL    XGBoost
+Date                                  
+2024-01  80.9192  83.754654  82.660751
+
+[Time elapsed: 05m 41s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+2013-07                  67.212819                        67.309768
+2013-08                  63.423486                        63.684959
+2013-09                  64.322448                        64.162340
+2013-10                  59.903556                        60.138527
+2013-11                  60.161225                        60.276926
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE
+Date                                                               
+2024-01                   82.44487                        82.304688
+
+Merging...
+...finished!
+
+
+[Time elapsed: 05m 42s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                     MAPE      RMSE     sMAPE  MAPE Ranking  \
+Model                                                                         
+Weighted Ensemble: Inverse RMSE  0.030578  2.735334  2.041507             1   
+Weighted Ensemble: Simple        0.030788  2.762546  2.055893             2   
+Naive                            0.032951  2.791199  2.194743             3   
+XGBoost                          0.034701  3.180757  2.328224             4   
+STL                              0.044823  3.999710  2.979882             5   
+
+                                 RMSE Ranking  sMAPE Ranking  
+Model                                                         
+Weighted Ensemble: Inverse RMSE             1              1  
+Weighted Ensemble: Simple                   2              2  
+Naive                                       3              3  
+XGBoost                                     4              4  
+STL                                         5              5  
+
+The 'Weighted Ensemble: Inverse RMSE' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    82.304688
+Freq: M, Name: Weighted Ensemble: Inverse RMSE, dtype: float64
+
+[2024-03-10 08:35] Finished Pipeline  for WeakSARIMA!
+[Total time elapsed: 05m 42s]
+=================================================================================
+

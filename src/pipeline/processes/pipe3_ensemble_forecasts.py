@@ -35,7 +35,7 @@ def pipe3_ensemble_forecasts(
     select_ensemblers : str or list, optional
         Specify which ensemblers to use (default: 'all').
     export_path : os.PathLike, optional
-        Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported (default: None).
+        Path to export_path the ensemble predictions as a CSV file. If not provided, no CSV file is exported (default: None).
     verbose : bool, optional
         If True, prints detailed information about the individual forecasting process and stores results in log file
         (default: False).
@@ -57,7 +57,7 @@ def pipe3_ensemble_forecasts(
     This function performs ensemble forecasting using the provided individual predictions and ensemble methods.
     It iterates over each ensemble approach and model within the ensemblers dictionary, generates historical 
     one-step-ahead predictions using the individual predictions as covariates. Finally, it merges them with the 
-    individual predictions. If export path is provided, it exports these predictions as CSV file.
+    individual predictions. If export_path path is provided, it exports these predictions as CSV file.
     """
 
     # Verbose print to indicate that the historical ensemble predictions start
@@ -94,7 +94,7 @@ def pipe3_ensemble_forecasts(
     if fh is None:
         pass
     else:
-        last_period = future_individual_predictions.index.to_timestamp()[-1]
+        last_period = future_individual_predictions.to_timestamp().index[-1]
         if fh == 1:
             vprint(f"Out-of-sample predictions are generated for next period: "
                    f"{(last_period + pd.DateOffset(n=-1))}")
@@ -240,7 +240,7 @@ def pipe3_ensemble_forecasts(
 
     vprint("...finished!\n")
 
-    # If path is specified, export results as .csv
+    # If path is specified, export_path results as .csv
     csv_exporter(export_path, full_historical_predictions, full_future_predictions,
                  file_names=["historical_predictions", "future_predictions"])
 

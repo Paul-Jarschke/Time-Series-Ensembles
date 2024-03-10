@@ -42,7 +42,7 @@ def pipe2_individual_forecasts(
             Refit interval for AutoSARIMA model (default: 0.33, corresponds to fitting at 0%, 33%, and 66% of ensemblers
             training set).
         export_path : os.PathLike, optional
-            Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported
+            Path to export_path the ensemble predictions as a CSV file. If not provided, no CSV file is exported
             (default: None).
         verbose : bool, optional
             If True, prints detailed information about the individual forecasting process and stores results in log file
@@ -64,7 +64,7 @@ def pipe2_individual_forecasts(
     ------
     This function performs forecasting using the provided individual forecasting models.
     It iterates over each approach and model in the models dictionary and generates historical one-step-ahead
-    predictions. Finally, if an export path is provided, it exports the ensemble predictions as a CSV file.
+    predictions. Finally, if an export_path path is provided, it exports the ensemble predictions as a CSV file.
     """
 
     # Verbose print to indicate that individual forecasters start historical forecasts
@@ -428,7 +428,7 @@ def pipe2_individual_forecasts(
                         # Select last known X as predictor if using a covariate model
                         X_pred_sarimax = (
                             X_train_transformed[
-                            current_trainsize: current_trainsize + 1
+                                current_trainsize: current_trainsize + 1
                             ]
                             if covtreatment_bool
                             else None
@@ -444,7 +444,17 @@ def pipe2_individual_forecasts(
                     # Perform predictions
                     vprint(f"Performing out-of-sample predictions...")
                     model.fit(fh=list(range(1, fh+1)), y=target_transformed, X=covariates_transformed)
-                    future_predictions_model = model.predict(X=X_train_transformed)
+                    # Note: do not take the transformed X for predictions; we require the "real" next observation
+                    if covtreatment_bool and fh > 1:
+                        raise ValueError("For now it is only supported to make one-step-ahead future predictions when "
+                                         "using covariate models using past observations (lags).")
+
+                    X_predict_sk = X_train_full
+                    if covtreatment_bool:
+                        X_predict_sk = X_predict_sk.copy() # Don't know if this is necessary
+                        X_predict_sk.index = X_train_full.index.shift(1)
+
+                    future_predictions_model = model.predict(X=X_predict_sk)
 
             # Now finished historical (and future) forecasts per model
             vprint("...finished!")

@@ -1,3 +1,5 @@
+import os
+
 import yaml
 
 from src.utils.helpers.model_finder import model_finder
@@ -6,6 +8,17 @@ from src.utils.paths import *
 stdout = sys.stdout
 
 print("Loading models...")
+
+INPUT_DIR = None
+
+for dirpath, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+        if file.endswith("ers.yml"):
+            INPUT_DIR = os.path.join(dirpath)
+
+if not INPUT_DIR:
+    raise RuntimeError(f"Could not find 'forecasters.yml' and 'ensemblers.yml' files in current directory or "
+                       f"subdirectories.")
 
 # Open forecasters' specification from yaml files
 with open(os.path.join(INPUT_DIR, "forecasters.yml"), 'r') as f:
@@ -64,7 +77,13 @@ for model_type, models_dict in MODELS.items():
 
         MODELS[model_type] = models_dict
 
+# Print information about loaded forecasters and ensemblers
+print("\nSuccessfully loaded forecasters:")
+print(f" - without covariates: {', '.join(MODELS['FORECASTERS']['without_covariates'].keys())}")
+print(f" - covariates: {', '.join(MODELS['FORECASTERS']['with_covariates'].keys())}")
 
-
+print("\nSuccessfully loaded ensemblers:")
+print(f" - weighted: {', '.join(MODELS['ENSEMBLERS']['weighted'].keys())}")
+print(f" - meta: {', '.join(MODELS['ENSEMBLERS']['meta'].keys())}")
 
 

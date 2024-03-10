@@ -13,8 +13,10 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
     Parameters:
     - PATH (str):                           The directory path where the CSV file is located.
     - file_name (str):                      The name of the CSV file.
-    - date_col (int, optional):             The index of the column to be used as the DataFrame index. Default is the first column.
-    - columns (list of int/str, optional):  Subset of columns to select, denoted either by column labels or indices stored in a list-like object.
+    - date_col (int, optional):             The index of the column to be used as the DataFrame index.
+                                            Default is the first column.
+    - columns (list of int/str, optional):  Subset of columns to select, denoted either by column labels or indices
+                                            stored in a list-like object.
 
     - *args:    Additional positional arguments to be passed to pandas.read_csv().
     - **kwargs: Additional keyword arguments to be passed to pandas.read_csv().
@@ -23,12 +25,11 @@ def csv_reader(PATH, file_name, date_col=0, columns='all', *args, **kwargs):
     - df (pandas DataFrame): The DataFrame containing the data from the CSV file.
     """
 
-    # Remove '.csv' from file_name if present
-    if file_name.endswith('.csv'):
-        file_name = file_name.replace('csv', '')
+    # Remove '.csv' from file_name if present (such that it does not matter whether you enter data with ending or not
+    file_name = file_name.replace('.csv', '')
 
     # Combine the directory path and file name
-    FILE = os.path.join(PATH, file_name + '.csv')
+    FILE = str(os.path.join(PATH, file_name + '.csv'))
 
     # Read data, set time index end select columns
     columns = None if columns == 'all' else columns
@@ -53,7 +54,7 @@ def csv_exporter(export_path,  *args, file_names=None):
             file_names (str or list of str, optional):  Export file name with '.csv' ending. If not defined,
                                                         infers it from object name.
 
-            *args: Variable-length argument list of DataFrames to export.
+            *args: Variable-length argument list of DataFrames to export_path.
 
         Notes:
             This function relies on the 'verbose' variable being accessible from the calling scope.
@@ -62,8 +63,8 @@ def csv_exporter(export_path,  *args, file_names=None):
             KeyError: If the 'verbose' variable is not found in the calling scope.
 
         Example:
-            csv_exporter("/path/to/export", df1, df2)
-            his will export df1 and df2 as CSV files called "df1.csv" and "df2.csv" to the "/path/to/export"
+            csv_exporter("/path/to/export_path", df1, df2)
+            his will export_path df1 and df2 as CSV files called "df1.csv" and "df2.csv" to the "/path/to/export_path"
             directory.
         """
     
@@ -82,7 +83,7 @@ def csv_exporter(export_path,  *args, file_names=None):
     if isinstance(export_path, (os.PathLike, str)):
         # Loop over dataframes
         for i, df in enumerate(args):
-            if isinstance(df, (pd.DataFrame, pd.Series)): # Don't export NoneTypes
+            if isinstance(df, (pd.DataFrame, pd.Series)): # Don't export_path NoneTypes
 
                 # Create file_name string from input
                 file_name = file_names
@@ -96,18 +97,18 @@ def csv_exporter(export_path,  *args, file_names=None):
                     for par_obj_name, par_obj in parent_objects.items():
                         if par_obj is df:
                             file_name = par_obj_name
-                            vprint(f"\nExporting {file_name} as csv to {export_path}...")
+                            print(f"\nExporting {file_name} as csv to {export_path}...")
 
                 # Export df with extracted string file_name
                 if isinstance(file_name, str):
                     df.to_csv(os.path.join(export_path, f"{file_name}.csv"), index=True)
                 # Export with specified file_name
                 else:
-                    raise ValueError('Can not export DataFrame. Please provide filename!')
+                    raise ValueError('Can not export_path DataFrame. Please provide filename!')
 
-        # Print export statements
+        # Print export_path statements
         if isinstance(file_names, str):
-            vprint(f"\nExporting {file_names} as csv to {export_path}...")
+            print(f"\nExporting {file_names} as csv to {export_path}...")
         elif isinstance(file_names, list):
-            vprint(f"\nExporting {' and '.join(file_names).replace('_', ' ')} as csv to {export_path}...")
-        vprint("...finished!")
+            print(f"\nExporting {' and '.join(file_names).replace('_', ' ')} as csv to {export_path}...")
+        print("...finished!")

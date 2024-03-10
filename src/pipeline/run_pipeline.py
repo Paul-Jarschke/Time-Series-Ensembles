@@ -2,6 +2,9 @@ import logging
 import sys
 import os
 from datetime import datetime
+
+import pandas as pd
+
 from src.utils.paths import *
 
 from src.pipeline.processes.pipe1_data_preprocessing import pipe1_data_preprocessing
@@ -22,15 +25,17 @@ def run_pipeline(df, models, metrics,
                  autosarimax_refit_interval=0.33,
                  select_ensemblers='all', ensemble_init_train=0.25,
                  sort_by='MAPE',
-                 export=True, errors='raise', verbose=False,
+                 export_path=None, errors='raise', verbose=False,
+                 paper=False,
                  *args, **kwargs):
     """
     Run pipeline of data preprocessing, individual, and ensemble forecasting, and subsequent model ranking.
 
     Parameters:
     -----------
-        df : pandas.DataFrame or pandas.Series:
-            Input DataFrame containing date, targets (and optionally covariates).
+        df : pandas.DataFrame, pandas.Series or dict:
+            Input DataFrame containing date, targets (and optionally covariates). Can also be a dictionary of
+            dataframes with DataFrame names in the keys and DataFrames/Series in the corresponding value.
         models : dict
             Dictionary containing the forecasters and ensemblers models (approach, names, class names, package name,
             and options). This can be imported from the 'models' module of the project.
@@ -77,8 +82,8 @@ def run_pipeline(df, models, metrics,
             results in a 25%/75% train-test split of the data).
         sort_by : str, optional
             Performance measure to sort by for model ranking (default: 'MAPE').
-        export : bool or os.PathLike, optional
-            If True but no path provided, exports to current working directory (default: True).
+        export_path : str or os.PathLike, optional
+            Exports results to provided path
         errors : str, optional
             How to handle errors (default: 'raise').
         verbose : bool, optional
@@ -95,48 +100,45 @@ def run_pipeline(df, models, metrics,
         - 'historical_individual_predictions': Individual forecasters' predictions.
         - 'full predictions': Full ensemble predictions.
         - 'metrics ranking': Rankings based on specified metrics.
+    If input is a dictionary, then the results will be a dictionary of dictionaries for each DataFrame in the input
+    dictionary.
     """
+
+    df = df.copy()
 
     # Save starting time
     start_pipe = datetime.now()
     start_pipe_formatted = start_pipe.strftime("%Y%m%d_%H%M")
 
+    # For paper pipline execution
+    if isinstance(df, (pd.Series, pd.DataFrame)):
+        # If df is imported by internal function csv_reader, export_path path can be inferred from file_name in attrs.
+        if 'file_name' in df.attrs:
+            file_name = df.attrs['file_name']
+        else:
+            file_name = "output"
+
+        # Outer loop requires DataFrames as dictionary to iterate over
+        df_dict = {file_name: df}
+    elif isinstance(df, dict):
+        # Is already a dict
+        df_dict = df
+
+    else:
+        raise ValueError("df input must be either a pandas DataFrame or Series or a list of these.")
+
+    # Set up output dict
+    output = {}
+
     # Correct confusing user inputs
     if fh == 0:
         fh = None
-
-    # Determine export path if exporting is enabled
-    if export is True:
-        if isinstance(export, os.PathLike):
-            export_path = export
-        else:
-            # If df is imported by internal function csv_reader, export path can be inferred from file_name in attrs.
-            if 'file_name' in df.attrs:
-                file_name = df.attrs['file_name'].replace('.csv', '')
-                export_path = os.path.join(OUTPUT_DIR, file_name, start_pipe_formatted)
-            else:
-                raise ValueError("Provide valid path for 'export' or set 'export = False'")
-
-        # Create non-existing export directory
-        if not os.path.exists(export_path):
-            os.makedirs(export_path)
-    else:
-        export_path = None
 
     # Set up logging if both exporting and verbosity are enabled
     # Outlook: Also store forecasters' hyperparameters in log
     # Set up logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-
-    # Set up log file logger
-    if export:
-        # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
-        log_file_name = os.path.join(export_path, 'pipe_log.log')
-        # Output file
-        fileHandler = logging.FileHandler(log_file_name)
-        fileHandler.setFormatter(logging.Formatter('%(message)s'))
-        logger.addHandler(fileHandler)
 
     # Set up console output/print logger
     if verbose:
@@ -160,60 +162,94 @@ def run_pipeline(df, models, metrics,
         'metrics ranking'
     ]
 
-    # Set up empty output dictionary
-    output_dict = {}
+    for df_name, df in df_dict.items():
 
-    # Print pipeline start time
-    vprint('================================================================================='
-           f'\n[{start_pipe.strftime("%Y-%m-%d %H:%M")}] Starting  Pipeline...')
+        print_info = f" for {df_name if df_name != 'output' else ''}"
 
-    # Feed pipeline with pandas DataFrame or Series
-    pipe_input = df
-
-    # Iterate over pipeline processes
-    for step, process in enumerate(processes):
-        # Execute each process
-        pipe_output = process(
-            # Provide required input (DataFrame or result from previous pipeline step)
-            pipe_input,
-            # Provide arguments for Pipe 1
-            start=start, end=end,
-            date_col=date_col, date_format=date_format,
-            target=target, covariates=covariates, exclude=exclude,
-            agg_method=agg_method, agg_freq=agg_freq,
-            # Provide arguments for Pipe 2
-            forecasters=models['FORECASTERS'], select_forecasters=select_forecasters,
-            forecast_init_train=forecast_init_train,
-            autosarimax_refit_interval=autosarimax_refit_interval,
-            # Provide arguments for Pipe 3
-            ensemblers=models['ENSEMBLERS'], select_ensemblers=select_ensemblers,
-            ensemble_init_train=ensemble_init_train,
-            # Provide arguments for Pipe 4
-            metrics=metrics,
-            sort_by=sort_by,
-            # Generic/shared arguments
-            fh=fh,
-            export_path=export_path,
-            errors=errors, verbose=verbose,
-            *args, **kwargs
-        )
-
-        # Store results to output dictionary
-        output_dict[expected_outputs[step]] = pipe_output
+        # Print pipeline start time
+        vprint('================================================================================='
+               f'\n[{start_pipe.strftime("%Y-%m-%d %H:%M")}] Starting  Pipeline{print_info}...')
         
-        # Previous output is next input
-        pipe_input = pipe_output
-        
-        # Print time elapsed since start
-        if step+1 != len(processes):
-            vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
+        # Set up empty output dictionary
+        output_dict = {}
 
-    # Reporting total time elapsed
-    end_pipe = datetime.now()
-    vprint(f'\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline!\n'
-           f'[Total time elapsed: {strfdelta(end_pipe - start_pipe)}]'
-           '\n================================================================================='
-           )
+        # Determine export_path path if exporting is enabled
+        if export_path:
+            if isinstance(export_path, (os.PathLike, str)):
+                curr_export_path = os.path.join(export_path, start_pipe_formatted, df_name)
+            else:
+                try:
+                    curr_export_path = os.path.join(PIPE_OUTPUT_DIR, start_pipe_formatted, df_name)
+                except:
+                    raise ValueError("Provide valid path for 'export_path'.")
+            # Create non-existing export_path directory
+            if not os.path.exists(curr_export_path):
+                os.makedirs(curr_export_path)
+
+            # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
+            log_file_name = os.path.join(curr_export_path, 'pipe.log')
+            # Output file
+            fileHandler = logging.FileHandler(log_file_name)
+            fileHandler.setFormatter(logging.Formatter('%(message)s'))
+            logger.addHandler(fileHandler)
+        else:
+            curr_export_path = None
+
+        # Feed pipeline with pandas DataFrame or Series
+        pipe_input = df.copy()
+
+        # Iterate over pipeline processes
+        for step, process in enumerate(processes):
+            # Execute each process
+            pipe_output = process(
+                # Provide required input (DataFrame or result from previous pipeline step)
+                pipe_input,
+                # Provide arguments for Pipe 1
+                start=start, end=end,
+                date_col=date_col, date_format=date_format,
+                target=target, covariates=covariates, exclude=exclude,
+                agg_method=agg_method, agg_freq=agg_freq,
+                # Provide arguments for Pipe 2
+                forecasters=models['FORECASTERS'], select_forecasters=select_forecasters,
+                forecast_init_train=forecast_init_train,
+                autosarimax_refit_interval=autosarimax_refit_interval,
+                # Provide arguments for Pipe 3
+                ensemblers=models['ENSEMBLERS'], select_ensemblers=select_ensemblers,
+                ensemble_init_train=ensemble_init_train,
+                # Provide arguments for Pipe 4
+                metrics=metrics,
+                sort_by=sort_by,
+                # Generic/shared arguments
+                fh=fh,
+                export_path=curr_export_path,
+                errors=errors, verbose=verbose,
+                *args, **kwargs
+            )
+
+            # Store results to output dictionary
+            output_dict[expected_outputs[step]] = pipe_output
+
+            # Previous output is next input
+            pipe_input = pipe_output
+
+            # Print time elapsed since start
+            if step+1 != len(processes):
+                vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
+
+        # Report logfile saving message
+        print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
+
+        # Reporting total time elapsed
+        end_pipe = datetime.now()
+        vprint(f'\n[{end_pipe.strftime("%Y-%m-%d %H:%M")}] Finished Pipeline{print_info}!\n'
+               f'[Total time elapsed: {strfdelta(end_pipe - start_pipe)}]'
+               '\n=================================================================================\n'
+               )
+
+        if len(df_dict) > 1:
+            output[df_name] = output_dict
+        else:
+            output = output_dict
 
     # Return results
-    return output_dict
+    return output

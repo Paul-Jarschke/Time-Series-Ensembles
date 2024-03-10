@@ -25,7 +25,7 @@ def pipe4_metrics_ranking(
         When provided, pipeline not only performs historical evaluation of forecasters and ensemblers but also
         provides out-of-sample future predictions along the whole provided forecast horizon.
     export_path : os.PathLike, optional
-        Path to export the ensemble predictions as a CSV file. If not provided, no CSV file is exported 
+        Path to export_path the ensemble predictions as a CSV file. If not provided, no CSV file is exported
         (default: None).
     sort_by : str, optional
         Performance measure to sort by for model ranking (default: 'MAPE').
@@ -115,7 +115,7 @@ def pipe4_metrics_ranking(
         vprint('Thus, it is recommended to work with the future predictions coming from this model:')
         vprint(full_future_predictions[best_model])
 
-    # If export path is specified, export results as .csv
+    # If export_path path is specified, export_path results as .csv
     csv_exporter(export_path, metrics_ranking)
 
     return metrics_ranking

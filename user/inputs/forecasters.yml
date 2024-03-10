@@ -1,3 +1,4 @@
+# Note: Mode names are not allowed to duplicate between approaches!
 without_covariates:
   #    Prophet:
   #      model: Prophet
@@ -8,7 +9,7 @@ without_covariates:
   #          name: seasonality
   #          period: 12
   #          fourier_order: 12
-  Naive:
+  Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
     model: NaiveForecaster
     package: sktime
     options:
@@ -48,19 +49,19 @@ without_covariates:
     options:
       lags: 10
 with_covariates:
-#    AutoSARIMAX:
-#      model: AutoARIMA
-#      package: sktime
-#      options:
-#        seasonal: True
-#        stationary: False
-#        d: 1
-#        trace: False
-#        update_pdq: False
-#        with_intercept: auto
-#        max_p: 6
-#        max_q: 6
-#        suppress_warnings: True
+  AutoSARIMAX: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
+    model: AutoARIMA
+    package: sktime
+    options:
+      seasonal: True
+      stationary: False
+      d: 1
+      trace: False
+      update_pdq: False
+      with_intercept: auto
+      max_p: 6
+      max_q: 6
+      suppress_warnings: True
 #  XGBoost:
 #    model: XGBModel
 #    package: darts

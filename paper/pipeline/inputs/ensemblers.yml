@@ -1,0 +1,29 @@
+# The pipeline accepts custom weighting schemes and regression metamodels from the sklearn library (by now)
+# I am not sure if models from other libraries work as well (not yet tested)
+# They should work, when they have a .fit(X_t, y_t) and a .predict(X_(t+1)) method
+# where X_t or X_(t+1) are the predictions from the individual models in period t or t+1
+# and y_t are the actual values in period t
+# See models here:
+# sklearn: https://scikit-learn.org/stable/user_guide.html
+weighted:
+  Simple: equal_weights # Note that this is the ensembler's name! If you want to select_ensemblers, use this!
+  Inverse RMSE: inv_rmse_weights
+  Inverse Variance: inv_variance_weights
+  Inverse Error Covariance: inv_error_cov_weights
+meta:
+  SVR: # Note that this is the ensembler's name! If you want to select_ensemblers, use this!
+    model: SVR
+    package: sklearn
+    options:
+      kernel: linear
+#  Ridge:
+#    model: Ridge
+#    package: sklearn
+#    options:
+#      alpha: 0.5
+  Random Forest:
+    model: RandomForestRegressor
+    package: sklearn
+    options:
+      n_estimators: 100
+      random_state: null

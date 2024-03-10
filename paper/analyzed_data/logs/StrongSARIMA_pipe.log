@@ -1,0 +1,847 @@
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: StrongSARIMA
+Covariates: None
+
+Data Insights:
+         StrongSARIMA
+Date                 
+2004-01     64.726819
+2004-02     65.665491
+2004-03     59.977914
+2004-04     58.470525
+2004-05     56.619631
+
+[Time elapsed: 06m 35s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (drift) (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 56th period.
+...forecast 1 / 168
+...forecast 42 / 168
+...forecast 84 / 168
+...forecast 126 / 168
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Exponential Smoothing (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2010-01  53.238002      53.076188   53.238002              53.238002   
+2010-02  54.048640      53.900332   54.048640              54.048640   
+2010-03  54.967022      54.833327   54.967022              54.967022   
+2010-04  56.805565      56.698521   56.805565              56.805564   
+2010-05  56.141273      56.026799   56.141273              56.141273   
+
+               STL    XGBoost  
+Date                           
+2010-01  55.413315  51.004799  
+2010-02  58.804369  52.822178  
+2010-03  55.794707  54.910160  
+2010-04  54.515936  56.141392  
+2010-05  53.172350  56.550434  
+
+Insights into forecasters' future predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2024-01  80.149937      80.214469   81.026198              80.149937   
+
+               STL    XGBoost  
+Date                           
+2024-01  83.320569  81.758759  
+
+[Time elapsed: 10m 09s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Random Forest (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2013-07                  67.325245                        67.261572   
+2013-08                  66.156779                        66.178905   
+2013-09                  66.518402                        66.656920   
+2013-10                  62.309062                        62.317493   
+2013-11                  60.134969                        60.032393   
+
+         Weighted Ensemble: Inverse Variance  \
+2013-07                            67.261279   
+2013-08                            66.173912   
+2013-09                            66.669890   
+2013-10                            62.309454   
+2013-11                            60.002225   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2013-07                                    20.779630           66.954960   
+2013-08                                    71.558856           65.930989   
+2013-09                                    39.378377           67.139939   
+2013-10                                    41.568308           62.768884   
+2013-11                                    18.690017           60.635135   
+
+         Meta Ensemble: Random Forest  
+2013-07                     69.206817  
+2013-08                     66.355430  
+2013-09                     65.725666  
+2013-10                     63.393610  
+2013-11                     61.576396  
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+Date                                                                  
+2024-01                  81.103312                        80.896268   
+
+         Weighted Ensemble: Inverse Variance  \
+Date                                           
+2024-01                             81.05617   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+Date                                                                       
+2024-01                                   126.928448            80.63258   
+
+         Meta Ensemble: Random Forest  
+Date                                   
+2024-01                     80.384682  
+
+Merging...
+...finished!
+
+
+[Time elapsed: 10m 35s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                                 MAPE        RMSE      sMAPE  \
+Model                                                                          
+AutoSARIMA                                   0.022377    1.989715   1.490504   
+Weighted Ensemble: Inverse RMSE              0.022488    2.026515   1.499780   
+Weighted Ensemble: Inverse Variance          0.022584    2.044171   1.506408   
+Weighted Ensemble: Simple                    0.022794    2.071574   1.520430   
+Naive                                        0.022841    2.014759   1.522180   
+Exponential Smoothing                        0.022841    2.014759   1.522180   
+Naive (drift)                                0.022867    2.018742   1.523473   
+Meta Ensemble: SVR                           0.023589    2.161485   1.576335   
+Meta Ensemble: Random Forest                 0.025617    2.366965   1.709780   
+XGBoost                                      0.026451    2.500118   1.771815   
+STL                                          0.043690    3.856003   2.909221   
+Weighted Ensemble: Inverse Error Covariance  0.885113  238.792939  33.261099   
+
+                                             MAPE Ranking  RMSE Ranking  \
+Model                                                                     
+AutoSARIMA                                              1             1   
+Weighted Ensemble: Inverse RMSE                         2             5   
+Weighted Ensemble: Inverse Variance                     3             6   
+Weighted Ensemble: Simple                               4             7   
+Naive                                                   5             2   
+Exponential Smoothing                                   6             3   
+Naive (drift)                                           7             4   
+Meta Ensemble: SVR                                      8             8   
+Meta Ensemble: Random Forest                            9             9   
+XGBoost                                                10            10   
+STL                                                    11            11   
+Weighted Ensemble: Inverse Error Covariance            12            12   
+
+                                             sMAPE Ranking  
+Model                                                       
+AutoSARIMA                                               1  
+Weighted Ensemble: Inverse RMSE                          2  
+Weighted Ensemble: Inverse Variance                      3  
+Weighted Ensemble: Simple                                4  
+Naive                                                    5  
+Exponential Smoothing                                    6  
+Naive (drift)                                            7  
+Meta Ensemble: SVR                                       8  
+Meta Ensemble: Random Forest                             9  
+XGBoost                                                 10  
+STL                                                     11  
+Weighted Ensemble: Inverse Error Covariance             12  
+
+The 'AutoSARIMA' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    81.026198
+Freq: M, Name: AutoSARIMA, dtype: float64
+
+[2024-03-10 11:38] Finished Pipeline for StrongSARIMA!
+[Total time elapsed: 10m 35s]
+=================================================================================
+
+=================================================================================
+[2024-03-10 11:27] Starting  Pipeline for TrendSeasRW...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: TrendSeasRW
+Covariates: None
+
+Data Insights:
+         TrendSeasRW
+Date                
+2004-01    69.091832
+2004-02    68.281398
+2004-03    59.419663
+2004-04    60.921257
+2004-05    57.008218
+
+[Time elapsed: 10m 35s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (drift) (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 56th period.
+...forecast 1 / 168
+...forecast 42 / 168
+...forecast 84 / 168
+...forecast 126 / 168
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Exponential Smoothing (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2010-01  55.335626      55.141877   53.638535              53.194358   
+2010-02  54.648712      54.448113   55.275822              54.187250   
+2010-03  55.429574      55.242420   54.193576              55.024839   
+2010-04  57.888055      57.736652   56.457815              56.967968   
+2010-05  53.278633      53.067791   53.738130              54.507219   
+
+               STL    XGBoost  
+Date                           
+2010-01  55.354353  52.346306  
+2010-02  60.088353  49.883060  
+2010-03  53.127261  53.310276  
+2010-04  51.757218  51.985195  
+2010-05  50.102725  52.860527  
+
+Insights into forecasters' future predictions:
+            Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                  
+2024-01  81.82247      81.875736   81.111836              80.284592   
+
+               STL    XGBoost  
+Date                           
+2024-01  83.627385  82.093315  
+
+[Time elapsed: 14m 03s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Random Forest (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2013-07                  66.794737                        66.863144   
+2013-08                  63.336975                        63.403950   
+2013-09                  64.873680                        64.687233   
+2013-10                  59.706053                        59.877070   
+2013-11                  59.719469                        59.710121   
+
+         Weighted Ensemble: Inverse Variance  \
+2013-07                            66.885367   
+2013-08                            63.426363   
+2013-09                            65.217036   
+2013-10                            59.651541   
+2013-11                            59.465230   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2013-07                                    66.784517           66.554432   
+2013-08                                    64.092493           63.908415   
+2013-09                                    61.283861           62.239977   
+2013-10                                    63.472310           64.730525   
+2013-11                                    64.075519           63.075359   
+
+         Meta Ensemble: Random Forest  
+2013-07                     68.704904  
+2013-08                     61.495564  
+2013-09                     61.495952  
+2013-10                     60.793542  
+2013-11                     63.530319  
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+Date                                                                  
+2024-01                  81.802556                        81.735145   
+
+         Weighted Ensemble: Inverse Variance  \
+Date                                           
+2024-01                            81.742067   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+Date                                                                       
+2024-01                                    81.748173           81.522792   
+
+         Meta Ensemble: Random Forest  
+Date                                   
+2024-01                     81.065258  
+
+Merging...
+...finished!
+
+
+[Time elapsed: 14m 32s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                                 MAPE      RMSE     sMAPE  \
+Model                                                                       
+Weighted Ensemble: Inverse RMSE              0.036957  3.214268  2.461733   
+Weighted Ensemble: Simple                    0.036960  3.218006  2.462334   
+Weighted Ensemble: Inverse Variance          0.036984  3.218687  2.463735   
+AutoSARIMA                                   0.038023  3.294485  2.528518   
+Weighted Ensemble: Inverse Error Covariance  0.038560  3.362233  2.563526   
+Exponential Smoothing                        0.039453  3.385891  2.624681   
+Meta Ensemble: SVR                           0.040147  3.595129  2.684202   
+Naive                                        0.040938  3.502125  2.724533   
+Naive (drift)                                0.041083  3.511998  2.734293   
+Meta Ensemble: Random Forest                 0.041794  3.741049  2.792476   
+XGBoost                                      0.044369  4.102619  2.976202   
+STL                                          0.049250  4.413122  3.273544   
+
+                                             MAPE Ranking  RMSE Ranking  \
+Model                                                                     
+Weighted Ensemble: Inverse RMSE                         1             1   
+Weighted Ensemble: Simple                               2             2   
+Weighted Ensemble: Inverse Variance                     3             3   
+AutoSARIMA                                              4             4   
+Weighted Ensemble: Inverse Error Covariance             5             5   
+Exponential Smoothing                                   6             6   
+Meta Ensemble: SVR                                      7             9   
+Naive                                                   8             7   
+Naive (drift)                                           9             8   
+Meta Ensemble: Random Forest                           10            10   
+XGBoost                                                11            11   
+STL                                                    12            12   
+
+                                             sMAPE Ranking  
+Model                                                       
+Weighted Ensemble: Inverse RMSE                          1  
+Weighted Ensemble: Simple                                2  
+Weighted Ensemble: Inverse Variance                      3  
+AutoSARIMA                                               4  
+Weighted Ensemble: Inverse Error Covariance              5  
+Exponential Smoothing                                    6  
+Meta Ensemble: SVR                                       7  
+Naive                                                    8  
+Naive (drift)                                            9  
+Meta Ensemble: Random Forest                            10  
+XGBoost                                                 11  
+STL                                                     12  
+
+The 'Weighted Ensemble: Inverse RMSE' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    81.735145
+Freq: M, Name: Weighted Ensemble: Inverse RMSE, dtype: float64
+
+[2024-03-10 11:41] Finished Pipeline for TrendSeasRW!
+[Total time elapsed: 14m 32s]
+=================================================================================
+
+=================================================================================
+[2024-03-10 11:27] Starting  Pipeline for WeakSARIMA...
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: month start
+Data goes from 2004-01 to 2023-12, resulting in 240 observations.
+
+Selecting target and covariates...
+Target: WeakSARIMA
+Covariates: None
+
+Data Insights:
+         WeakSARIMA
+Date               
+2004-01   67.834583
+2004-02   67.990248
+2004-03   60.532925
+2004-04   60.827498
+2004-05   57.793300
+
+[Time elapsed: 14m 32s]
+
+
+=====================================================
+== Pipeline Step 2: Individual Models' Predictions ==
+=====================================================
+
+Splitting data for training of forecasters (train/test ratio: 30/70)...
+Initial training set has 72 observations and goes from 2004-01 to 2009-12.
+
+In an historical expanding window approach, there are 168 periods to be forecasted by the individual models: 2010-01 to 2023-12
+Out-of-sample predictions are generated for next period: 2024-01
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Naive (drift) (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: AutoSARIMA (sktime)
+Auto-fitting model. Refitting every 56th period.
+...forecast 1 / 168
+...forecast 42 / 168
+...forecast 84 / 168
+...forecast 126 / 168
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: Exponential Smoothing (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: STL (sktime)
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 168 one-step ahead historical expanding window predictions from model: XGBoost (darts)
+Now performing corresponding out-of-sample predictions...
+...finished!
+
+Skipping covariate forecasters since no covariates are given.
+
+Finished predictions of individual forecasters!
+
+Insights into forecasters' historical predictions:
+             Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing  \
+Date                                                                   
+2010-01  54.125598      53.932514   53.419395              53.144189   
+2010-02  54.391598      54.204890   55.400318              54.186541   
+2010-03  55.414677      55.244541   54.473555              55.208567   
+2010-04  57.505825      57.366247   56.715515              57.130932   
+2010-05  54.400890      54.221774   54.307201              54.870874   
+
+               STL    XGBoost  
+Date                           
+2010-01  54.909797  53.260006  
+2010-02  59.503070  49.700474  
+2010-03  54.191112  53.145664  
+2010-04  52.546657  56.468643  
+2010-05  50.757380  49.862255  
+
+Insights into forecasters' future predictions:
+           Naive  Naive (drift)  AutoSARIMA  Exponential Smoothing        STL  \
+Date                                                                            
+2024-01  80.9192      80.973948      81.193              80.447976  83.754654   
+
+           XGBoost  
+Date                
+2024-01  82.660751  
+
+[Time elapsed: 18m 47s]
+
+
+===================================================
+== Pipeline Step 3: Ensemble Models' Predictions ==
+===================================================
+
+Splitting individual forecast data (n = 168) for training of ensemblers (train/test ratio: 25/75)...
+Initial training set has 42 observations and goes from 2010-01 to 2013-06
+
+In an historical expanding window approach, there are 126 periods to be forecasted by the ensemble models: 2013-07 to 2023-12
+Out-of-sample predictions are generated for next period: 2023-12-31 00:00:00
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Simple'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse RMSE'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Variance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Weighted - Inverse Error Covariance'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - SVR (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Now generating 126 one-step ahead historical expanding window predictions from ensemble model: 'Meta - Random Forest (sklearn)'
+...Forecast 1 / 126
+...Forecast 32 / 126
+...Forecast 63 / 126
+...Forecast 95 / 126
+...finished!
+Performing out-of-sample predictions...
+...finished!
+
+Finished predictions of ensemble forecasters!
+
+Insights into ensemblers' historical predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+2013-07                  67.427715                        67.483178   
+2013-08                  64.236304                        64.404621   
+2013-09                  65.396939                        65.376401   
+2013-10                  60.345122                        60.493217   
+2013-11                  59.294252                        59.307259   
+
+         Weighted Ensemble: Inverse Variance  \
+2013-07                            67.454341   
+2013-08                            64.337087   
+2013-09                            65.689422   
+2013-10                            60.337495   
+2013-11                            59.088977   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+2013-07                                    67.768302           67.174073   
+2013-08                                    65.363727           65.051277   
+2013-09                                    63.234037           63.299245   
+2013-10                                    63.262352           64.673124   
+2013-11                                    62.138762           61.305368   
+
+         Meta Ensemble: Random Forest  
+2013-07                     67.824745  
+2013-08                     64.299624  
+2013-09                     60.831694  
+2013-10                     63.226878  
+2013-11                     58.734106  
+
+Insights into ensemblers' future predictions:
+         Weighted Ensemble: Simple  Weighted Ensemble: Inverse RMSE  \
+Date                                                                  
+2024-01                  81.658256                        81.532194   
+
+         Weighted Ensemble: Inverse Variance  \
+Date                                           
+2024-01                            81.602971   
+
+         Weighted Ensemble: Inverse Error Covariance  Meta Ensemble: SVR  \
+Date                                                                       
+2024-01                                    81.546511           81.398278   
+
+         Meta Ensemble: Random Forest  
+Date                                   
+2024-01                     82.543451  
+
+Merging...
+...finished!
+
+
+[Time elapsed: 19m 13s]
+
+
+==============================================================
+== Pipeline Step 4: Ranking Models' Predictive Performance ==
+==============================================================
+
+Calculating MAPE, RMSE, sMAPE per model...
+Ranking models ...
+...finished!
+
+Results:
+                                                 MAPE      RMSE     sMAPE  \
+Model                                                                       
+Weighted Ensemble: Simple                    0.030278  2.644191  2.018751   
+Weighted Ensemble: Inverse RMSE              0.030288  2.640407  2.018978   
+Weighted Ensemble: Inverse Variance          0.030291  2.639048  2.019391   
+Weighted Ensemble: Inverse Error Covariance  0.030836  2.761528  2.054576   
+AutoSARIMA                                   0.031148  2.710313  2.073020   
+Exponential Smoothing                        0.032660  2.781677  2.174801   
+Meta Ensemble: SVR                           0.032751  2.972857  2.190514   
+Naive                                        0.032951  2.791199  2.194743   
+Naive (drift)                                0.033013  2.798546  2.198737   
+XGBoost                                      0.034701  3.180757  2.328224   
+Meta Ensemble: Random Forest                 0.035416  3.191925  2.368959   
+STL                                          0.044823  3.999710  2.979882   
+
+                                             MAPE Ranking  RMSE Ranking  \
+Model                                                                     
+Weighted Ensemble: Simple                               1             3   
+Weighted Ensemble: Inverse RMSE                         2             2   
+Weighted Ensemble: Inverse Variance                     3             1   
+Weighted Ensemble: Inverse Error Covariance             4             5   
+AutoSARIMA                                              5             4   
+Exponential Smoothing                                   6             6   
+Meta Ensemble: SVR                                      7             9   
+Naive                                                   8             7   
+Naive (drift)                                           9             8   
+XGBoost                                                10            10   
+Meta Ensemble: Random Forest                           11            11   
+STL                                                    12            12   
+
+                                             sMAPE Ranking  
+Model                                                       
+Weighted Ensemble: Simple                                1  
+Weighted Ensemble: Inverse RMSE                          2  
+Weighted Ensemble: Inverse Variance                      3  
+Weighted Ensemble: Inverse Error Covariance              4  
+AutoSARIMA                                               5  
+Exponential Smoothing                                    6  
+Meta Ensemble: SVR                                       7  
+Naive                                                    8  
+Naive (drift)                                            9  
+XGBoost                                                 10  
+Meta Ensemble: Random Forest                            11  
+STL                                                     12  
+
+The 'Weighted Ensemble: Simple' is identified as the best model based on the MAPE value of its the historical predictions.
+Thus, it is recommended to work with the future predictions coming from this model:
+Date
+2024-01    81.658256
+Freq: M, Name: Weighted Ensemble: Simple, dtype: float64
+
+[2024-03-10 11:46] Finished Pipeline for WeakSARIMA!
+[Total time elapsed: 19m 13s]
+=================================================================================
+
