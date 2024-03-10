@@ -237,7 +237,8 @@ def run_pipeline(df, models, metrics,
                 vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
 
         # Report logfile saving message
-        print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
+        if export_path:
+            print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
 
         # Reporting total time elapsed
         end_pipe = datetime.now()

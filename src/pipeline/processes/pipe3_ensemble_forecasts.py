@@ -89,7 +89,6 @@ def pipe3_ensemble_forecasts(
            f'{historical_individual_predictions.index[ens_init_trainsize]} to'
            f' {historical_individual_predictions.index[-1]}')
 
-
     # If out-of-sample prediction is desired, verbose print information about periods to be forecasted
     if fh is None:
         pass

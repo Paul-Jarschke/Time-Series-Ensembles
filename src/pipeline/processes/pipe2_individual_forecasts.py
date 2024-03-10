@@ -233,7 +233,7 @@ def pipe2_individual_forecasts(
                 y_train_transformed, X_train_transformed = transformer(
                     y_train_full, X_train_full
                 )
-                # Transform for future predictions
+                # Transform for future predictions (full set)
                 if fh is not None:
                     target_transformed, covariates_transformed = transformer(
                         target, covariates
@@ -290,14 +290,23 @@ def pipe2_individual_forecasts(
                 # out-of-sample predictions:
                 if fh is not None:
                     vprint(f"Now performing corresponding out-of-sample predictions...")
-                    model.fit(series=target_transformed, past_covariates=covariates_transformed)
-                    future_predictions_model = model.predict(
-                        n=fh,
-                        series=target_transformed,
-                        past_covariates=covariates_transformed,  # Provide covariates
-                        verbose=verbose,
-                        show_warnings=False,
-                    ).pd_dataframe()
+                    if covtreatment_bool:
+                        model.fit(series=target_transformed, past_covariates=covariates_transformed)
+                        future_predictions_model = model.predict(
+                            n=fh,
+                            #series=target_transformed,
+                            past_covariates=covariates_transformed,  # Provide covariates
+                            #verbose=verbose,
+                            show_warnings=False,
+                        ).pd_dataframe()
+                    else:
+                        model.fit(series=target_transformed)
+                        future_predictions_model = model.predict(
+                            n=fh,
+                            #series=target_transformed,
+                            #verbose=verbose,
+                            show_warnings=False,
+                        ).pd_dataframe()
 
                     future_predictions_model.set_index(
                     pd.PeriodIndex(

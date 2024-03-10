@@ -1,14 +1,10 @@
 # Note: Mode names are not allowed to duplicate between approaches!
 without_covariates:
-  #    Prophet:
-  #      model: Prophet
-  #      package: sktime
-  #      options:
-  #        freq: M
-  #        add_seasonality:
-  #          name: seasonality
-  #          period: 12
-  #          fourier_order: 12
+#  skProphet:
+#    model: Prophet
+#    package: sktime
+#    options:
+#      freq: M
   Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
     model: NaiveForecaster
     package: sktime
@@ -35,7 +31,9 @@ without_covariates:
   Exponential Smoothing:
     model: ExponentialSmoothing
     package: sktime
-    options: { }
+    options:
+      trend: add
+      seasonal: add
   #    Theta:
   #      model: ThetaForecaster
   #      options: {}
@@ -48,6 +46,14 @@ without_covariates:
     package: darts
     options:
       lags: 10
+#  dartsProphet:
+#    model: Prophet
+#    package: darts
+#    options:
+#      add_seasonalities:
+#        name: yearly_seasonality
+#        seasonal_periods: 12
+#        fourier_order: 10
 with_covariates:
   AutoSARIMAX: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
     model: AutoARIMA

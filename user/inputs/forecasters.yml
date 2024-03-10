@@ -35,7 +35,9 @@ without_covariates:
   Exponential Smoothing:
     model: ExponentialSmoothing
     package: sktime
-    options: { }
+    options:
+      trend: add
+      seasonal: add
   #    Theta:
   #      model: ThetaForecaster
   #      options: {}
