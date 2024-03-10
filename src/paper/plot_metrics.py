@@ -45,6 +45,10 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
     current_data_paths = os.listdir(data_dir)
     relevant_files = [file for file in current_data_paths if file.endswith('_metrics_ranking.csv')]
 
+    # Sort files:
+    if sort_labels:
+        relevant_files = [file + "_metrics_ranking.csv" for file in sort_labels]
+
     for file in relevant_files:
         # Read in file as dataframe
         df = pd.read_csv(os.path.join(data_dir, file), index_col='Model')
@@ -101,8 +105,10 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
     # else:
     #     # Default to 1, 2, 3
     #     models_data.index = [f'{i + 1}' for i in range(len(models_data.index))]
-    if sort_labels:
-        models_data = models_data.loc[sort_labels]
+
+    # Redundant:
+    # if sort_labels:
+    #     models_data = models_data.loc[sort_labels]
 
     # Sort data such that first comes naive, then weighted, then meta
     model_names = models_data.columns
@@ -157,7 +163,7 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
         label = sort_labels[i]
         if i == len(best_model_names) - 1:
             note += f" and {model_name} ({label})."
-        elif i == 1:
+        elif i == 2: # new line
             note += f" {model_name} ({label}),\n"
         else:
             note += f" {model_name} ({label}),"
