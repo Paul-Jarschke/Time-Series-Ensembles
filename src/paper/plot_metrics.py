@@ -8,7 +8,7 @@ import os
 from src.utils.paths import *
 
 
-def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels=None, export=True):
+def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels=None, export=True):
     """
     Plot comparison of a specified metric across different datasets for various models.
 
@@ -16,7 +16,7 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
         metric (str):                           The metric to be plotted.
         data_dir (str, os.PathLike):            The directory where currently analyzed files are stored.
         remove_models (list, optional):         Models to be removed from plot.
-        data_labels (list, optional):           Provide custom data labels for the x-axis.
+        sort_labels (list, optional):           Provide the order for the labels on the x-axis.
         export (bool, optional):                Export plots to given PLOT_DIR.
 
     Raises:
@@ -48,6 +48,7 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
     for file in relevant_files:
         # Read in file as dataframe
         df = pd.read_csv(os.path.join(data_dir, file), index_col='Model')
+        current_label = file.replace("_metrics_ranking.csv", "")
 
         # Throw error if metric is not in input data and thus not supported
         if metric not in df.columns:
@@ -78,7 +79,11 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
         # Add Best Forecaster column to filtered df
         filtered_df.loc["Best Forecaster"] = df_best_forecaster_value
 
-        models_data = pd.concat([models_data, filtered_df.T], axis=0)
+        # Transpose and change index to filename
+        filtered_df = filtered_df.T
+        filtered_df.index = [current_label]
+
+        models_data = pd.concat([models_data, filtered_df], axis=0)
 
         print("Dataset:", file,
               "\nBest Model:", df_best_forecaster_name,
@@ -87,15 +92,17 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
               )
 
     # Customize the x-axis tick marks based on whether custom data labels are provided
-    if data_labels:
-        # Use custom data labels
-        try:
-            models_data.index = data_labels
-        except:
-            raise ValueError('Length of provided data labels does not match number of given datasets.')
-    else:
-        # Default to 1, 2, 3
-        models_data.index = [f'{i + 1}' for i in range(len(models_data.index))]
+    # if data_labels:
+    #     # Use custom data labels
+    #     try:
+    #         models_data.index = data_labels
+    #     except:
+    #         raise ValueError('Length of provided data labels does not match number of given datasets.')
+    # else:
+    #     # Default to 1, 2, 3
+    #     models_data.index = [f'{i + 1}' for i in range(len(models_data.index))]
+    if sort_labels:
+        models_data = models_data.loc[sort_labels]
 
     # Sort data such that first comes naive, then weighted, then meta
     model_names = models_data.columns
@@ -145,9 +152,9 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, data_labels
     plt.title(f'Model Performance vs. Data Complexity', fontsize=18)
 
     # Add footnote for best individual forecasters
-    note = "Note: Best individual forecasters are"
+    note = "Best individual forecasters:"
     for i, model_name in enumerate(best_model_names):
-        label = data_labels[i]
+        label = sort_labels[i]
         if i == len(best_model_names) - 1:
             note += f" and {model_name} ({label})."
         elif i == 1:
