@@ -9,17 +9,17 @@ Inferred frequency: month start
 Data goes from 2004-01 to 2023-12, resulting in 240 observations.
 
 Selecting target and covariates...
-Target: SARIMAX
-Covariates: x1, x2, x3
+Target: StrongSARIMA
+Covariates: None
 
 Data Insights:
-           SARIMAX          x1         x2          x3
-Date                                                 
-2004-01  63.359514  323.949027  40.000000  933.107000
-2004-02  62.756503  308.988281  49.263525  934.755444
-2004-03  58.479650  302.057244  46.104072  932.751264
-2004-04  56.888113  293.210459  47.277415  930.060213
-2004-05  56.145492  299.166454  44.259856  930.273192
+         StrongSARIMA
+Date                 
+2004-01     64.726819
+2004-02     65.665491
+2004-03     59.977914
+2004-04     58.470525
+2004-05     56.619631
 
 [Time elapsed: 00s]
 
@@ -38,6 +38,12 @@ Now generating 168 one-step ahead historical expanding window predictions from m
 Performing out-of-sample predictions...
 ...finished!
 
-Now generating 168 one-step ahead historical expanding window predictions from model: AutoSARIMAX with covariates (sktime)
-Auto-fitting model. Refitting every 56th period.
-...forecast 1 / 168
+Now generating 168 one-step ahead historical expanding window predictions from model: LSTM (darts)
+Train dataset contains 48 samples.
+Time series values are 64-bits; casting model to float64.
+Train dataset contains 48 samples.
+Time series values are 64-bits; casting model to float64.
+Train dataset contains 60 samples.
+Time series values are 64-bits; casting model to float64.
+Train dataset contains 72 samples.
+Time series values are 64-bits; casting model to float64.
