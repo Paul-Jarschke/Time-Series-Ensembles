@@ -1,0 +1,23 @@
+\begin{table}
+\caption{Ranking Forecasters and Ensemblers by Predictive Performance - Data Complexity: 3}
+\begin{tabular}{lllllll}
+\toprule
+ & MAPE & RMSE & sMAPE & MAPE Ranking & RMSE Ranking & sMAPE Ranking \\
+Model &  &  &  &  &  &  \\
+\midrule
+Weighted Ensemble: Inverse Variance & 0.029 & 2.577 & 1.901 & 1 & 1 & 1 \\
+Weighted Ensemble: Simple & 0.029 & 2.591 & 1.904 & 2 & 3 & 2 \\
+Weighted Ensemble: Inverse RMSE & 0.029 & 2.585 & 1.906 & 3 & 2 & 3 \\
+AutoSARIMA & 0.03 & 2.638 & 2.011 & 4 & 4 & 4 \\
+Exponential Smoothing & 0.031 & 2.744 & 2.056 & 5 & 5 & 5 \\
+Weighted Ensemble: Inverse Error Covariance & 0.031 & 2.764 & 2.062 & 6 & 6 & 6 \\
+AutoTheta & 0.032 & 2.822 & 2.137 & 7 & 8 & 7 \\
+Meta Ensemble: SVR & 0.032 & 2.927 & 2.156 & 8 & 10 & 8 \\
+Meta Ensemble: Random Forest & 0.033 & 2.918 & 2.186 & 9 & 9 & 9 \\
+Naive & 0.033 & 2.791 & 2.195 & 10 & 7 & 10 \\
+TiDE & 0.033 & 3.064 & 2.221 & 11 & 11 & 11 \\
+XGBoost & 0.035 & 3.181 & 2.328 & 12 & 12 & 12 \\
+STL & 0.045 & 4.0 & 2.98 & 13 & 13 & 13 \\
+\bottomrule
+\end{tabular}
+\end{table}

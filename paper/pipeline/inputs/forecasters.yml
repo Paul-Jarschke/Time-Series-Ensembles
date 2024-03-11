@@ -10,11 +10,16 @@ without_covariates:
     package: sktime
     options:
       strategy: last
-  Naive (drift):
-    model: NaiveForecaster
-    package: sktime
+#  Naive (drift):
+#    model: NaiveForecaster
+#    package: sktime
+#    options:
+#      strategy: drift
+  AutoTheta:
+    model: StatsForecastAutoTheta
+    package: darts
     options:
-      strategy: drift
+      season_length: 12
   AutoSARIMA:
     model: AutoARIMA
     package: sktime
@@ -34,9 +39,29 @@ without_covariates:
     options:
       trend: add
       seasonal: add
-  #    Theta:
-  #      model: ThetaForecaster
-  #      options: {}
+#  RNN:
+#    model: RNNModel
+#    package: darts
+#    options:
+#      model: RNN
+#      input_chunk_length: 12
+#  LSTM:
+#    model: RNNModel
+#    package: darts
+#    options:
+#      model: LSTM
+#      input_chunk_length: 12
+#      n_epochs: 50
+#  Theta:
+#    model: ThetaForecaster
+#    options: {}
+  TiDE:
+    model: TiDEModel
+    package: darts
+    options:
+      input_chunk_length: 12
+      output_chunk_length: 1
+      n_epochs: 60
   STL:
     model: STLForecaster
     package: sktime

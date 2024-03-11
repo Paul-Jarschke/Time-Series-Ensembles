@@ -164,7 +164,7 @@ def pipe3_ensemble_forecasts(
             for k in range(H_ensemble):
                 # Print forecast updates (console output)
                 if k + 1 in printed_k:
-                    vprint(f'...Forecast {k + 1} / {H_ensemble}')
+                    vprint(f'...Forecast {k + 1} / {H_ensemble} done')
                 # Current train size = Period at which forecast is made:
                 current_trainsize = ens_init_trainsize + k
                 current_ensemble_train = historical_individual_predictions.iloc[0:current_trainsize, :]

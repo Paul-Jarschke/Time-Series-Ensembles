@@ -9,6 +9,7 @@ from sktime.split import ExpandingWindowSplitter
 from src.utils.helpers import vprint
 from src.utils.mappings import SEASONAL_FREQ_MAPPING
 from src.utils.transformers import TRANSFORMERS
+from src.utils import csv_exporter
 
 
 def pipe2_individual_forecasts(
@@ -17,7 +18,7 @@ def pipe2_individual_forecasts(
         forecast_init_train,
         fh=None,
         select_forecasters="all",
-        autosarimax_refit_interval=0.33,
+        autosarimax_refit_interval=0.15,
         export_path=None,
         verbose=False,
         *args, **kwargs):
@@ -267,14 +268,29 @@ def pipe2_individual_forecasts(
             # Method and data transformer are inferred from package_name
             # darts forecasters use .historical_forecasts() method:
             if "darts" in package_name:
-                historical_predictions_model = model.historical_forecasts(
-                    series=y_train_transformed,
-                    start=init_trainsize,
-                    stride=1,
-                    forecast_horizon=1,
-                    past_covariates=X_train_transformed,  # Provide covariates
-                    show_warnings=False,
-                ).pd_dataframe()
+
+                if forecaster_name in ["TiDE", "LSTM", "RNN"]:
+                    retrain = 12
+                    model.fit(series=y_train_transformed[:init_trainsize], verbose=False)
+                    historical_predictions_model = model.historical_forecasts(
+                        series=y_train_transformed,
+                        start=init_trainsize,
+                        stride=1,
+                        retrain=retrain,
+                        forecast_horizon=1,
+                        past_covariates=X_train_transformed,  # Provide covariates
+                        show_warnings=False,
+                        verbose=False
+                    ).pd_dataframe()
+                else:
+                    historical_predictions_model = model.historical_forecasts(
+                        series=y_train_transformed,
+                        start=init_trainsize,
+                        stride=1,
+                        forecast_horizon=1,
+                        past_covariates=X_train_transformed,  # Provide covariates
+                        show_warnings=False,
+                    ).pd_dataframe()
 
                 # Transforming back to PeriodIndex for better readability
                 period_freq = (
@@ -304,7 +320,7 @@ def pipe2_individual_forecasts(
                         future_predictions_model = model.predict(
                             n=fh,
                             #series=target_transformed,
-                            #verbose=verbose,
+                            verbose=False,
                             show_warnings=False,
                         ).pd_dataframe()
 
@@ -431,7 +447,7 @@ def pipe2_individual_forecasts(
 
                         # Print forecast update
                         if k + 1 in printed_k:
-                            vprint(f"...forecast {k + 1} / {H}")
+                            vprint(f"...forecast {k + 1} / {H} done")
 
                         # Predict:
                         # Select last known X as predictor if using a covariate model
@@ -501,7 +517,7 @@ def pipe2_individual_forecasts(
     historical_predictions.insert(0, "Target", value=target_output)
 
     # # Export results as .csv if a path is specified
-    # csv_exporter(export_path, historical_predictions)
+    csv_exporter(export_path, historical_predictions)
 
     # Note: Consider working with DateTimeIndex frequencies again
 

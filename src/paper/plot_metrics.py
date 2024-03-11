@@ -135,22 +135,22 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
         return new_cmap
 
     # Plot data
-    cmap = plt.get_cmap("Blues_r")
-    cmap = truncate_colormap(cmap, n_benchmarks, 0.4, 0.6)
+    cmap = plt.get_cmap("RdPu_r")
+    cmap = truncate_colormap(cmap, n_benchmarks, 0.3, 0.6)
     models_data[benchmarks].copy().plot(
-        marker='D', linestyle='-', colormap=cmap)  #, linewidth=3)
+        marker='D', linestyle='-', colormap=cmap, alpha = 0.6)  #, linewidth=3)
     if n_weighted > 0:
         cmap = plt.get_cmap("YlGn")
         if n_weighted > 1:
             cmap = truncate_colormap(cmap, n_weighted, 0.3, 0.8)
         models_data[weighted_model_names].copy().plot(
-            marker='s', linestyle='-', ax=plt.gca(), colormap=cmap, alpha=0.95)
+            marker='s', linestyle='-', ax=plt.gca(), colormap=cmap, alpha=0.6, linewidth=0.8)
     if n_meta > 0:
-        cmap = plt.get_cmap("RdPu")
+        cmap = plt.get_cmap("Blues_r")
         if n_weighted > 1:
-            cmap = truncate_colormap(cmap, n_meta, 0.3, 0.8)
+            cmap = truncate_colormap(cmap, n_meta, 0.4, 0.6)
         models_data[meta_model_names].copy().plot(
-            marker='o', linestyle='-', ax=plt.gca(), colormap=cmap, alpha=0.95)
+            marker='o', linestyle='-', ax=plt.gca(), colormap=cmap, alpha=0.6, linewidth=0.8)
 
     # Labeling
     plt.xlabel('Complexity Level', fontsize=12, labelpad=10)
@@ -159,27 +159,43 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
     plt.title(f'Model Performance vs. Data Complexity', fontsize=18)
 
     # Add footnote for best individual forecasters
-    note = "Best individual forecasters:"
+    note1 = "Best Individual Forecasters:\n"
+    note2 = "(from left to right)"
+    note3 = ""
     for i, model_name in enumerate(best_model_names):
-        label = sort_labels[i]
-        if i == len(best_model_names) - 1:
-            note += f" and {model_name} ({label})."
-        elif i == 2: # new line
-            note += f" {model_name} ({label}),\n"
-        else:
-            note += f" {model_name} ({label}),"
-    plt.annotate(text=note,
-                 xy=(0.5, -0.2),
+        # label = sort_labels[i]
+        #if i == len(best_model_names) - 1:
+            #note2 += f" and {model_name} ({label})."
+        #elif i == 1 or i == 5: # new line
+            #note2 += f" {model_name} ({label}),\n"
+        #else:
+            #note2 += f" {model_name} ({label}),"
+        note3 += f"{i+1}) {model_name}\n"
+    plt.annotate(text=note1,
+                 xy=(1.05, 0.55),
                  xycoords='axes fraction',
-                 ha='center',
-                 va="center",
+                 ha='left',
+                 va="top",
+                 fontsize=10, weight="bold")
+    plt.annotate(text=note2,
+                 xy=(1.05, 0.53),
+                 xycoords='axes fraction',
+                 ha='left',
+                 va="top",
+                 fontsize=8)
+
+    plt.annotate(text=note3,
+                 xy=(1.05, 0.51),
+                 xycoords='axes fraction',
+                 ha='left',
+                 va="top",
                  fontsize=10)
 
     # Cropping and other formatting
     plt.legend()
     plt.grid(True)
-    plt.gcf().set_size_inches(8.57,6)
-    plt.subplots_adjust(right=0.7)  # # makes space for legend
+    plt.gcf().set_size_inches(8.57,9.5)  # 8.57 - 6
+    plt.subplots_adjust(right=0.7)  # # makes space for legend and note
     #plt.tight_layout(rect=(0, 0, 0.6, 1))  # makes space for legend
 
     # Set up pretty legend
@@ -240,7 +256,7 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
     )
     # Export
     if export:
-        plt.savefig(os.path.join(PLOT_DIR, "metrics_ranking.png"))
+        plt.savefig(os.path.join(PLOT_DIR, f"metrics_ranking_{metric}.png"))
         print("Export successful!")
 
     plt.show()

@@ -22,9 +22,6 @@ def inv_error_cov_weights(predictions, verbose=True):
     # Compute errors for each model
     errors = predictions.apply(lambda x: target - x)
 
-    # Compute the number of forecasters
-    n_models = len(errors.columns)
-
     # Calculate Error Covariance Matrix
     C = errors.cov()
     # Compute the inverse matrix
