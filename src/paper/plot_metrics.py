@@ -155,6 +155,7 @@ def plot_metrics(metric, data_dir=PAPERDATA_DIR, remove_models=None, sort_labels
     # Labeling
     plt.xlabel('Complexity Level', fontsize=12, labelpad=10)
     plt.ylabel(metric, fontsize=12)
+    # plt.yscale('log')
     plt.title(f'Model Performance vs. Data Complexity', fontsize=18)
 
     # Add footnote for best individual forecasters

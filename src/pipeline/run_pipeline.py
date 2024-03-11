@@ -116,7 +116,7 @@ def run_pipeline(df, models, metrics,
         if 'file_name' in df.attrs:
             file_name = df.attrs['file_name']
         else:
-            file_name = "output"
+            file_name = "input"
 
         # Outer loop requires DataFrames as dictionary to iterate over
         df_dict = {file_name: df}
@@ -164,7 +164,7 @@ def run_pipeline(df, models, metrics,
 
     for df_name, df in df_dict.items():
 
-        print_info = f" for {df_name if df_name != 'output' else ''}"
+        print_info = f" for {df_name} dataset"
 
         # Print pipeline start time
         vprint('================================================================================='
