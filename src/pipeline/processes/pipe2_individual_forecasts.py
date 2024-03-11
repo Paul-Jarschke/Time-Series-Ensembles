@@ -270,13 +270,24 @@ def pipe2_individual_forecasts(
             if "darts" in package_name:
 
                 if forecaster_name in ["TiDE", "LSTM", "RNN"]:
-                    retrain = 12
+                    # For monthly simulated data we took 12 and for business days 126 (half business year)
+                    if freq in ["M", "MS"]:
+                        retrain_freq = 12
+                    elif freq == "B":
+                        retrain_freq = 126
+                    elif freq == "D":
+                        retrain_freq = 183
+                    else:
+                        retrain_freq = autosarimax_refit_interval * H
+
+                    retrain = retrain_freq
+
                     model.fit(series=y_train_transformed[:init_trainsize], verbose=False)
                     historical_predictions_model = model.historical_forecasts(
                         series=y_train_transformed,
                         start=init_trainsize,
                         stride=1,
-                        retrain=retrain,
+                        retrain=retrain, # retrain = 12 for monthly data and retrain =
                         forecast_horizon=1,
                         past_covariates=X_train_transformed,  # Provide covariates
                         show_warnings=False,
