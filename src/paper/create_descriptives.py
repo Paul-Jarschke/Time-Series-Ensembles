@@ -21,15 +21,22 @@ def create_descriptives(file_names, filter_variables, directory=DATA_DIR):
                 df.index.to_period()
                 if inferred_freq in ['M', 'MS']:
                     fmt = "%Y-%m"
-                else:  # in ['D', 'B']:
+                elif inferred_freq in ['D', 'B']:
                     fmt = "%Y-%m-%d"
+                else:
+                    fmt = None
                 start = df.index.strftime(fmt)[0]
                 end = df.index.strftime(fmt)[-1]
                 start_end_df = pd.DataFrame({"start": [start] * len(df.columns), "end": [end] * len(df.columns)},
-                                            index=df
-                                            .columns)
+                                            index=df.columns)
+                missing = df.isna().sum(axis=0)
+                missing = missing.rename("NaN")
+                inferred_freq_df = pd.DataFrame({"freq": [inferred_freq] * len(df.columns)},
+                                            index=df.columns)
                 transposed_summary = df.describe().T
-                transposed_summary = pd.concat([start_end_df, transposed_summary, ], axis=1)
+                transposed_summary = pd.concat([start_end_df, transposed_summary, missing, inferred_freq_df], axis=1)
+
+                #transposed_summary = pd.concat([transposed_summary, missing_count, freq], axis=1)
 
                 descriptives = pd.concat([descriptives, transposed_summary], axis=0)
 

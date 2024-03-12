@@ -20,6 +20,7 @@ PAPER_PIPE_OUTPUT_DIR = os.path.join(PAPER_PIPE_DIR, "outputs")
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 SIMDATA_DIR = os.path.join(DATA_DIR, "simulated")
 TESTDATA_DIR = os.path.join(DATA_DIR, "test_data")
+EUR_USD_DIR = os.path.join(DATA_DIR, "eurusd")
 
 # User directory and subdirectories
 USER_DIR = os.path.join(ROOT_DIR, "user")

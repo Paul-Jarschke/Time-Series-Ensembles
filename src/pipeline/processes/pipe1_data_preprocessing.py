@@ -9,6 +9,7 @@ def pipe1_data_preprocessing(
         date_col='infer', date_format=None,
         target='infer', covariates='infer', exclude=None,
         agg_method=None, agg_freq=None,
+        export_path=None,
         verbose=False,
         *args, **kwargs):
     """
@@ -160,5 +161,8 @@ def pipe1_data_preprocessing(
     # Provide data insight
     vprint("\nData Insights:")
     vprint(pd.concat([target, covariates], axis=1).head())
+
+    # from src.utils import csv_exporter
+    # csv_exporter(export_path, target)
 
     return target, covariates
