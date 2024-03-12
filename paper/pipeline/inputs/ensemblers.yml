@@ -6,7 +6,7 @@
 # See models here:
 # sklearn: https://scikit-learn.org/stable/user_guide.html
 weighted:
-  Simple: equal_weights # Note that this is the ensembler's name! If you want to select_ensemblers, use this!
+  Simple: equal_weights # Note that the key "Simple" is the ensembler's name! If you want to select_ensemblers, use this!
   Inverse RMSE: inv_rmse_weights
   Inverse Variance: inv_variance_weights
   Inverse Error Covariance: inv_error_cov_weights
