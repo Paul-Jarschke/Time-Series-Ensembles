@@ -84,7 +84,7 @@ def pipe3_ensemble_forecasts(
            f'Initial training set has {ens_init_trainsize} observations and goes from '
            f'{historical_individual_predictions.index[0]} to '
            f'{historical_individual_predictions.index[ens_init_trainsize - 1]}',
-           f'\nIn an historical expanding window approach, there are {H_ensemble} periods to be forecasted by the '
+           f'\nIn a historical expanding window approach, there are {H_ensemble} periods to be forecasted by the '
            f'ensemble models: '
            f'{historical_individual_predictions.index[ens_init_trainsize]} to'
            f' {historical_individual_predictions.index[-1]}')
@@ -96,12 +96,12 @@ def pipe3_ensemble_forecasts(
         last_period = future_individual_predictions.to_timestamp().index[-1]
         if fh == 1:
             vprint(f"Out-of-sample predictions are generated for next period: "
-                   f"{(last_period + pd.DateOffset(n=-1))}")
+                   f"{(last_period + pd.DateOffset(n=-1))}")  # Change me to "to_offset" as in pipe2
         else:
             vprint(
                 f"Out-of-sample predictions are generated for the next {fh} periods: "
-                f"{(last_period + pd.DateOffset(n=-1))} "
-                f"to {(last_period + pd.DateOffset(n=fh))}")
+                f"{(last_period + pd.DateOffset(n=-1))} "  # Change me to "to_offset" as in pipe2
+                f"to {(last_period + pd.DateOffset(n=fh))}")  # Change me to "to_offset" as in pipe2
 
     # Create empty DataFrames for storing ensemble predictions
     historical_ensemble_predictions = pd.DataFrame()

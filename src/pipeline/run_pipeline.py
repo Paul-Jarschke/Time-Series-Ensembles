@@ -236,9 +236,12 @@ def run_pipeline(df, models, metrics,
             if step+1 != len(processes):
                 vprint(f'\n[Time elapsed: {strfdelta(datetime.now() - start_pipe)}]\n')
 
-        # Report logfile saving message
-        if export_path:
-            print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
+            # Report logfile saving message
+            if export_path:
+                print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
+            logger.handlers = [
+                h for h in logger.handlers if not isinstance(h, logging.FileHandler)]
+
 
         # Reporting total time elapsed
         end_pipe = datetime.now()

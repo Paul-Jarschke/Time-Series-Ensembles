@@ -108,7 +108,7 @@ def pipe4_metrics_ranking(
 
     # If future predictions are to be made, make a recommendation as to which model to choose based on metric ranking
     best_model = metrics_ranking.index[0]
-    vprint(f'\nThe \'{best_model}\' is identified as the best model based on the {sort_by} value of its the historical '
+    vprint(f'\nThe \'{best_model}\' is identified as the best model based on the {sort_by} value of its historical '
            f'predictions.')
     # Show the corresponding future predictions
     if fh is not None:

@@ -1,4 +1,4 @@
-# Note: Mode names are not allowed to duplicate between approaches!
+# Note: Model names are not allowed to duplicate between approaches!
 without_covariates:
   #    Prophet:
   #      model: Prophet

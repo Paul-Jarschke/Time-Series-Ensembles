@@ -112,7 +112,7 @@ def pipe2_individual_forecasts(
         f"{int(forecast_init_train * 100)}/{int(100 - forecast_init_train * 100)})...",
         f"Initial training set has {init_trainsize} observations " f"and goes from {target.index[0]} to"
         f" {target.index[init_trainsize - 1]}.",
-        f"\nIn an historical expanding window approach, there are {H} periods to be forecasted by the individual "
+        f"\nIn a historical expanding window approach, there are {H} periods to be forecasted by the individual "
         f"models: "
         f"{target.index[init_trainsize]} to {target.index[-1]}",
     )
