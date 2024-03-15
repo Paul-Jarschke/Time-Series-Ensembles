@@ -1,0 +1,2 @@
+Date,Naive,AutoTheta,AutoSARIMA,Exponential Smoothing,TiDE,STL,XGBoost,AutoSARIMAX with covariates,XGBoostCov with covariates,Weighted Ensemble: Simple,Weighted Ensemble: Inverse RMSE,Weighted Ensemble: Inverse Variance,Weighted Ensemble: Inverse Error Covariance,Meta Ensemble: SVR,Meta Ensemble: Random Forest
+2024-01,78.14465106887741,79.07146575231582,77.51535221344496,78.91575076203286,73.43967009366564,81.86042799871265,76.51575,77.59309021427458,75.235245,77.58793332495699,77.59691317785068,77.57958747550903,77.38028702843208,77.37853785275085,76.81110771075706

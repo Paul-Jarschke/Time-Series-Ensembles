@@ -1,0 +1,29 @@
+
+=========================================
+== Pipeline Step 1: Data Preprocessing ==
+=========================================
+
+Searching time information...
+Dates found in 'index' column!
+Inferred frequency: 15T
+Data goes from 2020-01-01 00:00 to 2024-02-06 00:00, resulting in 143713 observations.
+
+Aggregating data to frequency 'business day' using method 'last' and dropping NaNs...
+...finished!
+Data now has 1069 observations.
+
+Selecting target...
+Target: bid_close
+Covariates: None
+
+Data Insights:
+            bid_close
+datetime             
+2020-01-02    1.11702
+2020-01-03    1.11599
+2020-01-06    1.11948
+2020-01-07    1.11530
+2020-01-08    1.11124
+
+[Time elapsed: 00s]
+

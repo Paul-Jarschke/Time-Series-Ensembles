@@ -14,7 +14,6 @@ from src.pipeline.processes.pipe4_metrics_ranking import pipe4_metrics_ranking
 from src.utils.helpers import strfdelta, vprint
 
 
-# noinspection PyTypeChecker
 def run_pipeline(df, models, metrics,
                  fh=None,
                  start=None, end=None,
@@ -187,8 +186,8 @@ def run_pipeline(df, models, metrics,
                 os.makedirs(curr_export_path)
 
             # log_file_name = os.path.join(export_path, f""pipe_log_{start_pipe_formatted}.txt")
-            log_file_name = os.path.join(curr_export_path, 'pipe.log')
             # Output file
+            log_file_name = os.path.join(curr_export_path, 'pipe.log')
             fileHandler = logging.FileHandler(log_file_name)
             fileHandler.setFormatter(logging.Formatter('%(message)s'))
             logger.addHandler(fileHandler)
@@ -241,7 +240,6 @@ def run_pipeline(df, models, metrics,
                 print(f"Saving logfile to {os.path.join(export_path, 'log_file.log')}")
             logger.handlers = [
                 h for h in logger.handlers if not isinstance(h, logging.FileHandler)]
-
 
         # Reporting total time elapsed
         end_pipe = datetime.now()

@@ -13,7 +13,7 @@
 # GMSE: geometric_mean_squared_error
 MAPE: mean_absolute_percentage_error
 RMSE: root_mean_squared_error
-sMAPE: symmetric_mean_absolute_percentage_error
+# sMAPE: symmetric_mean_absolute_percentage_error
 # MdAPE: median_absolute_percentage_error
 # MSPE: mean_squared_percentage_error
 # MdSPE: median_squared_percentage_error

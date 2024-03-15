@@ -1,0 +1,2 @@
+Date,Naive,Naive (drift),AutoSARIMA,Exponential Smoothing,STL,XGBoost,Weighted Ensemble: Simple,Weighted Ensemble: Inverse RMSE,Weighted Ensemble: Inverse Variance,Weighted Ensemble: Inverse Error Covariance,Meta Ensemble: SVR,Meta Ensemble: Random Forest
+2024-02-07,1.07415,1.0741098595505618,1.07415,1.0743798613792763,1.0752853733827978,1.07327,1.0742241861969577,1.0741959143106434,1.0742211072095154,1.0742258915839145,1.0872242605145601,1.0734414000000008
