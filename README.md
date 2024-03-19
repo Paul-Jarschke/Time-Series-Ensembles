@@ -291,6 +291,6 @@ def run_pipeline(df, models, metrics,
     return output
 ```
 
-## :loveletter: Contact
+## :love_letter: Contact
 If you encounter any issues or have feedback, please don't hesitate to reach out to [Paul 
 Jarschke](https://www.linkedin.com/in/paul-jarschke-b4439b1a3/) and [Leon Löppert](https://www.linkedin.com/in/leonloeppert/) via LinkedIn.
