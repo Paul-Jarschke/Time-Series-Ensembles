@@ -1,5 +1,5 @@
-# The following metrics can be chosen:
-# just uncomment and the metric will be implemented in the ranking table
+# The following metrics can be chosen for performance evaluation.
+# Just uncomment and the metric will be show up in the ranking table.
 #
 # MASE: mean_absolute_scaled_error
 # MdASE: median_absolute_scaled_error

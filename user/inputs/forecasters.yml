@@ -1,24 +1,19 @@
-# Note: Model names are not allowed to duplicate between approaches!
-without_covariates:
-  #    Prophet:
-  #      model: Prophet
-  #      package: sktime
-  #      options:
-  #        freq: M
-  #        add_seasonality:
-  #          name: seasonality
-  #          period: 12
-  #          fourier_order: 12
-  Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
+# Note: Model names are not allowed to duplicate!
+# Below we add some sample forecasters.
+# You can add new forecasters as described in the ReadMe 
+# or activate/deactivate exisiting ones.
+#
+without_covariates:  # These models do not include covariates for fitting and prediction.
+  Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this string!
     model: NaiveForecaster
     package: sktime
     options:
       strategy: last
-  Naive (drift):
-    model: NaiveForecaster
-    package: sktime
+  AutoTheta:
+    model: StatsForecastAutoTheta
+    package: darts
     options:
-      strategy: drift
+      season_length: 5
   AutoSARIMA:
     model: AutoARIMA
     package: sktime
@@ -29,8 +24,8 @@ without_covariates:
       trace: False
       update_pdq: False
       with_intercept: auto
-      max_p: 6
-      max_q: 6
+      max_p: 5
+      max_q: 5
       suppress_warnings: True
   Exponential Smoothing:
     model: ExponentialSmoothing
@@ -38,19 +33,64 @@ without_covariates:
     options:
       trend: add
       seasonal: add
-  #    Theta:
-  #      model: ThetaForecaster
-  #      options: {}
   STL:
     model: STLForecaster
     package: sktime
-    options: { }
+    options: {}
   XGBoost:
     model: XGBModel
     package: darts
     options:
       lags: 10
-with_covariates:
+  # Naive (drift):
+  #   model: NaiveForecaster
+  #   package: sktime
+  #   options:
+  #     strategy: drift
+  # Theta:
+  #    model: ThetaForecaster
+  #    package: sktime
+  #    options: {}
+  # skProphet:
+  #    model: Prophet
+  #    package: sktime
+  #    options:
+  #      freq: M
+  #      add_seasonality:
+  #        name: seasonality
+  #        period: 12
+  #        fourier_order: 12
+  #  dartsProphet:
+  #    model: Prophet
+  #    package: darts
+  #    options:
+  #      add_seasonalities:
+  #        name: yearly_seasonality
+  #        seasonal_periods: 12
+  #        fourier_order: 10
+  # TiDE:
+  #    model: TiDEModel
+  #    package: darts
+  #    options:
+  #      input_chunk_length: 12
+  #      output_chunk_length: 1
+  #      n_epochs: 60
+  #  RNN:
+  #    model: RNNModel
+  #    package: darts
+  #    options:
+  #      model: RNN
+  #      input_chunk_length: 5
+  #  LSTM:
+  #    model: RNNModel
+  #    package: darts
+  #    options:
+  #      model: LSTM
+  #      input_chunk_length: 5
+  #      n_epochs: 50
+#
+with_covariates:  # These models do include covariates for fitting and prediction.
+# If you do not want to include covariate models just leave an empty {} behind the "with_covariates".
   AutoSARIMAX: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
     model: AutoARIMA
     package: sktime
@@ -61,13 +101,13 @@ with_covariates:
       trace: False
       update_pdq: False
       with_intercept: auto
-      max_p: 6
-      max_q: 6
+      max_p: 5
+      max_q: 5
       suppress_warnings: True
-#  XGBoost:
+#  XGBoostCov:
 #    model: XGBModel
 #    package: darts
 #    options:
-#      lags: 6
-#      lags_past_covariates: 6
+#      lags: 10
+#      lags_past_covariates: 10
 

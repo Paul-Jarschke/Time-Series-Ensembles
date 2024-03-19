@@ -1,20 +1,13 @@
-# Note: Model names are not allowed to duplicate between approaches!
-without_covariates:
-#  skProphet:
-#    model: Prophet
-#    package: sktime
-#    options:
-#      freq: M
-  Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
+# Note: Model names are not allowed to duplicate!
+# Below we add some sample forecasters.
+# You can add new forecasters as described in the ReadMe 
+# or activate/deactivate exisiting ones.
+without_covariates:  # These models do not include covariates for fitting and prediction.
+  Naive: # Note that this is the forecaster's name! If you want to select_forecasters, use this string string!
     model: NaiveForecaster
     package: sktime
     options:
       strategy: last
-#  Naive (drift):
-#    model: NaiveForecaster
-#    package: sktime
-#    options:
-#      strategy: drift
   AutoTheta:
     model: StatsForecastAutoTheta
     package: darts
@@ -39,6 +32,35 @@ without_covariates:
     options:
       trend: add
       seasonal: add
+  TiDE:
+    model: TiDEModel
+    package: darts
+    options:
+      input_chunk_length: 12
+      output_chunk_length: 1
+      n_epochs: 60
+  STL:
+    model: STLForecaster
+    package: sktime
+    options: {}
+  XGBoost:
+    model: XGBModel
+    package: darts
+    options:
+      lags: 10
+#  dartsProphet:
+#    model: Prophet
+#    package: darts
+#    options:
+#      add_seasonalities:
+#        name: yearly_seasonality
+#        seasonal_periods: 12
+#        fourier_order: 10
+#  Naive (drift):
+#    model: NaiveForecaster
+#    package: sktime
+#    options:
+#      strategy: drift
 #  RNN:
 #    model: RNNModel
 #    package: darts
@@ -54,33 +76,11 @@ without_covariates:
 #      n_epochs: 50
 #  Theta:
 #    model: ThetaForecaster
+#    package: sktime
 #    options: {}
-  TiDE:
-    model: TiDEModel
-    package: darts
-    options:
-      input_chunk_length: 12
-      output_chunk_length: 1
-      n_epochs: 60
-  STL:
-    model: STLForecaster
-    package: sktime
-    options: { }
-  XGBoost:
-    model: XGBModel
-    package: darts
-    options:
-      lags: 10
-#  dartsProphet:
-#    model: Prophet
-#    package: darts
-#    options:
-#      add_seasonalities:
-#        name: yearly_seasonality
-#        seasonal_periods: 12
-#        fourier_order: 10
-with_covariates:
-  AutoSARIMAX: # Note that this is the forecaster's name! If you want to select_forecasters, use this!
+with_covariates:  # These models do include covariates for fitting and prediction.
+# If you do not want to include covariate models just leave an empty {} behind the "with_covariates".
+  AutoSARIMAX: # Note that this is the forecaster's name! If you want to select_forecasters, use this string!
     model: AutoARIMA
     package: sktime
     options:

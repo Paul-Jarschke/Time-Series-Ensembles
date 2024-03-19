@@ -1,17 +1,23 @@
-# The pipeline accepts custom weighting schemes and regression metamodels from the sklearn library (by now)
-# I am not sure if models from other libraries work as well (not yet tested)
-# They should work, when they have a .fit(X_t, y_t) and a .predict(X_(t+1)) method
-# where X_t or X_(t+1) are the predictions from the individual models in period t or t+1
-# and y_t are the actual values in period t
+# You can easily add and remove ensembling approaches by commenting them out.
+# Further, you can add new meta models by levereging the sklearn library.
 # See models here:
 # sklearn: https://scikit-learn.org/stable/user_guide.html
+#
+# I am not sure if models from other libraries work as well (not yet tested).
+# They should work, when they have a .fit(X_t, y_t) and a .predict(X_(t+1)) method
+# where X_t or X_(t+1) are the predictions from the individual models in period t or t+1
+# and y_t are the actual values in period t.
+#
+# The framework also accepts custom weighting schemes placed in the src/models/ensemblers folder/weighted folder.
+#
 weighted:
-  Simple: equal_weights # Note that the key "Simple" is the ensembler's name! If you want to select_ensemblers, use this!
+  Simple: equal_weights # Note that the key "Simple" is the ensembler's name! If you want to select_ensemblers, use this string!
   Inverse RMSE: inv_rmse_weights
   Inverse Variance: inv_variance_weights
   Inverse Error Covariance: inv_error_cov_weights
+#
 meta:
-  SVR: # Note that this is the ensembler's name! If you want to select_ensemblers, use this!
+  SVR: # Note that this is the ensembler's name! If you want to select_ensemblers, use this string!
     model: SVR
     package: sklearn
     options:
@@ -22,3 +28,8 @@ meta:
     options:
       n_estimators: 100
       random_state: null
+#  Ridge:
+#    model: Ridge
+#    package: sklearn
+#    options:
+#      alpha: 0.5
